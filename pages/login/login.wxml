@@ -1,0 +1,164 @@
+<!--pages/login/login.wxml-->
+<view class="login-container">
+  <!-- 背景装饰 -->
+  <view class="bg-circle circle-1"></view>
+  <view class="bg-circle circle-2"></view>
+
+  <view class="glass-card">
+    <!-- 顶部标题 -->
+    <view class="login-header">
+      <view class="logo-area">
+        <image src="/models/logo (1).png" class="app-logo" mode="aspectFit"></image>
+      </view>
+      <text class="login-title">{{isLogin ? '欢迎回来' : '创建账号'}}</text>
+      <text class="login-subtitle">{{isLogin ? '登录您的HOMESEE账号' : '加入HOMESEE社区'}}</text>
+    </view>
+
+    <!-- 错误消息 -->
+    <view wx:if="{{errorMessage}}" class="error-message">
+      <icon type="warn" size="16" color="#ff6b6b"></icon>
+      <text>{{errorMessage}}</text>
+    </view>
+
+    <!-- 表单 -->
+    <form bindsubmit="handleSubmit" class="login-form">
+      <!-- 登录模式 -->
+      <block wx:if="{{isLogin}}">
+        <view class="input-group">
+          <svg-icon name="phone" size="36" color="#666" class="input-icon" />
+          <input 
+            name="phone"
+            type="number" 
+            placeholder="请输入手机号"
+            placeholder-class="input-placeholder"
+            value="{{formData.phone}}"
+            bindinput="onInputChange"
+            data-field="phone"
+            maxlength="11"
+            class="input-field"
+          />
+        </view>
+
+        <view class="input-group">
+          <svg-icon name="lock" size="36" color="#666" class="input-icon" />
+          <input 
+            name="password"
+            type="password" 
+            placeholder="请输入密码"
+            placeholder-class="input-placeholder"
+            value="{{formData.password}}"
+            bindinput="onInputChange"
+            data-field="password"
+            password
+            class="input-field"
+          />
+        </view>
+      </block>
+
+      <!-- 注册模式 -->
+      <block wx:else>
+        <view class="input-group">
+          <svg-icon name="user" size="36" color="#666" class="input-icon" />
+          <input 
+            name="username"
+            type="text" 
+            placeholder="用户名"
+            placeholder-class="input-placeholder"
+            value="{{formData.username}}"
+            bindinput="onInputChange"
+            bindblur="checkUsername"
+            data-field="username"
+            class="input-field"
+          />
+        </view>
+
+        <view class="input-group">
+          <svg-icon name="badge" size="36" color="#666" class="input-icon" />
+          <input 
+            name="realName"
+            type="text" 
+            placeholder="真实姓名"
+            placeholder-class="input-placeholder"
+            value="{{formData.realName}}"
+            bindinput="onInputChange"
+            data-field="realName"
+            class="input-field"
+          />
+        </view>
+
+        <view class="input-group">
+          <svg-icon name="phone" size="36" color="#666" class="input-icon" />
+          <input 
+            name="phone"
+            type="number" 
+            placeholder="手机号"
+            placeholder-class="input-placeholder"
+            value="{{formData.phone}}"
+            bindinput="onInputChange"
+            bindblur="checkPhone"
+            data-field="phone"
+            maxlength="11"
+            class="input-field"
+          />
+        </view>
+
+        <view class="input-group">
+          <svg-icon name="lock" size="36" color="#666" class="input-icon" />
+          <input 
+            name="password"
+            type="password" 
+            placeholder="设置密码（至少6位）"
+            placeholder-class="input-placeholder"
+            value="{{formData.password}}"
+            bindinput="onInputChange"
+            data-field="password"
+            password
+            class="input-field"
+          />
+        </view>
+
+        <view class="input-group">
+          <svg-icon name="lock" size="36" color="#666" class="input-icon" />
+          <input 
+            name="confirmPassword"
+            type="password" 
+            placeholder="确认密码"
+            placeholder-class="input-placeholder"
+            value="{{formData.confirmPassword}}"
+            bindinput="onInputChange"
+            data-field="confirmPassword"
+            password
+            class="input-field"
+          />
+        </view>
+      </block>
+
+      <!-- 提交按钮 -->
+      <button 
+        formType="submit" 
+        class="submit-btn {{loading ? 'loading' : ''}}"
+        hover-class="button-hover"
+        disabled="{{loading}}"
+      >
+        {{isLogin ? '登 录' : '注 册'}}
+        <view wx:if="{{loading}}" class="loading-spinner"></view>
+      </button>
+    </form>
+
+    <!-- 切换链接 -->
+    <view class="toggle-area">
+      <text class="toggle-text">{{isLogin ? '还没有账号？' : '已有账号？'}}</text>
+      <view class="toggle-btn" bindtap="toggleForm">
+        {{isLogin ? '立即注册' : '立即登录'}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部协议 -->
+  <view class="footer-agreement">
+    <text>登录即代表您同意</text>
+    <text class="link">《用户协议》</text>
+    <text>和</text>
+    <text class="link">《隐私政策》</text>
+  </view>
+</view>

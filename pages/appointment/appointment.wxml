@@ -1,0 +1,121 @@
+<!--pages/appointment/appointment.wxml-->
+<view class="container">
+  <!-- 房屋信息卡片 -->
+  <view class="house-card" wx:if="{{houseInfo}}">
+    <view class="house-header">
+      <text class="house-title">{{houseInfo.communityName}} {{houseInfo.buildingUnit || ''}}{{houseInfo.doorNumber}}</text>
+      <view class="house-status {{houseInfo.status === 0 ? 'status-available' : 'status-unavailable'}}">
+        {{houseInfo.status === 0 ? '在租' : '已下架'}}
+      </view>
+    </view>
+    <view class="house-info">
+      <view class="info-row">
+        <text class="label">租金：</text>
+        <text class="value price">{{houseInfo.rentPrice}}元/月</text>
+      </view>
+      <view class="info-row">
+        <text class="label">户型：</text>
+        <text class="value">{{houseInfo.roomArea}}㎡ | {{houseInfo.floorInfo}}</text>
+      </view>
+      <view class="info-row">
+        <text class="label">装修：</text>
+        <text class="value">{{houseInfo.decoration === 1 ? '毛坯' : houseInfo.decoration === 2 ? '简装' : houseInfo.decoration === 3 ? '精装' : '豪装'}}</text>
+      </view>
+      <view class="info-row">
+        <text class="label">地址：</text>
+        <text class="value address">{{houseInfo.province}}{{houseInfo.city}}{{houseInfo.district}}{{houseInfo.street}}{{houseInfo.communityName}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 预约表单 -->
+  <view class="form-card">
+    <view class="form-title">填写预约信息</view>
+    
+    <view class="form-item">
+      <text class="label">期望日期 <text class="required">*</text></text>
+      <picker mode="date" value="{{preferredDate}}" start="{{minDate}}" bindchange="onDateChange">
+        <view class="picker {{preferredDate ? '' : 'placeholder'}}">
+          {{preferredDate || '请选择日期'}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="label">期望时间 <text class="required">*</text></text>
+      <picker range="{{timeSlots}}" bindchange="onTimeChange">
+        <view class="picker {{preferredTimeSlot ? '' : 'placeholder'}}">
+          {{preferredTimeSlot || '请选择时间段'}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="label">看房方式 <text class="required">*</text></text>
+      <picker range="{{appointmentTypes}}" range-key="label" bindchange="onTypeChange">
+        <view class="picker">
+          {{appointmentType === '1' ? '现场看房' : '视频看房'}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="label">租客人数 <text class="required">*</text></text>
+      <input type="number" placeholder="请输入人数" value="{{tenantCount}}" bindinput="onTenantCountInput" />
+    </view>
+
+    <view class="form-item">
+      <text class="label">入住日期 <text class="required">*</text></text>
+      <picker mode="date" value="{{expectedMoveInDate}}" start="{{minDate}}" bindchange="onMoveInDateChange">
+        <view class="picker {{expectedMoveInDate ? '' : 'placeholder'}}">
+          {{expectedMoveInDate || '请选择日期'}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="label">联系人 <text class="required">*</text></text>
+      <input type="text" placeholder="请输入姓名" value="{{contactName}}" bindinput="onNameInput" />
+    </view>
+
+    <view class="form-item">
+      <text class="label">联系电话 <text class="required">*</text></text>
+      <input type="number" placeholder="请输入手机号" value="{{contactPhone}}" bindinput="onPhoneInput" />
+    </view>
+
+    <view class="form-item">
+      <text class="label">微信号</text>
+      <input type="text" placeholder="选填" value="{{wechatId}}" bindinput="onWechatInput" />
+    </view>
+
+    <view class="form-item vertical">
+      <text class="label">租赁意向</text>
+      <textarea placeholder="请描述您的需求（选填）" value="{{rentalIntention}}" bindinput="onIntentionInput" auto-height />
+    </view>
+  </view>
+
+  <view class="submit-area">
+    <button class="submit-btn" bindtap="submitAppointment" disabled="{{submitting}}">
+      {{submitting ? '提交中...' : '提交预约'}}
+    </button>
+  </view>
+
+  <!-- 预约成功弹窗 -->
+  <view class="modal-overlay" wx:if="{{showSuccessModal}}">
+    <view class="modal-content">
+      <view class="modal-header">
+        <icon type="success" size="50" color="#28a745"/>
+        <text class="modal-title">预约成功！</text>
+      </view>
+      <view class="modal-body">
+        <view class="modal-msg">您的预约已提交成功，预约编号：</view>
+        <view class="appointment-number">{{appointmentNumber}}</view>
+        <view class="modal-tip">业务员会尽快与您联系确认看房事宜。</view>
+      </view>
+      <view class="modal-actions">
+        <button class="modal-btn secondary" bindtap="goBack">返回列表</button>
+        <button class="modal-btn primary" bindtap="goToMyAppointments">查看我的预约</button>
+      </view>
+    </view>
+  </view>
+</view>

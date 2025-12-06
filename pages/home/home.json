@@ -1,0 +1,6 @@
+{
+    "usingComponents": {
+        "DinoOverlay": "/components/dino-overlay/dino-overlay"
+    },
+    "navigationBarTitleText": "HOMESEE"
+}

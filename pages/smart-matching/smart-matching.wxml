@@ -1,0 +1,107 @@
+<!--pages/smart-matching/smart-matching.wxml-->
+<view class="chat-container">
+  <!-- 顶部标题 -->
+  <view class="chat-header">
+    <view class="header-content">
+      <view class="title">智能租房助手</view>
+      <view class="subtitle">基于 DeepSeek AI 为您提供个性化建议</view>
+    </view>
+  </view>
+
+  <!-- 消息列表 -->
+  <scroll-view 
+    class="chat-messages" 
+    scroll-y 
+    scroll-top="{{scrollTop}}"
+    scroll-with-animation
+    enable-back-to-top
+  >
+    <view class="message-list">
+      <view 
+        wx:for="{{messages}}" 
+        wx:key="timestamp" 
+        class="message {{item.role === 'user' ? 'user-message' : 'ai-message'}}"
+      >
+        <!-- 头像 -->
+        <view class="message-avatar">
+          <image 
+            wx:if="{{item.role === 'user'}}" 
+            src="{{avatarUrl}}" 
+            mode="aspectFill" 
+            class="avatar-img"
+          />
+          <view wx:else class="ai-avatar">AI</view>
+        </view>
+
+        <!-- 内容 -->
+        <view class="message-content">
+          <view class="message-bubble">
+            <block wx:for="{{item.parsedContent}}" wx:key="index" wx:for-item="node">
+              <text wx:if="{{node.type === 'text'}}" user-select>{{node.text}}</text>
+              <text wx:if="{{node.type === 'bold'}}" class="bold-text" user-select>{{node.text}}</text>
+              <text wx:if="{{node.type === 'title'}}" class="bold-title" user-select>{{node.text}}</text>
+              
+              <!-- 单个链接 (Fallback) -->
+              <text 
+                wx:if="{{node.type === 'link'}}" 
+                class="link-text" 
+                bindtap="handleLinkTap" 
+                data-type="{{node.linkType}}" 
+                data-id="{{node.id}}"
+              >{{node.text}}</text>
+
+              <!-- 链接组 (VR | 预约) -->
+              <view wx:if="{{node.type === 'link-group'}}" class="link-group">
+                <block wx:for="{{node.items}}" wx:key="i" wx:for-item="item">
+                  <text 
+                    wx:if="{{item.type === 'link'}}" 
+                    class="link-text" 
+                    bindtap="handleLinkTap" 
+                    data-type="{{item.linkType}}" 
+                    data-id="{{item.id}}"
+                  >{{item.text}}</text>
+                  <text wx:if="{{item.type === 'text'}}" class="separator">{{item.text}}</text>
+                </block>
+              </view>
+            </block>
+          </view>
+        </view>
+      </view>
+
+      <!-- 加载中 -->
+      <view wx:if="{{loading}}" class="message ai-message">
+        <view class="message-avatar">
+          <view class="ai-avatar">AI</view>
+        </view>
+        <view class="message-content">
+          <view class="message-bubble typing-indicator">
+            <view class="dot"></view>
+            <view class="dot"></view>
+            <view class="dot"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 输入区域 -->
+  <view class="chat-input-area">
+    <view class="input-wrapper">
+      <input 
+        class="chat-input" 
+        value="{{userInput}}" 
+        bindinput="handleInput" 
+        bindconfirm="sendMessage"
+        confirm-type="send"
+        placeholder="请输入您的租房需求..."
+      />
+      <button 
+        class="send-btn {{!userInput || loading ? 'disabled' : ''}}" 
+        bindtap="sendMessage"
+        disabled="{{!userInput || loading}}"
+      >
+        发送
+      </button>
+    </view>
+  </view>
+</view>

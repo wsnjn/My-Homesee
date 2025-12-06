@@ -1,0 +1,72 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/home/home",
+    "pages/house-selection/house-selection",
+    "pages/smart-matching/smart-matching",
+    "pages/community/community",
+    "pages/house-tour/house-tour",
+    "pages/maintenance/maintenance",
+    "pages/my-appointments/my-appointments",
+    "pages/user-profile/user-profile",
+    "pages/friend-circle/friend-circle",
+    "pages/chat-area/chat-area",
+    "pages/admin/admin",
+    "pages/landlord/landlord",
+    "pages/appointment/appointment",
+    "pages/maintenance-list/maintenance-list",
+    "pages/index/index",
+    "pages/logs/logs",
+    "pages/interactive-cube/interactive-cube"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "HOMESEE",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#f8f9fa",
+    "backgroundTextStyle": "light",
+    "enablePullDownRefresh": false
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#2c3e50",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/house-selection/house-selection",
+        "text": "找房"
+      },
+      {
+        "pagePath": "pages/smart-matching/smart-matching",
+        "text": "匹配"
+      }
+    ]
+  },
+  "style": "v2",
+  "usingComponents": {
+    "svg-icon": "/components/svg-icon/svg-icon"
+  },
+  "componentFramework": "glass-easel",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于推荐附近的房源"
+    },
+    "scope.camera": {
+      "desc": "需要访问相机进行AR看房和图片上传"
+    },
+    "scope.record": {
+      "desc": "需要访问麦克风进行语音交互"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation",
+    "chooseLocation"
+  ]
+}

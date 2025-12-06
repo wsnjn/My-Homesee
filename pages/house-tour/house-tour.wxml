@@ -1,0 +1,59 @@
+<!--pages/house-tour/house-tour.wxml-->
+<!-- 使用flex布局，canvas占据80%高度，场景选择器占据20%高度 -->
+<view class="vr-page">
+  <!-- VR Canvas - 占据80%高度 -->
+  <canvas 
+    type="webgl" 
+    id="webgl" 
+    class="vr-canvas"
+    bindtouchstart="onTouchStart" 
+    bindtouchmove="onTouchMove" 
+    bindtouchend="onTouchEnd"
+  ></canvas>
+  
+  <!-- UI 层 - 只覆盖在canvas区域 -->
+  <cover-view class="ui-layer">
+    <!-- Loading overlay -->
+    <cover-view class="loading-overlay" wx:if="{{loading}}">
+      <cover-view class="loading-content">
+        <cover-view class="loading-spinner-wrap">
+          <cover-view class="loading-spinner"></cover-view>
+        </cover-view>
+        <cover-view class="loading-text">加载VR全景中...</cover-view>
+      </cover-view>
+    </cover-view>
+    
+    <!-- Error message -->
+    <cover-view class="error-overlay" wx:if="{{error}}">
+      <cover-view class="error-content">
+        <cover-view class="error-text">{{error}}</cover-view>
+      </cover-view>
+    </cover-view>
+    
+    <!-- Scene info -->
+    <cover-view class="scene-info" wx:if="{{currentScene && !loading}}">
+      <cover-view class="scene-info-text">{{currentScene.scene.title || '未知场景'}}</cover-view>
+    </cover-view>
+    
+    <!-- Navigation hint -->
+    <cover-view class="navigation-hint" wx:if="{{!loading && !error}}">
+      <cover-view class="hint-text">拖动屏幕旋转视角</cover-view>
+    </cover-view>
+  </cover-view>
+  
+  <!-- Scene selector - 独立的20%高度区域 -->
+  <view class="scene-selector" wx:if="{{naviData.length >= 1 && !loading}}">
+    <view class="scene-tabs">
+      <view 
+        wx:for="{{naviData}}" 
+        wx:key="index"
+        class="scene-tab {{currentSceneIndex === index ? 'active' : ''}}"
+        bindtap="onSceneSelect"
+        data-index="{{index}}"
+      >
+        <view class="scene-tab-icon">{{index + 1}}</view>
+        <view class="scene-tab-name">{{item.scene.title}}</view>
+      </view>
+    </view>
+  </view>
+</view>

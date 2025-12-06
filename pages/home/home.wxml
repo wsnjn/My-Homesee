@@ -1,0 +1,121 @@
+<view class="home-container">
+  <DinoOverlay />
+  <!-- 顶部导航栏 -->
+  <view class="navbar {{isScrolled ? 'scrolled' : ''}}">
+    <view class="nav-content">
+      <view class="logo-container">
+        <image src="/models/logo (1).png" class="nav-logo-canvas" mode="aspectFit"></image>
+        <text class="logo-text">HOMESEE</text>
+      </view>
+      
+      <view class="nav-links-container">
+        <!-- 用户信息区域 -->
+        <view class="user-info-container" wx:if="{{isLoggedIn}}">
+          <button class="button-message" catchtap="toggleUserMenu">
+            <view class="content-avatar">
+              <view class="status-user"></view>
+              <view class="avatar">
+                <image src="{{avatarUrl}}" class="user-img" mode="aspectFill"></image>
+              </view>
+            </view>
+            <view class="notice-content">
+              <view class="username">{{displayName}}</view>
+              <view class="lable-message">{{user.phone}}</view>
+              <view class="user-id">@{{user.username}}</view>
+            </view>
+          </button>
+          
+          <!-- 用户菜单下拉框 -->
+          <view wx:if="{{showUserMenu}}" class="user-menu">
+            <view class="menu-item" bindtap="navigateToUserProfile">
+              <svg-icon name="user" size="32" color="#666" style="margin-right: 10rpx;" /> 个人信息
+            </view>
+            <view class="menu-item" bindtap="logout">
+              <svg-icon name="door" size="32" color="#666" style="margin-right: 10rpx;" /> 退出登录
+            </view>
+          </view>
+        </view>
+        
+        <button wx:else bindtap="navigateToLogin" class="nav-link login-btn">登录 / 注册</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- Hero Section -->
+  <view class="hero-section">
+    <view class="hero-content">
+      <view class="hero-title">发现理想生活</view>
+      <view class="hero-subtitle">专业的租房平台，为您提供优质的房屋租赁服务</view>
+      <view class="hero-actions">
+        <button class="primary-btn" bindtap="navigateToHouseSelection">
+          开始找房
+          <text>→</text>
+        </button>
+        <button class="secondary-btn" bindtap="navigateToSmartMatching">
+          智能匹配
+        </button>
+      </view>
+    </view>
+    <view class="hero-background">
+      <view class="blob blob-1"></view>
+      <view class="blob blob-2"></view>
+      <view class="blob blob-3"></view>
+    </view>
+  </view>
+
+  <!-- 主内容区域 -->
+  <view class="main-content">
+    <!-- 特性卡片 -->
+    <view class="features-section">
+      <view class="section-title">核心功能</view>
+      <view class="features-grid">
+        <view 
+          wx:for="{{features}}" 
+          wx:key="id" 
+          class="feature-card" 
+          bindtap="navigateToFeature"
+          data-page="{{item.page}}"
+          style="border-top: 8rpx solid; border-image: {{item.color}} 1"
+        >
+          <view class="card-icon" style="background: {{item.color}}">
+            <svg-icon wx:if="{{item.icon === 'vr'}}" name="vr" color="#fff" size="48" />
+            <svg-icon wx:elif="{{item.icon === 'match'}}" name="match" color="#fff" size="48" />
+            <svg-icon wx:elif="{{item.icon === 'safe'}}" name="safe" color="#fff" size="48" />
+            <svg-icon wx:elif="{{item.icon === 'fix'}}" name="fix" color="#fff" size="48" />
+            <svg-icon wx:elif="{{item.icon === 'community'}}" name="community" color="#fff" size="48" />
+            <svg-icon wx:elif="{{item.icon === 'virtual'}}" name="virtual" color="#fff" size="48" />
+            <svg-icon wx:else name="vr" color="#fff" size="48" />
+          </view>
+          <view class="feature-title">{{item.name}}</view>
+          <view class="feature-description">{{item.description}}</view>
+          <view class="link-text">
+            立即体验 <text class="arrow">→</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 预约信息概览 (仅登录显示) -->
+    <view wx:if="{{isLoggedIn && appointments.length > 0}}" class="appointments-section">
+      <view class="section-header">
+        <view class="section-title">我的预约</view>
+        <view class="view-all-btn" bindtap="navigateToMyAppointments">查看全部</view>
+      </view>
+      
+      <view class="appointments-list">
+        <view wx:for="{{appointments}}" wx:key="id" wx:if="{{index < 3}}" class="appointment-card">
+          <view class="apt-status {{item.statusClass}}">
+            {{item.statusText}}
+          </view>
+          <view class="apt-info">
+            <view class="apt-time">{{item.formattedTime}}</view>
+            <view class="apt-type">{{item.typeText}}</view>
+          </view>
+          <view class="apt-action">
+            <button class="detail-btn" bindtap="navigateToMyAppointments">详情</button>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

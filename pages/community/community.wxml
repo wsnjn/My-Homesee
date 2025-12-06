@@ -1,0 +1,294 @@
+<!--pages/community/community.wxml-->
+<view class="community-container">
+  <!-- 顶部Tab导航 -->
+  <view class="top-tabs">
+    <view 
+      class="tab-item {{currentTab === 'chat' ? 'active' : ''}}" 
+      bindtap="switchTab" 
+      data-tab="chat"
+    >
+      <svg-icon name="message" size="18" color="{{currentTab === 'chat' ? '#3b82f6' : '#64748b'}}" />
+      <text>聊天</text>
+    </view>
+    <view 
+      class="tab-item {{currentTab === 'feed' ? 'active' : ''}}" 
+      bindtap="switchTab" 
+      data-tab="feed"
+    >
+      <svg-icon name="globe" size="18" color="{{currentTab === 'feed' ? '#3b82f6' : '#64748b'}}" />
+      <text>社区</text>
+    </view>
+    <view 
+      class="tab-item {{currentTab === 'circle' ? 'active' : ''}}" 
+      bindtap="switchTab" 
+      data-tab="circle"
+    >
+      <svg-icon name="users" size="18" color="{{currentTab === 'circle' ? '#3b82f6' : '#64748b'}}" />
+      <text>朋友圈</text>
+    </view>
+  </view>
+
+  <!-- 聊天Tab内容 -->
+  <view class="chat-content" wx:if="{{currentTab === 'chat'}}">
+    <!-- 用户信息 -->
+    <view class="user-profile" wx:if="{{userInfo}}">
+      <image class="profile-avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <view class="profile-info">
+        <text class="profile-name">{{userInfo.username || userInfo.realName || '用户'}}</text>
+        <view class="profile-status">
+          <view class="status-dot"></view>
+          <text>在线</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 群组/好友切换 -->
+    <view class="chat-tabs">
+      <view class="chat-tab {{chatTab === 'groups' ? 'active' : ''}}" bindtap="switchChatTab" data-tab="groups">
+        <svg-icon name="users" size="16" color="{{chatTab === 'groups' ? '#3b82f6' : '#6b7280'}}" />
+        <text>群组</text>
+      </view>
+      <view class="chat-tab {{chatTab === 'friends' ? 'active' : ''}}" bindtap="switchChatTab" data-tab="friends">
+        <svg-icon name="user" size="16" color="{{chatTab === 'friends' ? '#3b82f6' : '#6b7280'}}" />
+        <text>好友</text>
+      </view>
+    </view>
+
+    <!-- 群组列表 -->
+    <scroll-view scroll-y class="chat-list" wx:if="{{chatTab === 'groups'}}">
+      <view class="list-header">
+        <text>我的群组</text>
+        <view class="add-btn" bindtap="showCreateGroup">
+          <svg-icon name="plus" size="16" color="#3b82f6" />
+        </view>
+      </view>
+      <view class="empty-hint" wx:if="{{groups.length === 0}}">暂无群组</view>
+      <view 
+        class="chat-item {{activeGroup && activeGroup.id === item.id ? 'active' : ''}}" 
+        wx:for="{{groups}}" 
+        wx:key="id"
+        bindtap="selectGroup"
+        data-group="{{item}}"
+      >
+        <!-- 私聊显示好友头像 -->
+        <image 
+          wx:if="{{item.groupType === 3}}"
+          class="item-avatar friend-type" 
+          src="{{item.displayAvatar || '/images/default-avatar.png'}}" 
+          mode="aspectFill"
+        ></image>
+        <!-- 群组显示群组图标 -->
+        <view wx:else class="item-avatar group-type">
+          <svg-icon name="users" size="20" color="#fff" />
+        </view>
+        <view class="item-info">
+          <text class="item-name">{{item.displayName || item.groupName}}</text>
+          <text class="item-desc">{{item.groupType === 1 ? '全局群' : (item.groupType === 2 ? '租客群' : (item.groupType === 3 ? '好友' : '群组'))}}</text>
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- 好友列表 -->
+    <scroll-view scroll-y class="chat-list" wx:if="{{chatTab === 'friends'}}">
+      <view class="list-header">
+        <text>我的好友</text>
+        <view class="add-btn" bindtap="showAddFriend">
+          <svg-icon name="plus" size="16" color="#3b82f6" />
+        </view>
+      </view>
+      
+      <!-- 好友申请 -->
+      <view class="pending-section" wx:if="{{pendingRequests.length > 0}}">
+        <view class="section-label">好友申请</view>
+        <view class="pending-item" wx:for="{{pendingRequests}}" wx:key="id">
+          <text class="pending-name">{{item.requesterName || '用户' + item.requesterId}}</text>
+          <view class="pending-actions">
+            <view class="accept-btn" catchtap="respondRequest" data-id="{{item.id}}" data-status="1">
+              <svg-icon name="check" size="14" color="#fff" />
+            </view>
+            <view class="reject-btn" catchtap="respondRequest" data-id="{{item.id}}" data-status="2">
+              <svg-icon name="close" size="14" color="#fff" />
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="empty-hint" wx:if="{{friends.length === 0}}">暂无好友</view>
+      <view class="chat-item" wx:for="{{friends}}" wx:key="id">
+        <image class="item-avatar friend-type" src="{{item.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+        <view class="item-info">
+          <text class="item-name">{{item.username}}</text>
+          <text class="item-desc">在线</text>
+        </view>
+        <view class="chat-btn" catchtap="startPrivateChat" data-friend="{{item}}">
+          <svg-icon name="message" size="16" color="#3b82f6" />
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 聊天窗口 -->
+  <view class="chat-window" wx:if="{{currentTab === 'chat' && activeGroup}}">
+    <view class="chat-header">
+      <view class="back-btn" bindtap="closeChat">
+        <svg-icon name="arrow-left" size="20" color="#333" />
+      </view>
+      <text class="chat-title">{{activeGroup.displayName || activeGroup.groupName}}</text>
+    </view>
+
+    <scroll-view 
+      scroll-y 
+      class="messages-container" 
+      scroll-into-view="{{scrollToMessage}}"
+      scroll-with-animation
+    >
+      <view 
+        class="message-wrapper {{item.senderId === userId ? 'self' : ''}}" 
+        wx:for="{{messages}}" 
+        wx:key="id"
+        id="msg-{{item.id}}"
+      >
+        <image 
+          class="message-avatar" 
+          wx:if="{{item.senderId !== userId}}"
+          src="{{item.senderAvatar || '/images/default-avatar.png'}}" 
+          mode="aspectFill"
+        ></image>
+        <view class="message-content">
+          <text class="sender-name" wx:if="{{item.senderId !== userId}}">{{item.senderName}}</text>
+          <view class="message-bubble">
+            <text class="msg-text">{{item.content}}</text>
+            <text class="msg-time">{{item.formattedTime}}</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="input-area">
+      <input 
+        class="message-input"
+        placeholder="输入消息..."
+        value="{{newMessage}}"
+        bindinput="onMessageInput"
+        bindconfirm="sendMessage"
+        confirm-type="send"
+      />
+      <button class="send-btn" bindtap="sendMessage">
+        <svg-icon name="send" size="20" color="#fff" />
+      </button>
+    </view>
+  </view>
+
+  <!-- 社区动态Tab -->
+  <scroll-view scroll-y class="post-list" bindscrolltolower="onReachBottom" wx:if="{{currentTab === 'feed' || currentTab === 'circle'}}">
+    <view class="filter-bar">
+      <text class="filter-title">{{currentTab === 'feed' ? '社区动态' : '朋友圈'}}</text>
+      <view class="filter-select" bindtap="toggleFilter" wx:if="{{currentTab === 'feed'}}">
+        <text>{{feedFilter === 'all' ? '全部' : '热门'}}</text>
+        <svg-icon name="arrow-down" size="14" color="#666" />
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{!loading && posts.length === 0}}">
+      <svg-icon name="empty" size="80" color="#ccc" />
+      <text>暂无动态</text>
+    </view>
+
+    <view class="post-card" wx:for="{{posts}}" wx:key="id">
+      <view class="post-header">
+        <image class="post-avatar" src="{{item.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+        <view class="user-info">
+          <text class="username">{{item.username || '用户' + item.userId}}</text>
+          <text class="time">{{item.formattedTime || item.createdTime}}</text>
+        </view>
+        <view class="visibility-badge {{item.visibility === 1 ? 'friends-only' : 'public'}}">
+          {{item.visibility === 1 ? '仅好友' : '公开'}}
+        </view>
+      </view>
+      
+      <view class="post-content">
+        <text class="content-text">{{item.content}}</text>
+        <view class="post-media" wx:if="{{item.mediaList && item.mediaList.length > 0}}">
+          <image 
+            wx:for="{{item.mediaList}}" 
+            wx:for-item="media" 
+            wx:key="*this"
+            class="media-image {{item.mediaList.length === 1 ? 'single' : ''}}"
+            src="{{media}}"
+            mode="aspectFill"
+            catchtap="previewImage"
+            data-urls="{{item.mediaList}}"
+            data-current="{{media}}"
+          ></image>
+        </view>
+      </view>
+      
+      <view class="post-footer">
+        <view class="footer-btn {{item.liked ? 'active' : ''}}" catchtap="toggleLike" data-id="{{item.id}}" data-index="{{index}}">
+          <svg-icon name="heart" size="18" color="{{item.liked ? '#ff6b6b' : '#666'}}" />
+          <text>{{item.likeCount || '赞'}}</text>
+        </view>
+        <view class="footer-btn" catchtap="toggleComments" data-id="{{item.id}}" data-index="{{index}}">
+          <svg-icon name="message" size="18" color="#666" />
+          <text>{{item.commentCount || '评论'}}</text>
+        </view>
+        <button class="footer-btn" open-type="share">
+          <svg-icon name="share" size="18" color="#666" />
+          <text>分享</text>
+        </button>
+      </view>
+
+      <view class="comments-section" wx:if="{{item.showComments}}">
+        <view class="comment-list" wx:if="{{item.comments && item.comments.length > 0}}">
+          <view class="comment-item" wx:for="{{item.comments}}" wx:for-item="comment" wx:key="id">
+            <text class="comment-user">{{comment.username || '用户' + comment.userId}}:</text>
+            <text class="comment-content">{{comment.content}}</text>
+          </view>
+        </view>
+        <view class="comment-input-area">
+          <input 
+            class="comment-input"
+            placeholder="写下评论..."
+            value="{{item.newComment}}"
+            bindinput="onCommentInput"
+            data-index="{{index}}"
+          />
+          <button class="comment-send-btn" catchtap="submitComment" data-index="{{index}}">发送</button>
+        </view>
+      </view>
+    </view>
+
+    <view class="loading-more" wx:if="{{loading}}">加载中...</view>
+    <view class="no-more" wx:if="{{!hasMore && posts.length > 0}}">没有更多了</view>
+  </scroll-view>
+
+  <!-- 发布按钮 -->
+  <view class="fab-btn" bindtap="handlePost" wx:if="{{currentTab !== 'chat' || !activeGroup}}">
+    <svg-icon name="plus" size="28" color="#fff" />
+  </view>
+
+  <!-- 创建群组弹窗 -->
+  <view class="modal-overlay" wx:if="{{showGroupModal}}" catchtap="hideModal">
+    <view class="modal-content" catchtap="">
+      <text class="modal-title">创建群组</text>
+      <input class="modal-input" placeholder="群组名称" value="{{newGroupName}}" bindinput="onGroupNameInput" />
+      <textarea class="modal-textarea" placeholder="群公告（可选）" value="{{newGroupAnnouncement}}" bindinput="onGroupAnnouncementInput"></textarea>
+      <view class="modal-actions">
+        <button class="btn-cancel" bindtap="hideModal">取消</button>
+        <button class="btn-confirm" bindtap="createGroup">创建</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 添加好友弹窗 -->
+  <view class="modal-overlay" wx:if="{{showFriendModal}}" catchtap="hideModal">
+    <view class="modal-content" catchtap="">
+      <text class="modal-title">添加好友</text>
+      <input class="modal-input" placeholder="输入手机号" value="{{friendPhone}}" bindinput="onFriendPhoneInput" type="number" />
+      <view class="modal-actions">
+        <button class="btn-cancel" bindtap="hideModal">取消</button>
+        <button class="btn-confirm" bindtap="sendFriendRequest">发送请求</button>
+      </view>
+    </view>
+  </view>
+</view>

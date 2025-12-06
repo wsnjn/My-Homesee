@@ -1,0 +1,3 @@
+<view class="svg-icon-container" style="width: {{size}}rpx; height: {{size}}rpx; color: {{color}};">
+  <image wx:if="{{src}}" src="{{src}}" class="svg-image" mode="aspectFit" />
+</view>

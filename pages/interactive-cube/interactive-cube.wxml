@@ -1,0 +1,7 @@
+<view class="container">
+  <view class="title">交互方块</view>
+  <view class="subtitle">探索全息交互的未来实验场</view>
+  <view class="content">
+    <text>这里将展示3D交互方块功能。</text>
+  </view>
+</view>

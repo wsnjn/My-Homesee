@@ -1,0 +1,242 @@
+/* pages/house-tour/house-tour.wxss */
+
+/* 页面容器 - 使用flex布局 */
+.vr-page {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Canvas 样式 - 占据80%高度 */
+.vr-canvas {
+  width: 100%;
+  height: 80vh; /* 占据80%视口高度 */
+  flex-shrink: 0;
+}
+
+/* UI 覆盖层 - 只覆盖canvas区域 */
+.ui-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80vh; /* 与canvas相同高度 */
+  pointer-events: none;
+}
+
+/* Loading overlay */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loading-spinner-wrap {
+  width: 80rpx;
+  height: 80rpx;
+  margin-bottom: 30rpx;
+}
+
+.loading-spinner {
+  width: 80rpx;
+  height: 80rpx;
+  border: 8rpx solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #4CAF50;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: white;
+  font-size: 32rpx;
+  font-weight: 500;
+}
+
+/* Error overlay */
+.error-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.error-content {
+  padding: 60rpx;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 20rpx;
+}
+
+.error-text {
+  color: white;
+  font-size: 32rpx;
+  text-align: center;
+}
+
+/* Scene info */
+.scene-info {
+  position: absolute;
+  top: 100rpx;
+  left: 40rpx;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 16rpx 24rpx;
+  border-radius: 12rpx;
+  pointer-events: auto;
+}
+
+.scene-info-text {
+  color: white;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+/* Navigation hint */
+.navigation-hint {
+  position: absolute;
+  bottom: 40rpx;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.hint-text {
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 12rpx 24rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+}
+
+/* Scene selector - Premium glassmorphism design */
+.scene-selector {
+  height: 20vh;
+  background: linear-gradient(180deg, rgba(20, 30, 48, 0.95) 0%, rgba(36, 59, 85, 0.98) 100%);
+  padding: 24rpx 30rpx;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-shrink: 0;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 -10rpx 40rpx rgba(0, 0, 0, 0.3);
+}
+
+/* Selector title */
+.scene-selector-title {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 22rpx;
+  text-align: center;
+  margin-bottom: 20rpx;
+  letter-spacing: 2rpx;
+}
+
+.scene-tabs {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+  gap: 24rpx;
+}
+
+.scene-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24rpx 28rpx;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+  border-radius: 24rpx;
+  min-width: 140rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10rpx);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover/active glow effect */
+.scene-tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(76, 175, 80, 0) 0%, rgba(76, 175, 80, 0) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.scene-tab.active {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.9) 0%, rgba(56, 142, 60, 0.95) 100%);
+  border-color: rgba(129, 199, 132, 0.5);
+  box-shadow: 0 8rpx 30rpx rgba(76, 175, 80, 0.4), 
+              0 0 60rpx rgba(76, 175, 80, 0.2),
+              inset 0 1rpx 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(-4rpx);
+}
+
+.scene-tab.active::before {
+  opacity: 1;
+  background: radial-gradient(circle at center top, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+}
+
+.scene-tab-icon {
+  width: 70rpx;
+  height: 70rpx;
+  line-height: 70rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%);
+  color: white;
+  font-size: 30rpx;
+  font-weight: bold;
+  margin-bottom: 14rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.2),
+              inset 0 1rpx 0 rgba(255, 255, 255, 0.2);
+  border: 1rpx solid rgba(255, 255, 255, 0.15);
+}
+
+.scene-tab.active .scene-tab-icon {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.15) 100%);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.25),
+              0 0 20rpx rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.scene-tab-name {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 26rpx;
+  text-align: center;
+  font-weight: 500;
+  letter-spacing: 1rpx;
+  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.3);
+}
+
+.scene-tab.active .scene-tab-name {
+  color: white;
+  font-weight: 600;
+}
+
