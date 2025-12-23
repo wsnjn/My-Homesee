@@ -1,0 +1,11 @@
+{
+	"ios": {
+		"name": "MyHomesee"
+	},
+	"android": {
+		"name": "MyHomesee"
+	},
+	"common": {
+		"name": "MyHomesee"
+	}
+}
