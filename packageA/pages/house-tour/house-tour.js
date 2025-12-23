@@ -566,7 +566,7 @@ Page({
       const response = await request({
         url: '/api/ai/house-tour/chat',
         method: 'POST',
-        timeout: 30000, // 增加超时时间到30秒
+        timeout: 60000, // 增加超时时间到 60秒以应对图片分析
         data: {
           message: text,
           screenshot: screenshot,
