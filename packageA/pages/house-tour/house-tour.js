@@ -478,31 +478,43 @@ Page({
         return;
       }
       try {
-        // 使用 wx.canvasToTempFilePath
-        wx.canvasToTempFilePath({
-          canvas: this.canvas,
-          fileType: 'jpg',    // 使用 jpg 减小体积
-          quality: 0.6,       // 压缩质量 0.6
-          success: (res) => {
-            // 读取文件内容为base64
-            wx.getFileSystemManager().readFile({
-              filePath: res.tempFilePath,
-              encoding: 'base64',
-              success: (r) => {
-                // jpg base64 header
-                resolve('data:image/jpeg;base64,' + r.data);
-              },
-              fail: (err) => {
-                console.error('Read file failed', err);
-                resolve(null);
-              }
-            });
-          },
-          fail: (err) => {
-            console.error('Screenshot failed', err);
-            resolve(null);
-          }
-        });
+        // Ensure scene is rendered before screenshot
+        if (this.renderer && this.scene && this.camera) {
+          this.renderer.render(this.scene, this.camera);
+        }
+
+        // Small delay to ensure buffer is ready
+        setTimeout(() => {
+          wx.canvasToTempFilePath({
+            canvas: this.canvas,
+            x: 0,
+            y: 0,
+            width: this.canvas.width,
+            height: this.canvas.height,
+            destWidth: 500,  // Reduce resolution for performance
+            destHeight: 500 * (this.canvas.height / this.canvas.width),
+            fileType: 'jpg',
+            quality: 0.6,
+            success: (res) => {
+              wx.getFileSystemManager().readFile({
+                filePath: res.tempFilePath,
+                encoding: 'base64',
+                success: (r) => {
+                  resolve('data:image/jpeg;base64,' + r.data);
+                },
+                fail: (err) => {
+                  console.error('Read file failed', err);
+                  resolve(null);
+                }
+              });
+            },
+            fail: (err) => {
+              console.error('Screenshot failed', err);
+              // Try fallback without canvas object if it was the issue (sometimes canvasId is better)
+              resolve(null);
+            }
+          });
+        }, 100);
       } catch (e) {
         console.error('Screenshot exception', e);
         resolve(null);

@@ -13,35 +13,37 @@
     ></canvas>
 
     <!-- 悬浮UI层 (使用 cover-view) -->
-    <cover-view class="float-ui">
+    <!-- 悬浮UI层 (使用 view + pointer-events: none 实现穿透) -->
+    <view class="float-ui" style="pointer-events: none;">
       <!-- 场景/状态信息 -->
-      <cover-view class="scene-info" wx:if="{{currentScene && !loading}}">
-        <cover-view class="scene-info-text">{{currentScene.scene.title || '未知场景'}}</cover-view>
-      </cover-view>
+      <view class="scene-info" wx:if="{{currentScene && !loading}}" style="pointer-events: auto;">
+        <text class="scene-info-text">{{currentScene.scene.title || '未知场景'}}</text>
+      </view>
 
       <!-- 聊天消息气泡 (独立于下方聊天框，悬浮在画面上) -->
-      <cover-view class="chat-bubbles-container" wx:if="{{!assistantCollapsed}}">
-        <cover-view class="chat-scroll-view"> <!-- 使用 cover-view 模拟 scroll -->
-          <cover-view class="message assistant">
-             <cover-view class="bubble">👋 您好！您可以问我关于这套房源的任何问题。</cover-view>
-          </cover-view>
-          <cover-view 
+      <view class="chat-bubbles-container" wx:if="{{!assistantCollapsed}}" style="pointer-events: auto;">
+        <scroll-view class="chat-scroll-view" scroll-y="{{true}}" scroll-into-view="{{scrollToMessageId}}">
+          <view class="message assistant" id="msg-0">
+             <view class="bubble">👋 您好！您可以问我关于这套房源的任何问题。</view>
+          </view>
+          <view 
             class="message {{item.role}}" 
             wx:for="{{messages}}" 
             wx:key="index"
+            id="msg-{{index + 1}}"
           >
-            <cover-view class="bubble">{{item.content}}</cover-view>
-          </cover-view>
-        </cover-view>
-      </cover-view>
+            <view class="bubble">{{item.content}}</view>
+          </view>
+        </scroll-view>
+      </view>
 
       <!-- Loading/Error -->
-      <cover-view class="status-overlay" wx:if="{{loading || error}}">
-        <cover-view class="status-text" wx:if="{{loading}}">Loading...</cover-view>
-        <cover-view class="status-text error" wx:if="{{error}}">{{error}}</cover-view>
+      <view class="status-overlay" wx:if="{{loading || error}}" style="pointer-events: auto;">
+        <view class="status-text" wx:if="{{loading}}">Loading...</view>
+        <view class="status-text error" wx:if="{{error}}">{{error}}</view>
          <button class="retry-btn" bindtap="onRetry" wx:if="{{error}}">重试</button>
-      </cover-view>
-    </cover-view>
+      </view>
+    </view>
   </view>
 
   <!-- 下部分：操作栏 (15%高度, 普通视口) -->
