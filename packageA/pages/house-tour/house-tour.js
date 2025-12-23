@@ -483,16 +483,34 @@ Page({
           this.renderer.render(this.scene, this.camera);
         }
 
-        // Small delay to ensure buffer is ready
+        // 尝试使用 Canvas.toDataURL (同步方法，更稳定)
+        if (typeof this.canvas.toDataURL === 'function') {
+          try {
+            const dataUrl = this.canvas.toDataURL('image/jpeg', 0.6);
+            if (dataUrl && dataUrl.length > 20) {
+              resolve(dataUrl);
+              return;
+            }
+          } catch (e) {
+            console.warn('canvas.toDataURL failed, trying fallback', e);
+          }
+        }
+
+        // Fallback: wx.canvasToTempFilePath with integer dimensions
         setTimeout(() => {
+          const width = this.canvas.width;
+          const height = this.canvas.height;
+          const destW = 500;
+          const destH = Math.floor(500 * (height / width)); // Ensure integer
+
           wx.canvasToTempFilePath({
             canvas: this.canvas,
             x: 0,
             y: 0,
-            width: this.canvas.width,
-            height: this.canvas.height,
-            destWidth: 500,  // Reduce resolution for performance
-            destHeight: 500 * (this.canvas.height / this.canvas.width),
+            width: width,
+            height: height,
+            destWidth: destW,
+            destHeight: destH,
             fileType: 'jpg',
             quality: 0.6,
             success: (res) => {
@@ -510,11 +528,11 @@ Page({
             },
             fail: (err) => {
               console.error('Screenshot failed', err);
-              // Try fallback without canvas object if it was the issue (sometimes canvasId is better)
               resolve(null);
             }
           });
         }, 100);
+
       } catch (e) {
         console.error('Screenshot exception', e);
         resolve(null);
