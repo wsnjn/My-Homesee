@@ -1,59 +1,107 @@
 <!--pages/house-tour/house-tour.wxml-->
-<!-- 使用flex布局，canvas占据80%高度，场景选择器占据20%高度 -->
-<view class="vr-page">
-  <!-- VR Canvas - 占据80%高度 -->
-  <canvas 
-    type="webgl" 
-    id="webgl" 
-    class="vr-canvas"
-    bindtouchstart="onTouchStart" 
-    bindtouchmove="onTouchMove" 
-    bindtouchend="onTouchEnd"
-  ></canvas>
+<view class="page-container">
   
-  <!-- UI 层 - 只覆盖在canvas区域 -->
-  <cover-view class="ui-layer">
-    <!-- Loading overlay -->
-    <cover-view class="loading-overlay" wx:if="{{loading}}">
-      <cover-view class="loading-content">
-        <cover-view class="loading-spinner-wrap">
-          <cover-view class="loading-spinner"></cover-view>
+  <!-- 上部分：VR Canvas (85%高度) -->
+  <view class="vr-container">
+    <canvas 
+      type="webgl" 
+      id="webgl" 
+      class="vr-canvas"
+      bindtouchstart="onTouchStart" 
+      bindtouchmove="onTouchMove" 
+      bindtouchend="onTouchEnd"
+    ></canvas>
+
+    <!-- 悬浮UI层 (使用 cover-view) -->
+    <cover-view class="float-ui">
+      <!-- 场景/状态信息 -->
+      <cover-view class="scene-info" wx:if="{{currentScene && !loading}}">
+        <cover-view class="scene-info-text">{{currentScene.scene.title || '未知场景'}}</cover-view>
+      </cover-view>
+
+      <!-- 聊天消息气泡 (独立于下方聊天框，悬浮在画面上) -->
+      <cover-view class="chat-bubbles-container" wx:if="{{!assistantCollapsed}}">
+        <cover-view class="chat-scroll-view"> <!-- 使用 cover-view 模拟 scroll -->
+          <cover-view class="message assistant">
+             <cover-view class="bubble">👋 您好！您可以问我关于这套房源的任何问题。</cover-view>
+          </cover-view>
+          <cover-view 
+            class="message {{item.role}}" 
+            wx:for="{{messages}}" 
+            wx:key="index"
+          >
+            <cover-view class="bubble">{{item.content}}</cover-view>
+          </cover-view>
         </cover-view>
-        <cover-view class="loading-text">加载VR全景中...</cover-view>
+      </cover-view>
+
+      <!-- Loading/Error -->
+      <cover-view class="status-overlay" wx:if="{{loading || error}}">
+        <cover-view class="status-text" wx:if="{{loading}}">Loading...</cover-view>
+        <cover-view class="status-text error" wx:if="{{error}}">{{error}}</cover-view>
+         <button class="retry-btn" bindtap="onRetry" wx:if="{{error}}">重试</button>
       </cover-view>
     </cover-view>
+  </view>
+
+  <!-- 下部分：操作栏 (15%高度, 普通视口) -->
+  <view class="bottom-dock">
     
-    <!-- Error message -->
-    <cover-view class="error-overlay" wx:if="{{error}}">
-      <cover-view class="error-content">
-        <cover-view class="error-text">{{error}}</cover-view>
-      </cover-view>
-    </cover-view>
-    
-    <!-- Scene info -->
-    <cover-view class="scene-info" wx:if="{{currentScene && !loading}}">
-      <cover-view class="scene-info-text">{{currentScene.scene.title || '未知场景'}}</cover-view>
-    </cover-view>
-    
-    <!-- Navigation hint -->
-    <cover-view class="navigation-hint" wx:if="{{!loading && !error}}">
-      <cover-view class="hint-text">拖动屏幕旋转视角</cover-view>
-    </cover-view>
-  </cover-view>
-  
-  <!-- Scene selector - 独立的20%高度区域 -->
-  <view class="scene-selector" wx:if="{{naviData.length >= 1 && !loading}}">
-    <view class="scene-tabs">
-      <view 
-        wx:for="{{naviData}}" 
-        wx:key="index"
-        class="scene-tab {{currentSceneIndex === index ? 'active' : ''}}"
-        bindtap="onSceneSelect"
-        data-index="{{index}}"
-      >
-        <view class="scene-tab-icon">{{index + 1}}</view>
-        <view class="scene-tab-name">{{item.scene.title}}</view>
+    <!-- 1. 默认状态：功能按钮 -->
+    <view class="dock-default" wx:if="{{!showControls && assistantCollapsed}}">
+      <view class="dock-btn scenes-btn" bindtap="toggleControls">
+        <svg-icon name="vr-card" size="24" color="#FFFFFF" />
+        <text>切换场景</text>
+      </view>
+      <view class="dock-info">
+        <text class="dock-tips">拖动屏幕旋转视角</text>
+      </view>
+      <view class="dock-btn ai-btn" bindtap="toggleAssistant">
+        <svg-icon name="ai-sparkle" size="24" color="#FFFFFF" />
+        <text>AI助手</text>
       </view>
     </view>
+
+    <!-- 2. 场景选择模式 -->
+    <view class="dock-scenes" wx:if="{{showControls}}">
+      <view class="dock-header">
+        <text>选择场景</text>
+        <view class="close-btn" bindtap="toggleControls">×</view>
+      </view>
+      <scroll-view scroll-x class="scene-scroller">
+        <view class="scene-track">
+          <view 
+            wx:for="{{naviData}}" 
+            wx:key="index"
+            class="dock-scene-item {{currentSceneIndex === index ? 'active' : ''}}"
+            catchtap="onSceneSelect"
+            data-index="{{index}}"
+          >
+            <image class="dock-thumb" src="{{item.scene.sphereSource.thumb || item.scene.sphereSource.url}}" mode="aspectFill" />
+            <text class="dock-scene-title">{{item.scene.title}}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 3. AI 助手模式 (输入框) -->
+    <view class="dock-chat" wx:if="{{!assistantCollapsed}}">
+      <view class="chat-input-row">
+        <view class="close-btn mini" bindtap="toggleAssistant">×</view>
+        <input 
+          class="dock-input" 
+          placeholder="问问AI关于这套房..." 
+          value="{{inputText}}"
+          bindinput="onInput"
+          bindconfirm="sendMessage"
+          confirm-type="send"
+          cursor-spacing="20"
+        />
+        <view class="send-btn {{!inputText ? 'disabled' : ''}}" bindtap="sendMessage">
+          <text>发送</text>
+        </view>
+      </view>
+    </view>
+
   </view>
 </view>

@@ -1,6 +1,6 @@
-/* Pages are scoped by default, but we can use page selector for global-like styles */
+/* 工业极简风格 - 首页 */
 page {
-  background-color: #f8f9fa;
+  background-color: #FFFFFF;
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica,
     Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei',
     sans-serif;
@@ -10,27 +10,29 @@ page {
   min-height: 100vh;
   overflow-x: hidden;
   padding-bottom: 40rpx;
+  background: #FFFFFF;
 }
 
-/* Navbar Styles */
+/* Navbar Styles - 工业极简 */
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 160rpx; /* 80px * 2 */
+  height: 160rpx;
   z-index: 1000;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  border-bottom: 1rpx solid rgba(0,0,0,0.05);
+  transition: border-color 0.2s;
+  background: rgba(255, 255, 255, 1);
+  backdrop-filter: none;
+  border-bottom: 1px solid #E5E7EB;
   display: flex;
   align-items: center;
 }
 
 .navbar.scrolled {
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 1);
+  box-shadow: none;
+  border-bottom: 1px solid #111827;
 }
 
 .nav-content {
@@ -50,12 +52,13 @@ page {
 .nav-logo-canvas {
   height: 100rpx;
   width: 100rpx;
+  border-radius: 0;
 }
 
 .logo-text {
   font-size: 36rpx;
   font-weight: 700;
-  color: #667eea; /* Gradient text not fully supported in simple text, using fallback color */
+  color: #111827;
   letter-spacing: -1rpx;
 }
 
@@ -65,18 +68,23 @@ page {
   gap: 24rpx;
 }
 
+/* 登录按钮 - 黑色直角 */
 .login-btn {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: #111827;
   color: white;
   border: none;
   padding: 12rpx 32rpx;
-  border-radius: 50rpx;
+  border-radius: 0;
   font-weight: 600;
   font-size: 28rpx;
-  box-shadow: 0 4rpx 15rpx rgba(102, 126, 234, 0.3);
+  box-shadow: none;
 }
 
-/* Hero Section */
+.login-btn:hover {
+  background: #374151;
+}
+
+/* Hero Section - 移除装饰性 blob */
 .hero-section {
   position: relative;
   min-height: 90vh;
@@ -84,8 +92,9 @@ page {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 160rpx 32rpx 64rpx; /* Top padding for navbar */
+  padding: 160rpx 32rpx 64rpx;
   overflow: hidden;
+  background: #FFFFFF;
 }
 
 .hero-content {
@@ -97,16 +106,19 @@ page {
 .hero-title {
   font-size: 72rpx;
   font-weight: 800;
-  line-height: 1.1;
-  margin-bottom: 24rpx;
-  color: #2c3e50;
+  line-height: 0.9;
+  margin-bottom: 48rpx;
+  color: #111827;
+  white-space: pre-line; /* Support line breaks */
+  letter-spacing: -3px;
+  text-transform: uppercase;
 }
 
 .hero-subtitle {
   font-size: 32rpx;
-  color: #666;
+  color: #6B7280;
   margin-bottom: 48rpx;
-  font-weight: 300;
+  font-weight: 400;
 }
 
 .hero-actions {
@@ -115,29 +127,42 @@ page {
   justify-content: center;
 }
 
+/* 主按钮 - 黑色直角 */
 .primary-btn {
-  background: #2c3e50;
+  background: #111827;
   color: white;
   padding: 20rpx 40rpx;
-  border-radius: 50rpx;
+  border-radius: 0;
   font-size: 32rpx;
   font-weight: 600;
   display: flex;
   align-items: center;
   gap: 8rpx;
+  border: none;
+  transition: background-color 0.2s;
 }
 
+.primary-btn:hover {
+  background: #374151;
+}
+
+/* 次级按钮 - 白底黑边 */
 .secondary-btn {
   background: white;
-  color: #2c3e50;
-  border: 4rpx solid #2c3e50;
+  color: #111827;
+  border: 2px solid #111827;
   padding: 20rpx 40rpx;
-  border-radius: 50rpx;
+  border-radius: 0;
   font-size: 32rpx;
   font-weight: 600;
+  transition: background-color 0.2s;
 }
 
-/* Background Blobs */
+.secondary-btn:hover {
+  background: #F9FAFB;
+}
+
+/* Industrial Grid Background - 工业网格背景 */
 .hero-background {
   position: absolute;
   top: 0;
@@ -145,39 +170,30 @@ page {
   right: 0;
   bottom: 0;
   z-index: 1;
-  overflow: hidden;
   pointer-events: none;
-}
-
-.blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80rpx);
   opacity: 0.4;
 }
 
-.blob-1 {
-  width: 500rpx;
-  height: 500rpx;
-  background: #667eea;
-  top: -100rpx;
-  left: -100rpx;
+.grid-line {
+  position: absolute;
+  background: #E5E7EB;
 }
 
-.blob-2 {
-  width: 400rpx;
-  height: 400rpx;
-  background: #764ba2;
-  bottom: -50rpx;
-  right: -50rpx;
+.grid-line.horizontal {
+  left: 0;
+  right: 0;
+  height: 1px;
 }
 
-.blob-3 {
-  width: 300rpx;
-  height: 300rpx;
-  background: #4facfe;
-  top: 40%;
-  left: 60%;
+.grid-line.vertical {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+/* 移除blob样式 */
+.blob {
+  display: none;
 }
 
 /* Features Section */
@@ -185,12 +201,13 @@ page {
   padding: 64rpx 32rpx;
   position: relative;
   z-index: 2;
+  background: #FFFFFF;
 }
 
 .section-title {
   font-size: 40rpx;
   font-weight: 700;
-  color: #2c3e50;
+  color: #111827;
   margin-bottom: 48rpx;
   text-align: center;
   position: relative;
@@ -198,69 +215,75 @@ page {
 
 .features-grid {
   display: grid;
-  grid-template-columns: 1fr; /* Mobile first, single column */
+  grid-template-columns: 1fr;
   gap: 32rpx;
 }
 
+/* 功能卡片 - 直角设计 */
 .feature-card {
   background: white;
   padding: 40rpx;
-  border-radius: 30rpx;
-  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.05);
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid #E5E7EB;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  transition: border-color 0.2s;
 }
 
+.feature-card:hover {
+  border-color: #111827;
+}
+
+/* 卡片图标 - 直角黑色背景 */
 .card-icon {
   width: 100rpx;
   height: 100rpx;
-  border-radius: 24rpx;
+  border-radius: 0;
+  background: #FFFFFF; /* White background */
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 24rpx;
-  color: white;
+  color: #111827; /* Black icon color context */
   font-size: 48rpx;
 }
 
-.vr-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
-.match-icon { background: linear-gradient(135deg, #FF9A9E, #FECFEF); }
-.safe-icon { background: linear-gradient(135deg, #a18cd1, #fbc2eb); }
-.fix-icon { background: linear-gradient(135deg, #84fab0, #8fd3f4); }
-.community-icon { background: linear-gradient(135deg, #fccb90, #d57eeb); }
-.virtual-icon { background: linear-gradient(135deg, #00f2ff, #007bff); }
-
-.feature-card .h3 {
+/* 功能标题和描述 */
+.feature-title {
   font-size: 36rpx;
   font-weight: 600;
-  color: #2c3e50;
+  color: #111827;
   margin-bottom: 16rpx;
 }
 
-.feature-card .p {
-  color: #666;
+.feature-description {
+  color: #6B7280;
   line-height: 1.6;
   margin-bottom: 32rpx;
   font-size: 28rpx;
 }
 
 .link-text {
-  color: #667eea;
+  color: #111827;
   font-weight: 600;
   font-size: 28rpx;
   display: flex;
   align-items: center;
   gap: 8rpx;
+  border-bottom: 1px solid #111827;
+  padding-bottom: 4rpx;
 }
 
 /* Appointments Section */
 .appointments-section {
   margin-top: 96rpx;
   background: white;
-  border-radius: 30rpx;
+  border-radius: 0;
   padding: 32rpx;
-  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.05);
+  box-shadow: none;
+  border: 1px solid #E5E7EB;
 }
 
 .section-header {
@@ -271,9 +294,10 @@ page {
 }
 
 .view-all-btn {
-  color: #667eea;
+  color: #111827;
   font-weight: 600;
   font-size: 28rpx;
+  border-bottom: 1px solid #111827;
 }
 
 .appointments-list {
@@ -282,48 +306,85 @@ page {
   gap: 24rpx;
 }
 
+/* 预约卡片 - 直角设计 */
 .appointment-card {
-  background: #f8f9fa;
+  background: #F9FAFB;
   padding: 24rpx;
-  border-radius: 20rpx;
-  border: 1rpx solid #e9ecef;
+  border-radius: 0;
+  border: 1px solid #E5E7EB;
 }
 
+/* 状态标签 - 直角 */
 .apt-status {
   display: inline-block;
   padding: 8rpx 24rpx;
-  border-radius: 40rpx;
+  border-radius: 0;
   font-size: 24rpx;
   font-weight: 600;
   margin-bottom: 16rpx;
 }
 
-.status-pending { background: #fff3cd; color: #856404; }
-.status-confirmed { background: #d4edda; color: #155724; }
-.status-completed { background: #d1ecf1; color: #0c5460; }
-.status-cancelled { background: #f8d7da; color: #721c24; }
-.status-expired { background: #e2e3e5; color: #383d41; }
-.status-missed { background: #f8d7da; color: #721c24; }
+.status-pending { 
+  background: #FEF3C7; 
+  color: #92400E;
+  border: 1px solid #FCD34D;
+}
+
+.status-confirmed { 
+  background: #D1FAE5; 
+  color: #065F46;
+  border: 1px solid #10B981;
+}
+
+.status-completed { 
+  background: #DBEAFE; 
+  color: #1E3A8A;
+  border: 1px solid #3B82F6;
+}
+
+.status-cancelled { 
+  background: #FEE2E2; 
+  color: #991B1B;
+  border: 1px solid #EF4444;
+}
+
+.status-expired { 
+  background: #F3F4F6; 
+  color: #374151;
+  border: 1px solid #9CA3AF;
+}
+
+.status-missed { 
+  background: #FEE2E2; 
+  color: #991B1B;
+  border: 1px solid #EF4444;
+}
 
 .apt-time {
   font-weight: 600;
-  color: #2c3e50;
+  color: #111827;
   font-size: 30rpx;
   margin-bottom: 8rpx;
 }
 
 .apt-type {
   font-size: 26rpx;
-  color: #666;
+  color: #6B7280;
 }
 
 .detail-btn {
   width: 100%;
   margin-top: 16rpx;
   background: white;
-  border: 1rpx solid #e0e0e0;
+  border: 1px solid #E5E7EB;
+  border-radius: 0;
   font-size: 26rpx;
   padding: 10rpx;
+  transition: border-color 0.2s;
+}
+
+.detail-btn:hover {
+  border-color: #111827;
 }
 
 /* User Menu */
@@ -331,16 +392,26 @@ page {
   position: relative;
 }
 
+/* User Info Button - Smooth Transition */
 .button-message {
   display: flex;
   align-items: center;
   background: white;
-  border-radius: 68rpx;
-  padding: 8rpx 16rpx 8rpx 8rpx;
+  border-radius: 40rpx !important; /* Force rounded corners */
+  padding: 8rpx;
   height: 80rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.1);
-  width: auto;
+  box-shadow: 0 2rpx 6rpx rgba(0,0,0,0.05);
+  border: 1px solid #E5E7EB;
+  width: 320rpx; /* Fixed width to prevent jumping */
   margin: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  position: relative;
+}
+
+.button-message:active {
+  transform: scale(0.98);
+  background: #F9FAFB;
 }
 
 .content-avatar {
@@ -348,15 +419,26 @@ page {
   height: 64rpx;
   position: relative;
   margin-right: 16rpx;
+  flex-shrink: 0;
+  z-index: 2; /* Keep avatar above text slider if overlap */
 }
 
+/* 头像 - 圆形 */
 .avatar {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
+  border-radius: 50% !important;
   overflow: hidden;
+  border: 1px solid #F3F4F6;
 }
 
+.user-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+/* 状态点 */
 .status-user {
   position: absolute;
   width: 16rpx;
@@ -364,55 +446,105 @@ page {
   right: 0;
   bottom: 0;
   border-radius: 50%;
-  background-color: #00da00;
+  background-color: #10B981;
   border: 2rpx solid white;
   z-index: 2;
 }
 
-.notice-content {
+/* Text Slider Container */
+.info-slider {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* Individual Slides */
+.info-slide {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.username {
-  font-size: 28rpx;
+.main-text {
+  font-size: 26rpx;
   font-weight: 600;
-  color: #333;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: 'JetBrains Mono', monospace; /* Nice for numbers */
 }
 
-.lable-message {
-  font-size: 24rpx;
-  color: #666;
+.sub-text {
+  font-size: 18rpx;
+  color: #6B7280;
+  margin-top: -2rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.user-id {
-  font-size: 20rpx;
-  color: #999;
+/* State 1: Default (Phone) */
+.default-state {
+  opacity: 1;
+  transform: translateY(0);
 }
 
+.default-state.slide-out {
+  opacity: 0;
+  transform: translateY(-20rpx);
+}
+
+/* State 2: Long Press (Name) */
+.active-state {
+  opacity: 0;
+  transform: translateY(20rpx);
+}
+
+.active-state.slide-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/* User Menu - 直角 */
 .user-menu {
   position: absolute;
   top: 100rpx;
   right: 0;
   width: 300rpx;
   background: white;
-  border-radius: 20rpx;
-  box-shadow: 0 10rpx 40rpx rgba(0,0,0,0.15);
-  padding: 16rpx;
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid #E5E7EB;
+  padding: 0;
   z-index: 1100;
 }
 
 .menu-item {
   padding: 24rpx;
   font-size: 28rpx;
-  color: #2c3e50;
+  color: #111827;
   display: flex;
   align-items: center;
   gap: 16rpx;
-  border-bottom: 1rpx solid #f0f0f0;
+  border-bottom: 1px solid #E5E7EB;
+  transition: background-color 0.2s;
 }
 
 .menu-item:last-child {
   border-bottom: none;
+}
+
+.menu-item:hover {
+  background: #F9FAFB;
 }

@@ -11,17 +11,30 @@
       <view class="nav-links-container">
         <!-- 用户信息区域 -->
         <view class="user-info-container" wx:if="{{isLoggedIn}}">
-          <button class="button-message" catchtap="toggleUserMenu">
+          <button 
+            class="button-message" 
+            catchtap="toggleUserMenu" 
+            bindlongpress="showUserDetail" 
+            bindtouchend="hideUserDetail"
+          >
             <view class="content-avatar">
               <view class="status-user"></view>
               <view class="avatar">
                 <image src="{{avatarUrl}}" class="user-img" mode="aspectFill"></image>
               </view>
             </view>
-            <view class="notice-content">
-              <view class="username">{{displayName}}</view>
-              <view class="lable-message">{{user.phone}}</view>
-              <view class="user-id">@{{user.username}}</view>
+            
+            <view class="info-slider">
+              <!-- 状态1: 默认显示手机号 -->
+              <view class="info-slide default-state {{isLongPressing ? 'slide-out' : ''}}">
+                <text class="main-text">{{user.phone}}</text>
+              </view>
+              
+              <!-- 状态2: 长按显示用户名 -->
+              <view class="info-slide active-state {{isLongPressing ? 'slide-in' : ''}}">
+                <text class="main-text">{{displayName}}</text>
+                <text class="sub-text" wx:if="{{user.username}}">@{{user.username}}</text>
+              </view>
             </view>
           </button>
           
@@ -29,6 +42,12 @@
           <view wx:if="{{showUserMenu}}" class="user-menu">
             <view class="menu-item" bindtap="navigateToUserProfile">
               <svg-icon name="user" size="32" color="#666" style="margin-right: 10rpx;" /> 个人信息
+            </view>
+            <view class="menu-item" bindtap="navigateToMyAppointments">
+              <svg-icon name="check-circle" size="32" color="#666" style="margin-right: 10rpx;" /> 我的预约
+            </view>
+            <view class="menu-item" bindtap="navigateToMaintenance">
+              <svg-icon name="fix" size="32" color="#666" style="margin-right: 10rpx;" /> 维修服务
             </view>
             <view class="menu-item" bindtap="logout">
               <svg-icon name="door" size="32" color="#666" style="margin-right: 10rpx;" /> 退出登录
@@ -44,22 +63,22 @@
   <!-- Hero Section -->
   <view class="hero-section">
     <view class="hero-content">
-      <view class="hero-title">发现理想生活</view>
+      <view class="hero-title">发现
+理想生活</view>
       <view class="hero-subtitle">专业的租房平台，为您提供优质的房屋租赁服务</view>
       <view class="hero-actions">
         <button class="primary-btn" bindtap="navigateToHouseSelection">
           开始找房
-          <text>→</text>
         </button>
         <button class="secondary-btn" bindtap="navigateToSmartMatching">
           智能匹配
         </button>
       </view>
     </view>
+    <!-- Industrial Grid Background -->
     <view class="hero-background">
-      <view class="blob blob-1"></view>
-      <view class="blob blob-2"></view>
-      <view class="blob blob-3"></view>
+      <view wx:for="{{20}}" wx:key="index" class="grid-line horizontal" style="top: {{item * 5}}%"></view>
+      <view wx:for="{{20}}" wx:key="index" class="grid-line vertical" style="left: {{item * 5}}%"></view>
     </view>
   </view>
 
@@ -75,21 +94,20 @@
           class="feature-card" 
           bindtap="navigateToFeature"
           data-page="{{item.page}}"
-          style="border-top: 8rpx solid; border-image: {{item.color}} 1"
         >
-          <view class="card-icon" style="background: {{item.color}}">
-            <svg-icon wx:if="{{item.icon === 'vr'}}" name="vr" color="#fff" size="48" />
-            <svg-icon wx:elif="{{item.icon === 'match'}}" name="match" color="#fff" size="48" />
-            <svg-icon wx:elif="{{item.icon === 'safe'}}" name="safe" color="#fff" size="48" />
-            <svg-icon wx:elif="{{item.icon === 'fix'}}" name="fix" color="#fff" size="48" />
-            <svg-icon wx:elif="{{item.icon === 'community'}}" name="community" color="#fff" size="48" />
-            <svg-icon wx:elif="{{item.icon === 'virtual'}}" name="virtual" color="#fff" size="48" />
-            <svg-icon wx:else name="vr" color="#fff" size="48" />
+          <view class="card-icon">
+            <svg-icon wx:if="{{item.icon === 'vr'}}" name="vr" color="#111827" size="48" />
+            <svg-icon wx:elif="{{item.icon === 'match'}}" name="match" color="#111827" size="48" />
+            <svg-icon wx:elif="{{item.icon === 'safe'}}" name="safe" color="#111827" size="48" />
+            <svg-icon wx:elif="{{item.icon === 'fix'}}" name="fix" color="#111827" size="48" />
+            <svg-icon wx:elif="{{item.icon === 'community'}}" name="community" color="#111827" size="48" />
+            <svg-icon wx:elif="{{item.icon === 'map'}}" name="map" color="#111827" size="48" />
+            <svg-icon wx:else name="vr" color="#111827" size="48" />
           </view>
           <view class="feature-title">{{item.name}}</view>
           <view class="feature-description">{{item.description}}</view>
           <view class="link-text">
-            立即体验 <text class="arrow">→</text>
+            {{item.linkText}} <text class="arrow">→</text>
           </view>
         </view>
       </view>
@@ -112,7 +130,7 @@
             <view class="apt-type">{{item.typeText}}</view>
           </view>
           <view class="apt-action">
-            <button class="detail-btn" bindtap="navigateToMyAppointments">详情</button>
+            <button class="detail-btn" bindtap="navigateToMyAppointments">DETAIL</button>
           </view>
         </view>
       </view>

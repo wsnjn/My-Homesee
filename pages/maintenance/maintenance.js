@@ -3,28 +3,48 @@ const { request } = require('../../utils/request');
 
 Page({
   data: {
+    userInfo: null,
+    activeLease: null,
     requests: [],
     loading: false,
-    userInfo: null,
+
+    // Modal
+    showCreateModal: false,
+    newTitle: '',
+    newDesc: '',
+    newDate: '',
+
+    // Formatting
     statusMap: {
-      0: '待处理',
-      1: '处理中',
-      2: '已完成'
-    },
-    statusColorMap: {
-      0: '#ff9800', // Orange
-      1: '#2196f3', // Blue
-      2: '#4caf50'  // Green
+      0: { text: '待处理', class: 'status-pending' },
+      1: { text: '处理中', class: 'status-processing' },
+      2: { text: '已完成', class: 'status-completed' },
+      3: { text: '已关闭', class: 'status-closed' }
     }
   },
 
   onLoad(options) {
+    // Set default date to tomorrow
+    const tmr = new Date();
+    tmr.setDate(tmr.getDate() + 1);
+    this.setData({
+      newDate: this.formatDateSimple(tmr)
+    });
+
     this.checkLogin();
   },
 
   onShow() {
-    if (this.data.userInfo) {
+    if (this.data.activeLease) {
       this.loadRequests();
+    }
+  },
+
+  onPullDownRefresh() {
+    if (this.data.activeLease) {
+      this.loadRequests().then(() => wx.stopPullDownRefresh());
+    } else {
+      this.fetchActiveLease().then(() => wx.stopPullDownRefresh());
     }
   },
 
@@ -32,67 +52,119 @@ Page({
     const user = wx.getStorageSync('user');
     if (user) {
       this.setData({ userInfo: user });
-      this.loadRequests();
-    } else {
-      wx.showModal({
-        title: '提示',
-        content: '请先登录查看维修记录',
-        showCancel: false,
-        success: () => {
-          wx.navigateTo({ url: '/pages/login/login' });
-        }
+      this.fetchActiveLease();
+    }
+  },
+
+  async fetchActiveLease() {
+    if (!this.data.userInfo) return;
+    try {
+      const res = await request({
+        url: `/api/admin/tenant/tenant/${this.data.userInfo.id}`,
+        method: 'GET'
       });
+
+      if (res.success && res.contracts && res.contracts.length > 0) {
+        // Find active contract
+        const active = res.contracts.find(c => c.contractStatus === 1 || c.contractStatus === 2);
+        if (active) {
+          this.setData({ activeLease: active });
+          this.loadRequests();
+        }
+      }
+    } catch (e) {
+      console.error('Fetch lease failed', e);
     }
   },
 
   async loadRequests() {
-    if (this.data.loading) return;
+    if (!this.data.activeLease) return;
     this.setData({ loading: true });
 
     try {
-      // Assuming API endpoint for user's maintenance requests
       const res = await request({
-        url: `/api/maintenance/user/${this.data.userInfo.id}`,
+        url: `/api/maintenance/list/${this.data.activeLease.id}`,
         method: 'GET'
       });
 
-      const requests = Array.isArray(res) ? res : (res.content || []);
-
-      this.setData({
-        requests: requests.map(item => ({
-          ...item,
-          statusText: this.data.statusMap[item.status] || '未知',
-          statusColor: this.data.statusColorMap[item.status] || '#999',
-          formattedTime: this.formatDate(item.createTime)
-        })),
-        loading: false
-      });
-    } catch (error) {
-      console.error('加载维修记录失败', error);
+      if (res.success) {
+        const requests = (res.data || []).map(req => ({
+          ...req,
+          statusInfo: this.data.statusMap[req.requestStatus] || { text: '未知', class: 'status-closed' },
+          formattedTime: this.formatDate(req.requestDate),
+          formattedFixDate: this.formatDate(req.expectedFixDate)
+        }));
+        this.setData({ requests });
+      }
+    } catch (e) {
+      console.error('Load requests failed', e);
+    } finally {
       this.setData({ loading: false });
-      wx.showToast({
-        title: '加载失败',
-        icon: 'none'
-      });
     }
   },
 
-  formatDate(dateString) {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-  },
-
+  // Modal Handlers
   handleCreate() {
-    wx.navigateTo({ url: '/pages/maintenance-request/maintenance-request' });
+    if (!this.data.activeLease) {
+      wx.showToast({ title: '无有效租约，无法申请', icon: 'none' });
+      return;
+    }
+    this.setData({ showCreateModal: true });
   },
 
-  viewDetail(e) {
-    const { id } = e.currentTarget.dataset;
-    // Navigate to detail page if exists, or show modal
-    wx.showToast({
-      title: '查看详情: ' + id,
-      icon: 'none'
-    });
+  hideModal() {
+    this.setData({ showCreateModal: false });
+  },
+
+  preventBubble() { },
+
+  onTitleInput(e) { this.setData({ newTitle: e.detail.value }); },
+  onDescInput(e) { this.setData({ newDesc: e.detail.value }); },
+  onDateChange(e) { this.setData({ newDate: e.detail.value }); },
+
+  async submitRequest() {
+    if (!this.data.newTitle || !this.data.newDesc) {
+      wx.showToast({ title: '请完善信息', icon: 'none' });
+      return;
+    }
+
+    try {
+      const res = await request({
+        url: '/api/maintenance/create',
+        method: 'POST',
+        data: {
+          tenantManagementId: this.data.activeLease.id,
+          requestTitle: this.data.newTitle,
+          requestDescription: this.data.newDesc,
+          expectedFixDate: this.data.newDate, // YYYY-MM-DD
+          requestStatus: 0
+        }
+      });
+
+      if (res.success) {
+        wx.showToast({ title: '提交成功', icon: 'success' });
+        this.setData({
+          showCreateModal: false,
+          newTitle: '',
+          newDesc: ''
+        });
+        this.loadRequests();
+      } else {
+        wx.showToast({ title: '提交失败', icon: 'none' });
+      }
+    } catch (e) {
+      console.error('Submit failed', e);
+      wx.showToast({ title: '网络错误', icon: 'none' });
+    }
+  },
+
+  formatDate(str) {
+    if (!str) return '';
+    const d = new Date(str);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  },
+
+  formatDateSimple(d) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }
 });

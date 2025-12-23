@@ -1,13 +1,5 @@
 <!--pages/smart-matching/smart-matching.wxml-->
 <view class="chat-container">
-  <!-- 顶部标题 -->
-  <view class="chat-header">
-    <view class="header-content">
-      <view class="title">智能租房助手</view>
-      <view class="subtitle">基于 DeepSeek AI 为您提供个性化建议</view>
-    </view>
-  </view>
-
   <!-- 消息列表 -->
   <scroll-view 
     class="chat-messages" 
@@ -30,7 +22,12 @@
             mode="aspectFill" 
             class="avatar-img"
           />
-          <view wx:else class="ai-avatar">AI</view>
+          <image 
+            wx:else
+            src="/images/models/IMG_20251208_160325.png"
+            mode="aspectFill"
+            class="avatar-img"
+          />
         </view>
 
         <!-- 内容 -->
@@ -71,7 +68,11 @@
       <!-- 加载中 -->
       <view wx:if="{{loading}}" class="message ai-message">
         <view class="message-avatar">
-          <view class="ai-avatar">AI</view>
+          <image 
+            src="/images/models/IMG_20251208_160325.png"
+            mode="aspectFill"
+            class="avatar-img"
+          />
         </view>
         <view class="message-content">
           <view class="message-bubble typing-indicator">
@@ -100,7 +101,7 @@
         bindtap="sendMessage"
         disabled="{{!userInput || loading}}"
       >
-        发送
+        SEND
       </button>
     </view>
   </view>

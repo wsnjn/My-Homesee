@@ -3,7 +3,7 @@
   <!-- Navigation Bar -->
   <view class="navbar">
     <view class="nav-left" bindtap="goBack">
-      <svg-icon name="arrow-left" size="40" color="#333" />
+      <svg-icon name="arrow-left" size="24" color="#111827" />
     </view>
     <view class="nav-center">个人信息</view>
     <view class="nav-right">
@@ -16,9 +16,9 @@
 
   <scroll-view scroll-y class="content-scroll">
     <view class="content-wrapper">
-      <!-- Avatar Card -->
+      
+      <!-- Avatar Section -->
       <view class="info-card avatar-card">
-        <view class="card-title">头像设置</view>
         <view class="avatar-section">
           <view class="avatar-wrapper" bindtap="chooseAvatar">
             <image 
@@ -27,10 +27,10 @@
               mode="aspectFill"
             ></image>
             <view class="avatar-overlay">
-              <svg-icon name="camera" size="40" color="#fff" />
+              <svg-icon name="camera" size="32" color="#FFFFFF" />
             </view>
           </view>
-          <view class="avatar-tip">点击头像更换</view>
+          <view class="avatar-tip">点击更换</view>
         </view>
       </view>
 
@@ -141,7 +141,7 @@
             <view wx:if="{{!isEditing || editingField !== 'rentalBudgetMin'}}" 
                   class="value {{!user.rentalBudgetMin ? 'placeholder' : ''}}" 
                   bindtap="startEditField" data-field="rentalBudgetMin">
-              {{user.rentalBudgetMin ? user.rentalBudgetMin + '元' : '未设置'}}
+              {{user.rentalBudgetMin ? user.rentalBudgetMin : '未设置'}}
             </view>
             <input wx:else class="edit-input" type="number" value="{{editForm.rentalBudgetMin}}" 
                    bindinput="handleInput" data-field="rentalBudgetMin" focus />
@@ -152,7 +152,7 @@
             <view wx:if="{{!isEditing || editingField !== 'rentalBudgetMax'}}" 
                   class="value {{!user.rentalBudgetMax ? 'placeholder' : ''}}" 
                   bindtap="startEditField" data-field="rentalBudgetMax">
-              {{user.rentalBudgetMax ? user.rentalBudgetMax + '元' : '未设置'}}
+              {{user.rentalBudgetMax ? user.rentalBudgetMax : '未设置'}}
             </view>
             <input wx:else class="edit-input" type="number" value="{{editForm.rentalBudgetMax}}" 
                    bindinput="handleInput" data-field="rentalBudgetMax" focus />
@@ -181,6 +181,7 @@
           </view>
         </view>
       </view>
+
     </view>
   </scroll-view>
 </view>

@@ -5,19 +5,16 @@
     <view class="search-input-container">
       <input 
         class="search-input" 
-        placeholder="搜索房源、小区或地址"
+        placeholder="搜索房源..."
         value="{{searchKeyword}}"
         bindinput="onSearch"
-        confirm-type="search"
       />
       <view class="search-icon-wrapper">
-        <svg-icon name="search" size="20" color="#6c757d" />
+        <svg-icon name="search" size="20" color="#9CA3AF" />
       </view>
     </view>
     <button class="filter-btn" bindtap="toggleFilterPanel">
-      <view class="filter-icon-wrapper">
-        <svg-icon name="filter" size="18" color="#ffffff" />
-      </view>
+      <svg-icon name="filter" size="20" color="#FFFFFF" />
       筛选
     </button>
   </view>
@@ -43,90 +40,69 @@
     </view>
     
     <scroll-view scroll-y class="filter-content">
-      <!-- 价格范围 -->
+      <!-- 区域选择 -->
       <view class="filter-section">
-        <view class="filter-label">价格范围（元/月）</view>
-        <slider 
-          min="0" 
-          max="10000" 
-          step="500" 
-          value="{{filters.priceRange[1]}}"
-          bindchange="updateFilter"
-          data-field="priceRange[1]"
-          show-value
-          activeColor="#2c3e50"
-        />
-        <view class="range-display">
-          <text>0 - {{filters.priceRange[1] >= 10000 ? '不限' : filters.priceRange[1] + '元'}}</text>
+        <view class="filter-label">区域选择</view>
+        <!-- 省份和城市在同一行 -->
+        <view class="filter-row-horizontal">
+          <picker mode="selector" range="{{provinces}}" value="{{selectedProvinceIndex}}" bindchange="onProvinceChange" class="picker-half">
+            <view class="picker-item">{{selectedProvince || '省份'}}</view>
+          </picker>
+          <picker mode="selector" range="{{cities}}" value="{{selectedCityIndex}}" bindchange="onCityChange" class="picker-half">
+            <view class="picker-item">{{selectedCity || '城市'}}</view>
+          </picker>
+        </view>
+        <!-- 区县和街道在同一行 -->
+        <view class="filter-row-horizontal">
+          <picker mode="selector" range="{{districts}}" value="{{selectedDistrictIndex}}" bindchange="onDistrictChange" class="picker-half">
+            <view class="picker-item">{{selectedDistrict || '区县'}}</view>
+          </picker>
+          <picker mode="selector" range="{{streets}}" value="{{selectedStreetIndex}}" bindchange="onStreetChange" class="picker-half">
+            <view class="picker-item">{{selectedStreet || '街道'}}</view>
+          </picker>
+        </view>
+        <!-- 小区单独一行 -->
+        <picker mode="selector" range="{{communities}}" value="{{selectedCommunityIndex}}" bindchange="onCommunityChange">
+          <view class="picker-item">{{selectedCommunity || '小区'}}</view>
+        </picker>
+      </view>
+
+      <!-- 基本筛选 -->
+      <view class="filter-section">
+        <view class="filter-label">基本筛选</view>
+        <!-- 租赁类型和装修程度在同一行 -->
+        <view class="filter-row-horizontal">
+          <picker mode="selector" range="{{rentalTypeOptions}}" range-key="label" value="{{selectedRentalTypeIndex}}" bindchange="onRentalTypeChange" class="picker-half">
+            <view class="picker-item">{{selectedRentalType || '租赁类型'}}</view>
+          </picker>
+          <picker mode="selector" range="{{decorationOptions}}" range-key="label" value="{{selectedDecorationIndex}}" bindchange="onDecorationChange" class="picker-half">
+            <view class="picker-item">{{selectedDecoration || '装修程度'}}</view>
+          </picker>
+        </view>
+        <!-- 电梯和朝向在同一行 -->
+        <view class="filter-row-horizontal">
+          <picker mode="selector" range="{{elevatorOptions}}" range-key="label" value="{{selectedElevatorIndex}}" bindchange="onElevatorChange" class="picker-half">
+            <view class="picker-item">{{selectedElevator || '电梯'}}</view>
+          </picker>
+          <picker mode="selector" range="{{orientationOptions}}" range-key="label" value="{{selectedOrientationIndex}}" bindchange="onOrientationChange" class="picker-half">
+            <view class="picker-item">{{selectedOrientation || '朝向'}}</view>
+          </picker>
         </view>
       </view>
 
-      <!-- 面积范围 -->
+      <!-- 价格与面积 -->
       <view class="filter-section">
-        <view class="filter-label">面积范围（㎡）</view>
-        <slider 
-          min="0" 
-          max="200" 
-          step="10" 
-          value="{{filters.areaRange[1]}}"
-          bindchange="updateFilter"
-          data-field="areaRange[1]"
-          show-value
-          activeColor="#2c3e50"
-        />
-        <view class="range-display">
-          <text>0 - {{filters.areaRange[1] >= 200 ? '不限' : filters.areaRange[1] + '㎡'}}</text>
-        </view>
-      </view>
-
-      <!-- 租赁类型 -->
-      <view class="filter-section">
-        <view class="filter-label">租赁类型</view>
-        <view class="options-grid">
-          <view 
-            wx:for="{{rentalTypeOptions}}" 
-            wx:key="value"
-            class="option-item {{filters.rentalType === item.value ? 'active' : ''}}"
-            bindtap="updateFilter"
-            data-field="rentalType"
-            data-value="{{item.value}}"
-          >
-            {{item.label}}
+        <view class="filter-label">价格与面积</view>
+        <view class="range-inputs">
+          <view class="range-group">
+            <input type="number" placeholder="最低租金" value="{{minPrice}}" bindinput="onMinPriceInput" />
+            <text class="range-divider">-</text>
+            <input type="number" placeholder="最高租金" value="{{maxPrice}}" bindinput="onMaxPriceInput" />
           </view>
-        </view>
-      </view>
-
-      <!-- 装修程度 -->
-      <view class="filter-section">
-        <view class="filter-label">装修程度</view>
-        <view class="options-grid">
-          <view 
-            wx:for="{{decorationOptions}}" 
-            wx:key="value"
-            class="option-item {{filters.decoration === item.value ? 'active' : ''}}"
-            bindtap="updateFilter"
-            data-field="decoration"
-            data-value="{{item.value}}"
-          >
-            {{item.label}}
-          </view>
-        </view>
-      </view>
-
-      <!-- 特色筛选 -->
-      <view class="filter-section">
-        <view class="filter-label">特色</view>
-        <view class="feature-options">
-          <view 
-            class="feature-option {{filters.hasElevator ? 'active' : ''}}"
-            bindtap="updateFilter"
-            data-field="hasElevator"
-            data-value="{{!filters.hasElevator}}"
-          >
-            <view class="feature-icon">
-              <svg-icon name="plus" size="16" color="{{filters.hasElevator ? '#fff' : '#6c757d'}}" />
-            </view>
-            有电梯
+          <view class="range-group">
+            <input type="number" placeholder="最小面积" value="{{minArea}}" bindinput="onMinAreaInput" />
+            <text class="range-divider">-</text>
+            <input type="number" placeholder="最大面积" value="{{maxArea}}" bindinput="onMaxAreaInput" />
           </view>
         </view>
       </view>
@@ -134,7 +110,7 @@
 
     <view class="filter-actions">
       <button class="cancel-btn" bindtap="toggleFilterPanel">取消</button>
-      <button class="apply-btn" bindtap="applyFilters">应用筛选</button>
+      <button class="apply-btn" bindtap="applyFilters">应用</button>
     </view>
   </view>
 
@@ -155,60 +131,73 @@
 
     <view wx:for="{{houses}}" wx:key="id" class="house-card">
       <!-- 房屋图片 -->
-      <view class="house-image-container" bindtap="goToHouseTour" data-id="{{item.id}}">
+      <view class="house-image-wrapper" hover-class="house-image-wrapper-hover" hover-stay-time="100">
         <image 
           class="house-image" 
           src="{{item.coverImage || '/images/models/客厅.jpg'}}" 
           mode="aspectFill"
         />
-        <!-- 状态标签 - 右上角 -->
-        <view class="status-badge {{item.status === 0 ? 'available' : 'unavailable'}}">
-          {{item.status === 0 ? '在租' : '已下架'}}
+        <!-- 标签组：左上角 -->
+        <view class="house-tags">
+          <view class="tag status-tag {{item.status === 0 ? 'status-available' : 'status-unavailable'}}">
+            {{item.status === 0 ? '在租' : '已下架'}}
+          </view>
+          <view class="tag type-tag">
+            {{item.rentalType === 0 ? '整租' : (item.rentalType === 1 ? '合租' : '单间')}}
+          </view>
         </view>
-        <!-- 租赁类型 - 左上角 -->
-        <view class="rental-type-badge">
-          {{item.rentalType === 0 ? '整租' : (item.rentalType === 1 ? '合租' : '单间')}}
+        <!-- VR看房按钮：手指按住时显示 -->
+        <view class="vr-overlay">
+          <button 
+            class="vr-tour-btn" 
+            catchtap="goToHouseTour" 
+            data-id="{{item.id}}"
+          >
+            VR看房
+          </button>
         </view>
       </view>
 
       <!-- 房屋信息 -->
       <view class="house-info">
-        <!-- 标题和价格在同一行 -->
-        <view class="info-row">
-          <view class="house-title">{{item.district}} {{item.doorNumber || ''}}</view>
-          <view class="house-price">
-            <text class="price-value">¥{{item.rentPrice}}</text>
-            <text class="price-unit">/月</text>
-          </view>
-        </view>
+        <!-- 标题 -->
+        <view class="house-title">{{item.district}} {{item.doorNumber || ''}}</view>
         
-        <!-- 房屋基本信息 -->
-        <view class="house-specs">
-          <text class="spec-item">{{item.roomArea}}㎡</text>
-          <text class="spec-divider">|</text>
-          <text class="spec-item">{{item.floorInfo || '中层'}}</text>
-          <text class="spec-divider">|</text>
-          <text class="spec-item">{{item.decoration === 1 ? '毛坯' : (item.decoration === 2 ? '简装' : (item.decoration === 3 ? '精装' : '豪装'))}}</text>
+        <!-- 地址 -->
+        <view class="house-address">
+          <svg-icon name="location" size="28" color="#6B7280" />
+          <text>{{item.city}}{{item.district}}{{item.street}}</text>
         </view>
         
         <!-- 房东电话 -->
-        <view wx:if="{{item.landlordPhone}}" class="landlord-row" catchtap="callLandlord" data-phone="{{item.landlordPhone}}">
-          <svg-icon name="phone" size="18" color="#666" />
-          <text class="phone-number">{{item.formattedPhone || item.landlordPhone}}</text>
+        <view wx:if="{{item.landlordPhone}}" class="landlord-phone">
+          <svg-icon name="phone" size="28" color="#6B7280" />
+          <text>房东电话: {{item.formattedPhone || item.landlordPhone}}</text>
         </view>
         
-        <!-- 操作按钮 -->
-        <view class="card-actions">
-          <button class="btn-vr" catchtap="goToHouseTour" data-id="{{item.id}}">
-            VR看房
-          </button>
+        <!-- 房屋规格 -->
+        <view class="house-meta">
+          <text class="meta-item">{{item.roomArea}}㎡</text>
+          <text class="meta-divider">|</text>
+          <text class="meta-item">{{item.floorInfo || '中层'}}</text>
+          <text class="meta-divider">|</text>
+          <text class="meta-item">{{item.decoration === 1 ? '毛坯' : (item.decoration === 2 ? '简装' : (item.decoration === 3 ? '精装' : '豪装'))}}</text>
+        </view>
+        
+        <!-- 底部：价格和操作按钮 -->
+        <view class="house-footer">
+          <view class="price-container">
+            <text class="price-symbol">¥</text>
+            <text class="price-value">{{item.rentPrice}}</text>
+            <text class="price-unit">/月</text>
+          </view>
           <button 
-            class="btn-appointment {{item.status !== 0 ? 'disabled' : ''}}" 
+            class="action-btn appointment-btn {{item.status !== 0 ? 'disabled' : ''}}" 
             catchtap="goToAppointment" 
             data-id="{{item.id}}"
             data-status="{{item.status}}"
           >
-            预约看房
+            {{item.status === 0 ? '预约看房' : '已下架'}}
           </button>
         </view>
       </view>

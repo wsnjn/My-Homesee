@@ -10,7 +10,14 @@ Page({
     naviData: [],
     loading: true,
     error: null,
-    showSceneSelector: true, // 控制场景选择器显示
+    showSceneSelector: false, // 默认不显示场景选择面板
+
+    // 智能助手相关
+    assistantCollapsed: true, // 默认收起
+    inputText: '',
+    messages: [], // 聊天记录
+    aiLoading: false,
+    scrollToMessageId: '', // 滚动到最新消息
     // 默认场景配置
     defaultScenes: [
       {
@@ -48,18 +55,21 @@ Page({
 
   onLoad(options) {
     const houseId = options.id || options.houseId;
-    if (houseId) {
-      this.setData({ houseId, loading: true });
 
-      // Initialize Three.js first
-      this.initThreeJs(() => {
-        // Then load house info
+    this.setData({ houseId, loading: true });
+
+    // Initialize Three.js first
+    this.initThreeJs(() => {
+      if (houseId) {
+        // Load specific house info if ID is present
         this.loadHouseInfo(houseId);
-      });
-    } else {
-      wx.showToast({ title: '参数错误', icon: 'none' });
-      setTimeout(() => wx.navigateBack(), 1500);
-    }
+      } else {
+        // Otherwise load demo scenes for "Feature Experience"
+        wx.showToast({ title: 'VR体验模式', icon: 'none' });
+        this.createDemoScenes();
+        this.setData({ loading: false });
+      }
+    });
   },
 
   onUnload() {
@@ -98,33 +108,81 @@ Page({
 
   async loadHouseInfo(houseId) {
     try {
-      // 直接使用默认场景，避免API请求失败
-      console.log('Using default demo scenes for house tour');
-      this.createDemoScenes();
-      
-      // 可选：尝试加载房屋信息用于标题（但不阻塞）
-      try {
-        const houseRes = await request({
-          url: `/api/room-info/${houseId}`,
-          method: 'GET'
-        });
-        if (houseRes && houseRes.success && houseRes.room) {
-          wx.setNavigationBarTitle({
-            title: `${houseRes.room.communityName} - VR漫游`
-          });
-        }
-      } catch (titleError) {
-        console.log('Failed to load house title, using default:', titleError);
+      // 1. 获取房屋基本信息
+      const houseRes = await request({
+        url: `/api/room-info/${houseId}`,
+        method: 'GET'
+      });
+      if (houseRes && houseRes.success && houseRes.room) {
         wx.setNavigationBarTitle({
-          title: 'VR全景看房'
+          title: `${houseRes.room.communityName} - VR漫游`
         });
+        this.roomInfo = houseRes.room;
       }
+
+      // 2. 获取VR场景列表
+      await this.loadVrScenes(houseId);
+
     } catch (error) {
       console.error('Failed to load house info:', error);
       this.setData({ loading: false });
-      // Use default demo scenes
+      // Fallback if critical failure
+      wx.showToast({ title: '加载失败', icon: 'error' });
+    }
+  },
+
+  // 加载VR场景列表
+  async loadVrScenes(houseId) {
+    try {
+      const res = await request({
+        url: `/api/vr-scenes/${houseId}`,
+        method: 'GET'
+      });
+
+      if (res && res.success && res.data && res.data.length > 0) {
+        const scenes = res.data.map(scene => ({
+          scene: {
+            photo_key: scene.id.toString(),
+            title: scene.sceneName,
+            sphereSource: {
+              url: this.ensureHttps(scene.imageUrl),
+              thumb: this.ensureHttps(scene.imageUrl)
+            }
+          }
+        }));
+
+        this.setData({
+          naviData: scenes,
+          currentSceneIndex: 0, // 默认第一个
+          loading: true // loadScene will handle loading state
+        });
+
+        // 加载第一个场景
+        this.loadScene(scenes[0]);
+
+      } else {
+        console.log('No VR scenes found, using demo scenes');
+        wx.showToast({ title: '使用演示全景图', icon: 'none' });
+        this.createDemoScenes();
+      }
+    } catch (err) {
+      console.error('Load VR scenes failed:', err);
+      // Fallback to demo scenes on error
       this.createDemoScenes();
     }
+  },
+
+  // 确保URL为HTTPS
+  ensureHttps(url) {
+    if (!url) return '';
+    if (url.startsWith('http')) {
+      return url.replace('http://', 'https://');
+    }
+    // 处理相对路径或不完整路径
+    if (url.startsWith('/')) {
+      return `https://files.homesee.xyz${url}`;
+    }
+    return `https://files.homesee.xyz/${url}`;
   },
 
   initThree(canvas) {
@@ -145,7 +203,8 @@ Page({
     // Renderer
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
-      canvas: canvas // 关键：将canvas传递给renderer
+      canvas: canvas,
+      preserveDrawingBuffer: true // 关键：允许截图，否则截图可能是黑屏
     });
     renderer.setSize(canvas.width, canvas.height);
     // 使用新的API替代已弃用的wx.getSystemInfoSync().pixelRatio
@@ -227,7 +286,7 @@ Page({
     });
 
     console.log('Demo scenes created, naviData length:', defaultScenes.length);
-    
+
     // 加载第一个场景
     if (defaultScenes.length > 0) {
       this.loadScene(defaultScenes[0]);
@@ -251,13 +310,13 @@ Page({
 
   loadScene(sceneData) {
     console.log('loadScene called with:', sceneData);
-    
+
     if (!this.scene || !this.THREE) {
       console.error('Three.js not initialized');
       return;
     }
 
-    this.setData({ 
+    this.setData({
       currentScene: sceneData,
       loading: true // 确保在加载新场景时显示loading
     });
@@ -314,7 +373,7 @@ Page({
       this.updateCameraRotation();
 
       // 更新加载状态 - 确保loading为false，但保持场景选择器显示
-      this.setData({ 
+      this.setData({
         loading: false
       });
 
@@ -411,7 +470,17 @@ Page({
     }
   },
 
-  // Scene selection handler
+  // === 新增UI交互逻辑 ===
+
+  // 1. 切换场景控制面板
+  toggleControls() {
+    this.setData({
+      showControls: !this.data.showControls,
+      assistantCollapsed: true // 互斥：打开场景时，收起助手
+    });
+  },
+
+  // 场景选择
   onSceneSelect(e) {
     const index = e.currentTarget.dataset.index;
     const { naviData, currentSceneIndex } = this.data;
@@ -422,9 +491,139 @@ Page({
     if (naviData && naviData[index]) {
       this.setData({
         currentSceneIndex: index,
-        loading: true
+        loading: true,
+        // showControls: false // 保持展开方便连续切换? 或者收起? 用户体验更好是保持展开直到点击关闭
       });
       this.loadScene(naviData[index]);
+    }
+  },
+
+  // 2. 智能助手交互
+  toggleAssistant() {
+    this.setData({
+      assistantCollapsed: !this.data.assistantCollapsed,
+      showControls: false // 互斥：打开助手时，收起场景
+    });
+  },
+
+  onInput(e) {
+    this.setData({
+      inputText: e.detail.value
+    });
+  },
+
+  // 截图当前场景
+  captureScreenshot() {
+    return new Promise((resolve) => {
+      if (!this.canvas) {
+        resolve(null);
+        return;
+      }
+      try {
+        // 使用 wx.canvasToTempFilePath
+        wx.canvasToTempFilePath({
+          canvas: this.canvas,
+          fileType: 'jpg',    // 使用 jpg 减小体积
+          quality: 0.6,       // 压缩质量 0.6
+          success: (res) => {
+            // 读取文件内容为base64
+            wx.getFileSystemManager().readFile({
+              filePath: res.tempFilePath,
+              encoding: 'base64',
+              success: (r) => {
+                // jpg base64 header
+                resolve('data:image/jpeg;base64,' + r.data);
+              },
+              fail: (err) => {
+                console.error('Read file failed', err);
+                resolve(null);
+              }
+            });
+          },
+          fail: (err) => {
+            console.error('Screenshot failed', err);
+            resolve(null);
+          }
+        });
+      } catch (e) {
+        console.error('Screenshot exception', e);
+        resolve(null);
+      }
+    });
+  },
+
+  async sendMessage() {
+    const text = this.data.inputText.trim();
+    if (!text || this.data.aiLoading) return;
+
+    // 添加用户消息
+    const userMsg = { role: 'user', content: text };
+    const newMessages = [...this.data.messages, userMsg];
+
+    this.setData({
+      messages: newMessages,
+      inputText: '',
+      aiLoading: true,
+      scrollToMessageId: `msg-${newMessages.length - 1}`
+    });
+
+    try {
+      // 截图
+      console.log('Capturing screenshot for AI...');
+      const screenshot = await this.captureScreenshot();
+
+      console.log('Sending to AI API...', { text, hasScreenshot: !!screenshot });
+
+      // 调用后端API
+      const response = await request({
+        url: '/api/ai/house-tour/chat',
+        method: 'POST',
+        timeout: 30000, // 增加超时时间到30秒
+        data: {
+          message: text,
+          screenshot: screenshot,
+          roomInfo: this.roomInfo || {}, // 传递当前房屋信息
+          userId: 1 // TODO: get real user ID
+        }
+      });
+
+      if (response && response.success) {
+        // 后端返回HTML，需要剥离标签以在cover-view显示
+        // 简单处理：<br> -> \n, <p> -> \n, 移除其他标签
+        let cleanContent = response.message
+          .replace(/<br\s*\/?>/gi, '\n')
+          .replace(/<\/p>/gi, '\n')
+          .replace(/<[^>]+>/g, '') // 移除剩余标签
+          .trim();
+
+        const aiMsg = { role: 'assistant', content: cleanContent };
+        const updatedMessages = [...newMessages, aiMsg];
+        this.setData({
+          messages: updatedMessages,
+          scrollToMessageId: `msg-${updatedMessages.length - 1}`
+        });
+      } else {
+        // 模拟回复
+        setTimeout(() => {
+          const mockReply = { role: 'assistant', content: '收到您的问题：' + text };
+          const updatedMessages = [...newMessages, mockReply];
+          this.setData({
+            messages: updatedMessages,
+            scrollToMessageId: `msg-${updatedMessages.length - 1}`
+          });
+        }, 1000);
+      }
+
+    } catch (error) {
+      console.error('Chat error:', error);
+      const errorMsg = { role: 'assistant', content: '抱歉，网络连接似乎有点问题。' };
+      const updatedMessages = [...newMessages, errorMsg];
+      this.setData({
+        messages: updatedMessages,
+        scrollToMessageId: `msg-${updatedMessages.length - 1}`
+      });
+    } finally {
+      this.setData({ aiLoading: false });
     }
   }
 })

@@ -264,12 +264,12 @@
 
   <!-- 发布按钮 -->
   <view class="fab-btn" bindtap="handlePost" wx:if="{{currentTab !== 'chat' || !activeGroup}}">
-    <svg-icon name="plus" size="28" color="#fff" />
+    <svg-icon name="plus" size="28" color="#111827" />
   </view>
 
   <!-- 创建群组弹窗 -->
   <view class="modal-overlay" wx:if="{{showGroupModal}}" catchtap="hideModal">
-    <view class="modal-content" catchtap="">
+    <view class="modal-content" catchtap="preventBubble">
       <text class="modal-title">创建群组</text>
       <input class="modal-input" placeholder="群组名称" value="{{newGroupName}}" bindinput="onGroupNameInput" />
       <textarea class="modal-textarea" placeholder="群公告（可选）" value="{{newGroupAnnouncement}}" bindinput="onGroupAnnouncementInput"></textarea>
@@ -282,12 +282,30 @@
 
   <!-- 添加好友弹窗 -->
   <view class="modal-overlay" wx:if="{{showFriendModal}}" catchtap="hideModal">
-    <view class="modal-content" catchtap="">
+    <view class="modal-content" catchtap="preventBubble">
       <text class="modal-title">添加好友</text>
       <input class="modal-input" placeholder="输入手机号" value="{{friendPhone}}" bindinput="onFriendPhoneInput" type="number" />
       <view class="modal-actions">
         <button class="btn-cancel" bindtap="hideModal">取消</button>
         <button class="btn-confirm" bindtap="sendFriendRequest">发送请求</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 发布帖子弹窗 -->
+  <view class="modal-overlay" wx:if="{{showPostModal}}" catchtap="hideModal">
+    <view class="modal-content" catchtap="preventBubble">
+      <text class="modal-title">发布动态</text>
+      <textarea class="modal-textarea" placeholder="分享你的新鲜事..." value="{{newPostContent}}" bindinput="onPostContentInput"></textarea>
+      
+      <view class="visibility-selector">
+        <view class="visibility-option {{postVisibility === 0 ? 'active' : ''}}" bindtap="setPostVisibility" data-value="0">公开</view>
+        <view class="visibility-option {{postVisibility === 1 ? 'active' : ''}}" bindtap="setPostVisibility" data-value="1">仅好友</view>
+      </view>
+
+      <view class="modal-actions">
+        <button class="btn-cancel" bindtap="hideModal">取消</button>
+        <button class="btn-confirm" bindtap="publishPost">发布</button>
       </view>
     </view>
   </view>

@@ -1,17 +1,21 @@
 /* pages/appointment/appointment.wxss */
+/* 工业极简风格 - 预约页 */
+
 .container {
-  padding: 20rpx;
-  background-color: #f5f7fa;
+  padding: 30rpx;
+  background-color: #FFFFFF;
   min-height: 100vh;
   box-sizing: border-box;
 }
 
+/* 房屋信息卡片 - 直角 */
 .house-card {
-  background: white;
-  border-radius: 16rpx;
+  background: #FFFFFF;
+  border-radius: 0;
   padding: 30rpx;
-  margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.05);
+  margin-bottom: 30rpx;
+  box-shadow: none;
+  border: 1px solid #E5E7EB;
 }
 
 .house-header {
@@ -23,29 +27,30 @@
 
 .house-title {
   font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
+  font-weight: 700;
+  color: #111827;
   flex: 1;
   margin-right: 20rpx;
 }
 
+/* 状态标签 - 直角 */
 .house-status {
   font-size: 24rpx;
-  padding: 4rpx 12rpx;
-  border-radius: 8rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 0;
   white-space: nowrap;
 }
 
 .status-available {
-  background: #e6f7ff;
-  color: #1890ff;
-  border: 1rpx solid #91d5ff;
+  background: #D1FAE5;
+  color: #065F46;
+  border: 1px solid #10B981;
 }
 
 .status-unavailable {
-  background: #fff1f0;
-  color: #f5222d;
-  border: 1rpx solid #ffa39e;
+  background: #FEE2E2;
+  color: #991B1B;
+  border: 1px solid #EF4444;
 }
 
 .house-info {
@@ -61,43 +66,46 @@
 }
 
 .info-row .label {
-  color: #999;
-  width: 90rpx;
+  color: #6B7280;
+  width: 120rpx;
   flex-shrink: 0;
 }
 
 .info-row .value {
-  color: #333;
+  color: #111827;
   flex: 1;
 }
 
 .info-row .value.price {
-  color: #ff4d4f;
-  font-weight: bold;
+  color: #111827;
+  font-weight: 700;
   font-size: 28rpx;
 }
 
+/* 表单卡片 - 直角 */
 .form-card {
-  background: white;
-  border-radius: 16rpx;
+  background: #FFFFFF;
+  border-radius: 0;
   padding: 30rpx;
-  margin-bottom: 120rpx; /* Space for button */
-  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.05);
+  margin-bottom: 120rpx;
+  box-shadow: none;
+  border: 1px solid #E5E7EB;
 }
 
 .form-title {
   font-size: 30rpx;
-  font-weight: bold;
+  font-weight: 700;
+  color: #111827;
   margin-bottom: 30rpx;
   padding-bottom: 20rpx;
-  border-bottom: 1rpx solid #eee;
+  border-bottom: 1px solid #E5E7EB;
 }
 
 .form-item {
   display: flex;
   align-items: center;
   padding: 24rpx 0;
-  border-bottom: 1rpx solid #f5f5f5;
+  border-bottom: 1px solid #F3F4F6;
 }
 
 .form-item:last-child {
@@ -116,56 +124,64 @@
 .form-item.vertical textarea {
   width: 100%;
   padding: 20rpx;
-  background: #f9f9f9;
-  border-radius: 8rpx;
+  background: #F9FAFB;
+  border-radius: 0;
+  border: 1px solid #E5E7EB;
   box-sizing: border-box;
+  font-size: 28rpx;
+  color: #111827;
 }
 
 .label {
   width: 180rpx;
   font-size: 28rpx;
-  color: #333;
+  color: #111827;
+  font-weight: 500;
 }
 
 .required {
-  color: #ff4d4f;
+  color: #EF4444;
 }
 
 input, .picker, textarea {
   flex: 1;
   font-size: 28rpx;
-  color: #333;
+  color: #111827;
 }
 
 .placeholder {
-  color: #999;
+  color: #9CA3AF;
 }
 
+/* 提交区域 */
 .submit-area {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   padding: 20rpx 30rpx;
-  background: white;
-  box-shadow: 0 -2rpx 10rpx rgba(0,0,0,0.05);
+  background: #FFFFFF;
+  box-shadow: none;
+  border-top: 1px solid #E5E7EB;
   z-index: 100;
 }
 
 .submit-btn {
-  background: #28a745;
-  color: white;
-  border-radius: 44rpx;
+  background: #111827;
+  color: #FFFFFF;
+  border-radius: 0;
   font-size: 32rpx;
-  font-weight: bold;
+  font-weight: 600;
+  border: none;
+  height: 88rpx;
 }
 
 .submit-btn[disabled] {
-  background: #a0d9b1;
-  color: white;
+  background: #E5E7EB;
+  color: #9CA3AF;
 }
 
-/* Modal Styles */
+/* 模态框 - 直角*/
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -180,11 +196,12 @@ input, .picker, textarea {
 }
 
 .modal-content {
-  background: white;
+  background: #FFFFFF;
   width: 600rpx;
-  border-radius: 16rpx;
+  border-radius: 0;
   padding: 40rpx 30rpx;
   text-align: center;
+  border: 1px solid #E5E7EB;
 }
 
 .modal-header {
@@ -196,8 +213,8 @@ input, .picker, textarea {
 
 .modal-title {
   font-size: 36rpx;
-  font-weight: bold;
-  color: #28a745;
+  font-weight: 700;
+  color: #111827;
   margin-top: 20rpx;
 }
 
@@ -207,20 +224,21 @@ input, .picker, textarea {
 
 .modal-msg {
   font-size: 28rpx;
-  color: #666;
+  color: #6B7280;
   margin-bottom: 10rpx;
 }
 
 .appointment-number {
   font-size: 40rpx;
-  font-weight: bold;
-  color: #333;
+  font-weight: 700;
+  color: #111827;
   margin: 20rpx 0;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .modal-tip {
   font-size: 24rpx;
-  color: #999;
+  color: #9CA3AF;
 }
 
 .modal-actions {
@@ -231,16 +249,19 @@ input, .picker, textarea {
 .modal-btn {
   flex: 1;
   font-size: 28rpx;
-  border-radius: 8rpx;
+  border-radius: 0;
   padding: 16rpx 0;
+  border: none;
+  font-weight: 600;
 }
 
 .modal-btn.secondary {
-  background: #f5f5f5;
-  color: #666;
+  background: #F9FAFB;
+  color: #6B7280;
+  border: 1px solid #E5E7EB;
 }
 
 .modal-btn.primary {
-  background: #28a745;
-  color: white;
+  background: #111827;
+  color: #FFFFFF;
 }

@@ -1,2 +1,113 @@
 <!--pages/my-appointments/my-appointments.wxml-->
-<text>pages/my-appointments/my-appointments.wxml</text>
+<view class="container">
+  <!-- 未登录状态 -->
+  <view class="login-prompt" wx:if="{{!userInfo}}">
+    <svg-icon name="lock" size="48" color="#9CA3AF" />
+    <text class="prompt-text">请先登录以查看预约信息</text>
+    <button class="btn-primary" bindtap="goLogin">立即登录</button>
+  </view>
+
+  <view class="content" wx:else>
+    <!-- 1. 当前房屋信息 (Current House) -->
+    <view class="section">
+      <view class="section-header">
+        <svg-icon name="home" size="18" color="#111827" />
+        <text class="section-title">当前房屋 (CURRENT HOUSE)</text>
+      </view>
+
+      <view class="card" wx:if="{{activeLease}}">
+        <view class="card-header">
+          <text class="card-title">租约: {{activeLease.contractNumber}}</text>
+          <view class="status-badge" style="color: {{activeLease.statusInfo.color}}; border-color: {{activeLease.statusInfo.color}}">
+            {{activeLease.statusInfo.text}}
+          </view>
+        </view>
+
+        <view class="info-grid">
+          <view class="info-item">
+            <text class="label">租期</text>
+            <text class="value">{{activeLease.formattedStart}} - {{activeLease.formattedEnd}}</text>
+          </view>
+          <view class="info-item">
+            <text class="label">月租金</text>
+            <text class="value price">¥{{activeLease.monthlyRent}}<text class="unit">/月</text></text>
+          </view>
+          <view class="info-item">
+            <text class="label">付款方式</text>
+            <text class="value">{{activeLease.paymentMethod}}</text>
+          </view>
+        </view>
+
+        <!-- 水电费 -->
+        <view class="divider"></view>
+        <view class="subtitle">水电费用</view>
+        <view class="info-grid two-col">
+          <view class="info-item">
+            <text class="label">水费单价</text>
+            <text class="value">{{houseDetails.waterPrice ? '¥' + houseDetails.waterPrice : '-'}}</text>
+          </view>
+          <view class="info-item">
+            <text class="label">电费单价</text>
+            <text class="value">{{houseDetails.electricPrice ? '¥' + houseDetails.electricPrice : '-'}}</text>
+          </view>
+        </view>
+        
+        <!-- 房屋详情 -->
+         <view class="divider" wx:if="{{houseDetails}}"></view>
+         <view class="info-grid" wx:if="{{houseDetails}}">
+            <view class="info-item">
+              <text class="label">地址</text>
+              <text class="value">{{houseDetails.city}} {{houseDetails.district}} {{houseDetails.communityName}} {{houseDetails.building}}栋{{houseDetails.roomNo}}</text>
+            </view>
+         </view>
+      </view>
+
+      <view class="empty-card" wx:else>
+        <text>暂无有效租约</text>
+      </view>
+    </view>
+
+    <!-- 2. 预约列表 (Appointments) -->
+    <view class="section">
+      <view class="section-header">
+        <svg-icon name="check-circle" size="18" color="#111827" />
+        <text class="section-title">预约列表 (APPOINTMENTS)</text>
+      </view>
+
+      <view class="empty-card" wx:if="{{appointments.length === 0}}">
+        <text>暂无预约记录</text>
+        <button class="btn-secondary small" bindtap="goHome">去预约</button>
+      </view>
+
+      <view class="appointment-list" wx:else>
+        <view class="card appointment-item" wx:for="{{appointments}}" wx:key="id">
+          <view class="card-header">
+            <text class="appt-number">#{{item.appointmentNumber}}</text>
+            <view class="status-badge" style="color: {{item.statusInfo.color}}; border-color: {{item.statusInfo.color}}">
+              {{item.statusInfo.text}}
+            </view>
+          </view>
+
+          <view class="info-grid">
+            <view class="info-row">
+              <text class="label">类型</text>
+              <text class="value">{{item.typeText}}</text>
+            </view>
+            <view class="info-row">
+              <text class="label">日期</text>
+              <text class="value highlight">{{item.formattedDate}}</text>
+            </view>
+            <view class="info-row">
+              <text class="label">时间</text>
+              <text class="value">{{item.preferredTimeSlot}}</text>
+            </view>
+            <view class="info-row">
+              <text class="label">联系人</text>
+              <text class="value">{{item.contactName}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

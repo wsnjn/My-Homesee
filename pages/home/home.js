@@ -6,59 +6,60 @@ Page({
         isLoggedIn: false,
         showUserMenu: false,
         isScrolled: false,
+        isLongPressing: false, // For tooltip
         appointments: [],
         loadingAppointments: false,
         avatarUrl: '/models/image/default-avatar.png',
         displayName: '',
-        // 功能卡片数据
+        // 功能卡片数据 - 与Vue3前端对齐
         features: [
             {
                 id: 1,
-                name: 'VR漫游看房',
+                name: '全景看房',
                 icon: 'vr',
-                description: '体验沉浸式的房屋漫游功能，支持360度全景浏览和场景切换',
-                page: 'house-tour',
-                color: 'linear-gradient(135deg, #667eea, #764ba2)'
+                description: '全景漫游 / 沉浸式体验 / 360度浏览',
+                page: 'house-selection',
+                linkText: '立即体验'
             },
             {
                 id: 2,
                 name: '智能匹配',
                 icon: 'match',
-                description: '根据您的偏好和预算，智能推荐最适合的房源',
+                description: '智能算法 / 偏好分析 / 精准推荐',
                 page: 'smart-matching',
-                color: 'linear-gradient(135deg, #FF9A9E, #FECFEF)'
+                linkText: '开始匹配'
             },
             {
                 id: 3,
                 name: '安全保障',
                 icon: 'safe',
-                description: '严格的房源审核机制，确保每一笔交易的安全可靠',
+                description: '实名认证 / 交易担保 / 隐私保护',
                 page: 'my-appointments',
-                color: 'linear-gradient(135deg, #a18cd1, #fbc2eb)'
+                linkText: '查看详情'
             },
             {
                 id: 4,
-                name: '维修处理',
+                name: '在线报修',
                 icon: 'fix',
-                description: '房屋维修服务，快速响应您的维修需求',
+                description: '在线报修 / 进度追踪 / 快速响应',
                 page: 'maintenance',
-                color: 'linear-gradient(135deg, #84fab0, #8fd3f4)'
+                linkText: '立即报修'
             },
             {
                 id: 5,
-                name: '社区交流',
+                name: '社区互动',
                 icon: 'community',
-                description: '与邻居交流，分享生活点滴，建立社区联系',
+                description: '邻里互动 / 经验分享 / 活动组织',
                 page: 'community',
-                color: 'linear-gradient(135deg, #fccb90, #d57eeb)'
+                linkText: '加入社区'
             },
             {
                 id: 6,
-                name: '交互方块',
-                icon: 'virtual',
-                description: '探索全息交互的未来实验场，体验多维空间',
-                page: 'interactive-cube',
-                color: 'linear-gradient(135deg, #00f2ff, #007bff)'
+                name: '地图找房',
+                icon: 'map',
+                description: '地图选房 / 区域筛选 / 周边配套',
+                page: 'map-search',
+                linkText: '查看地图'
             }
         ]
     },
@@ -125,6 +126,16 @@ Page({
         });
     },
 
+    showUserDetail() {
+        this.setData({ isLongPressing: true });
+    },
+
+    hideUserDetail() {
+        if (this.data.isLongPressing) {
+            this.setData({ isLongPressing: false });
+        }
+    },
+
     navigateToLogin() {
         wx.navigateTo({ url: '/pages/login/login' }); // Assuming login page exists or will exist
     },
@@ -178,7 +189,7 @@ Page({
     navigateToFeature(e) {
         const { page } = e.currentTarget.dataset;
         if (page) {
-            const tabPages = ['home', 'house-selection', 'smart-matching'];
+            const tabPages = ['home', 'house-selection', 'smart-matching', 'map-search'];
             if (tabPages.includes(page)) {
                 wx.switchTab({ url: `/pages/${page}/${page}` });
             } else {

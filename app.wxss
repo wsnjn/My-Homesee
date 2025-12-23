@@ -1,4 +1,6 @@
 /**app.wxss**/
+/* 导入工业极简设计系统 */
+@import "styles/industrial-minimal.wxss";
 .container {
   height: 100%;
   display: flex;

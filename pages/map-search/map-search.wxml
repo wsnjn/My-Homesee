@@ -1,0 +1,134 @@
+<!--pages/map-search/map-search.wxml-->
+<view class="container">
+  <!-- Map Component (Full Screen) -->
+  <map 
+    id="map" 
+    class="map"
+    latitude="{{latitude}}" 
+    longitude="{{longitude}}" 
+    scale="{{scale}}"
+    markers="{{markers}}"
+    bindmarkertap="onMarkerTap"
+    bindregionchange="onRegionChange"
+    bindtap="onMapTap"
+    show-location
+  ></map>
+
+  <!-- Collapsible Sidebar (Absolute Position) -->
+  <view class="sidebar {{sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}}">
+    <view class="sidebar-content">
+      <!-- Search Bar -->
+      <view class="sidebar-search">
+        <input 
+          class="sidebar-search-input"
+          placeholder="输入区域、地铁、小区名房..." 
+          placeholder-class="placeholder"
+          bindinput="onSearchInput"
+          bindconfirm="onSearchConfirm"
+        />
+        <view class="sidebar-search-btn" bindtap="onSearchConfirm">
+          <svg-icon name="search" size="18" color="#fff" />
+        </view>
+      </view>
+
+      <!-- AI Completion Button -->
+      <button class="sidebar-ai-btn" bindtap="startAICompletion">
+        AI 完善数据
+      </button>
+
+      <!-- Divider -->
+      <view class="sidebar-divider"></view>
+
+      <!-- Filter Tags -->
+      <view class="sidebar-filters">
+        <view 
+          class="sidebar-tag {{activeFilters.includes('whole') ? 'active' : ''}}" 
+          bindtap="toggleFilter" data-type="whole"
+        >整租</view>
+        <view 
+          class="sidebar-tag {{activeFilters.includes('shared') ? 'active' : ''}}" 
+          bindtap="toggleFilter" data-type="shared"
+        >合租</view>
+        <view 
+          class="sidebar-tag {{activeFilters.includes('single') ? 'active' : ''}}" 
+          bindtap="toggleFilter" data-type="single"
+        >单间</view>
+        <view 
+          class="sidebar-tag {{activeFilters.includes('subway') ? 'active' : ''}}" 
+          bindtap="toggleFilter" data-type="subway"
+        >近地铁</view>
+        <view 
+          class="sidebar-tag {{activeFilters.includes('price_desc') ? 'active' : ''}}" 
+          bindtap="toggleFilter" data-type="price_desc"
+        >价格↓</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Sidebar Toggle Button -->
+  <view class="sidebar-toggle" bindtap="toggleSidebar">
+    <text>{{sidebarOpen ? '◀' : '▶'}}</text>
+  </view>
+
+
+  <!-- Room Detail Modal -->
+  <view class="modal-overlay {{showDetail ? 'show' : ''}}" wx:if="{{selectedRoom}}" bindtap="closeDetail">
+    <view class="modal-content" catchtap="preventBubble">
+      <!-- Close Button -->
+      <view class="modal-close" bindtap="closeDetail">
+        <text>✕</text>
+      </view>
+
+      <!-- Header -->
+      <view class="modal-header">
+        <text class="modal-title">{{selectedRoom.communityName}} {{selectedRoom.roomNumber || ''}}</text>
+        <text class="modal-price">¥{{selectedRoom.rentPrice}}<text class="unit">/月</text></text>
+      </view>
+
+      <!-- Info -->
+      <view class="modal-info">
+        <text class="info-text">{{selectedRoom.bedroomCount || 1}}室{{selectedRoom.parlorCount || 1}}厅 | {{selectedRoom.roomArea}}㎡ | {{selectedRoom.direction || '南'}}</text>
+      </view>
+
+      <!-- Tags -->
+      <view class="modal-tags">
+        <text class="modal-tag">随时看房</text>
+        <text class="modal-tag" wx:if="{{selectedRoom.rentalType === 0}}">整租</text>
+        <text class="modal-tag" wx:elif="{{selectedRoom.rentalType === 1}}">合租</text>
+        <text class="modal-tag" wx:elif="{{selectedRoom.rentalType === 2}}">单间</text>
+      </view>
+
+      <!-- AI Analysis Section -->
+      <view class="modal-ai-section">
+        <view class="ai-title">
+          <svg-icon name="ai-sparkle" size="14" color="#2563EB" />
+          <text class="ai-title-text">AI 周边配套分析</text>
+        </view>
+        <view class="ai-tags">
+           <!-- Loading State -->
+           <view class="ai-tag loading" wx:if="{{aiLoading}}">
+             <view class="loading-spinner"></view>
+             <text class="ai-tag-text">AI 正在分析周边配套...</text>
+           </view>
+
+           <!-- Result List -->
+           <block wx:else>
+             <view class="ai-tag" wx:for="{{aiItems}}" wx:key="name">
+                <svg-icon name="{{item.type}}" size="12" color="{{item.color}}" />
+                <text class="ai-tag-text">{{item.name}} <text class="ai-dist-text">{{item.distance}}m</text></text>
+             </view>
+             
+             <!-- Empty State -->
+             <view class="ai-tag" wx:if="{{aiItems.length === 0}}">
+                <text class="ai-tag-text empty-text">暂无周边配套数据</text>
+             </view>
+           </block>
+        </view>
+      </view>
+
+      <!-- Action Button -->
+      <button class="modal-action-btn" bindtap="navigateToDetail">查看详情</button>
+    </view>
+  </view>
+
+</view>

@@ -17,7 +17,8 @@
     "pages/maintenance-list/maintenance-list",
     "pages/index/index",
     "pages/logs/logs",
-    "pages/interactive-cube/interactive-cube"
+    "pages/interactive-cube/interactive-cube",
+    "pages/map-search/map-search"
   ],
   "window": {
     "navigationBarTextStyle": "black",
@@ -39,11 +40,15 @@
       },
       {
         "pagePath": "pages/house-selection/house-selection",
-        "text": "找房"
+        "text": "房源精选"
       },
       {
         "pagePath": "pages/smart-matching/smart-matching",
         "text": "匹配"
+      },
+      {
+        "pagePath": "pages/map-search/map-search",
+        "text": "地图找房"
       }
     ]
   },

@@ -1,0 +1,375 @@
+/* 工业极简设计系统 - 全局样式 */
+/* Industrial Minimal Design System - Global Styles */
+
+/* ==================== 色彩系统 (Color System) ==================== */
+
+/* 基础色 (Base Colors) */
+page {
+  /* 画布底色 - 纯白背景，保持干净 */
+  --canvas-bg: #FFFFFF;
+  
+  /* 深色底/强强调 - 用于侧边栏背景、主按钮、强调边框 */
+  --primary-dark: #111827;
+  
+  /* 浅灰底 - 用于列表交替、Hover背景 */
+  --light-bg: #F9FAFB;
+  
+  /* 容器边框 - 用于常规分割线 */
+  --border-color: #E5E7EB;
+  
+  /* 中灰底 */
+  --mid-gray: #F3F4F6;
+  
+  /* 深灰底 */
+  --dark-gray: #374151;
+}
+
+/* 文字色 (Typography Colors) */
+page {
+  /* 主标题/正文 - 最深灰，接近纯黑 */
+  --text-primary: #111827;
+  
+  /* 次级信息 - 用于描述、图标 */
+  --text-secondary: #6B7280;
+  
+  /* 弱信息/占位 - 用于时间戳、无关紧要信息 */
+  --text-weak: #9CA3AF;
+}
+
+/* 功能色 (Functional Colors) */
+page {
+  /* 在线/成功 - 状态点 */
+  --color-success: #10B981;
+  
+  /* 错误/删除 - 警示操作 */
+  --color-error: #EF4444;
+  
+  /* 自己消息泡 - 聊天中已发消息背景色 */
+  --color-message-self: #4B5563;
+}
+
+/* ==================== 全局重置 (Global Reset) ==================== */
+
+/* 页面基础样式 */
+page {
+  background-color: var(--canvas-bg);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica,
+    Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 
+    'Microsoft Yahei', sans-serif;
+  font-size: 28rpx;
+  line-height: 1.5;
+}
+
+/* 移除所有默认圆角 */
+view, button, input, textarea, image {
+  border-radius: 0 !important;
+}
+
+/* 移除所有默认阴影 */
+view, button, input, textarea {
+  box-shadow: none !important;
+}
+
+/* ==================== 按钮样式 (Button Styles) ==================== */
+
+/* 主按钮 - 黑底白字 */
+.btn-primary {
+  background-color: var(--primary-dark);
+  color: #FFFFFF;
+  border: none;
+  padding: 20rpx 40rpx;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-primary:hover,
+.btn-primary:active {
+  background-color: var(--dark-gray);
+}
+
+/* 次级按钮 - 白底黑边 */
+.btn-secondary {
+  background-color: #FFFFFF;
+  color: var(--primary-dark);
+  border: 2rpx solid var(--primary-dark);
+  padding: 20rpx 40rpx;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover,
+.btn-secondary:active {
+  background-color: var(--light-bg);
+}
+
+/* 图标按钮 - 无背景 */
+.btn-icon {
+  background: transparent;
+  border: none;
+  padding: 16rpx;
+  transition: all 0.2s;
+}
+
+.btn-icon:hover,
+.btn-icon:active {
+  background-color: var(--light-bg);
+}
+
+/* 禁用按钮 */
+.btn-disabled,
+button[disabled] {
+  background-color: var(--border-color) !important;
+  color: var(--text-weak) !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ==================== 输入框样式 (Input Styles) ==================== */
+
+/* 标准输入框 */
+.input-field {
+  border: 1rpx solid var(--border-color);
+  border-radius: 0;
+  padding: 20rpx 24rpx;
+  background-color: #FFFFFF;
+  color: var(--text-primary);
+  font-size: 28rpx;
+  transition: border-color 0.2s;
+}
+
+.input-field:focus,
+.input-field.focus {
+  border-color: var(--primary-dark);
+  outline: none;
+}
+
+/* 文本域 */
+.textarea-field {
+  border: 1rpx solid var(--border-color);
+  border-radius: 0;
+  padding: 20rpx 24rpx;
+  background-color: #FFFFFF;
+  color: var(--text-primary);
+  font-size: 28rpx;
+  min-height: 160rpx;
+  transition: border-color 0.2s;
+}
+
+.textarea-field:focus,
+.textarea-field.focus {
+  border-color: var(--primary-dark);
+}
+
+/* ==================== 卡片样式 (Card Styles) ==================== */
+
+/* 标准卡片 */
+.card {
+  background-color: #FFFFFF;
+  border: 1rpx solid var(--border-color);
+  border-radius: 0;
+  padding: 40rpx;
+  transition: border-color 0.2s;
+}
+
+.card:hover {
+  border-color: var(--primary-dark);
+}
+
+/* 简洁卡片 - 无内边距 */
+.card-compact {
+  background-color: #FFFFFF;
+  border: 1rpx solid var(--border-color);
+  border-radius: 0;
+}
+
+/* ==================== 列表样式 (List Styles) ==================== */
+
+/* 列表项 */
+.list-item {
+  padding: 30rpx;
+  border-bottom: 1rpx solid var(--border-color);
+  background-color: #FFFFFF;
+  transition: background-color 0.2s;
+}
+
+.list-item:hover,
+.list-item:active {
+  background-color: var(--light-bg);
+}
+
+.list-item.active {
+  border-left: 6rpx solid var(--primary-dark);
+  background-color: var(--light-bg);
+}
+
+/* ==================== 标签样式 (Tag/Badge Styles) ==================== */
+
+/* 标准标签 - 直角 */
+.tag {
+  display: inline-block;
+  padding: 8rpx 16rpx;
+  border-radius: 0;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+/* 状态标签 - 成功/在线 */
+.tag-success {
+  background-color: var(--color-success);
+  color: #FFFFFF;
+}
+
+/* 状态标签 - 错误/下架 */
+.tag-error {
+  background-color: var(--color-error);
+  color: #FFFFFF;
+}
+
+/* 状态标签 - 灰色/中性 */
+.tag-neutral {
+  background-color: var(--text-secondary);
+  color: #FFFFFF;
+}
+
+/* 状态标签 - 深色 */
+.tag-dark {
+  background-color: var(--primary-dark);
+  color: #FFFFFF;
+}
+
+/* ==================== 头像样式 (Avatar Styles) ==================== */
+
+/* 圆形头像 - 唯一例外，用于人物识别 */
+.avatar {
+  border-radius: 50% !important;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatar-sm {
+  width: 64rpx;
+  height: 64rpx;
+}
+
+.avatar-md {
+  width: 80rpx;
+  height: 80rpx;
+}
+
+.avatar-lg {
+  width: 100rpx;
+  height: 100rpx;
+}
+
+/* 状态指示点 - 圆形 */
+.status-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50% !important;
+  background-color: var(--color-success);
+  border: 2rpx solid #FFFFFF;
+}
+
+/* ==================== 分割线 (Divider) ==================== */
+
+.divider {
+  height: 1rpx;
+  background-color: var(--border-color);
+  margin: 32rpx 0;
+}
+
+.divider-vertical {
+  width: 1rpx;
+  background-color: var(--border-color);
+  height: 100%;
+}
+
+/* ==================== 工具类 (Utility Classes) ==================== */
+
+/* 文字对齐 */
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+/* 文字颜色 */
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-weak { color: var(--text-weak); }
+.text-white { color: #FFFFFF; }
+
+/* 文字粗细 */
+.font-normal { font-weight: 400; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+/* 背景色 */
+.bg-white { background-color: #FFFFFF; }
+.bg-light { background-color: var(--light-bg); }
+.bg-dark { background-color: var(--primary-dark); }
+.bg-mid-gray { background-color: var(--mid-gray); }
+
+/* 边框 */
+.border { border: 1rpx solid var(--border-color); }
+.border-top { border-top: 1rpx solid var(--border-color); }
+.border-bottom { border-bottom: 1rpx solid var(--border-color); }
+.border-left { border-left: 1rpx solid var(--border-color); }
+.border-right { border-right: 1rpx solid var(--border-color); }
+
+.border-dark { border-color: var(--primary-dark); }
+
+/* Flex 布局 */
+.flex { display: flex; }
+.flex-column { flex-direction: column; }
+.flex-center { align-items: center; justify-content: center; }
+.flex-between { justify-content: space-between; }
+.flex-around { justify-content: space-around; }
+.flex-1 { flex: 1; }
+
+/* 间距 */
+.p-0 { padding: 0; }
+.p-1 { padding: 16rpx; }
+.p-2 { padding: 24rpx; }
+.p-3 { padding: 32rpx; }
+.p-4 { padding: 40rpx; }
+
+.m-0 { margin: 0; }
+.m-1 { margin: 16rpx; }
+.m-2 { margin: 24rpx; }
+.m-3 { margin: 32rpx; }
+.m-4 { margin: 40rpx; }
+
+/* ==================== 动画 (Animations) ==================== */
+
+/* 简单过渡 - 仅颜色和边框 */
+.transition {
+  transition: all 0.2s ease;
+}
+
+/* 禁用所有变换动画 */
+.no-transform {
+  transform: none !important;
+}
+
+/* ==================== 覆盖默认小程序样式 ==================== */
+
+/* 移除 button 默认样式 */
+button::after {
+  border: none;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  line-height: inherit;
+}
+
+/* 移除 input 默认样式 */
+input {
+  background-color: transparent;
+}
+
+/* 移除 navigator 默认样式 */
+navigator {
+  display: inline-block;
+}

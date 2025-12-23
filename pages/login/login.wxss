@@ -1,93 +1,64 @@
 /* pages/login/login.wxss */
+/* 工业极简风格 - 登录页 */
+
 .login-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  background: #FFFFFF;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 40rpx;
   position: relative;
-  overflow: hidden;
 }
 
-/* 背景装饰圆 */
+/* 移除背景装饰圆 - 违反工业极简原则 */
 .bg-circle {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60rpx);
-  z-index: 0;
+  display: none;
 }
 
-.circle-1 {
-  width: 400rpx;
-  height: 400rpx;
-  background: rgba(102, 126, 234, 0.4);
-  top: -100rpx;
-  right: -100rpx;
-  animation: float 8s infinite ease-in-out;
-}
-
-.circle-2 {
-  width: 300rpx;
-  height: 300rpx;
-  background: rgba(118, 75, 162, 0.4);
-  bottom: -50rpx;
-  left: -50rpx;
-  animation: float 8s infinite ease-in-out reverse;
-}
-
-@keyframes float {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(20rpx, 30rpx); }
-}
-
-/* 玻璃拟态卡片 */
+/* 主卡片 - 直角设计 */
 .glass-card {
   width: 100%;
   max-width: 650rpx;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20rpx);
-  -webkit-backdrop-filter: blur(20rpx);
-  border-radius: 40rpx;
-  padding: 40rpx 30rpx;
-  box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.1);
-  border: 1rpx solid rgba(255, 255, 255, 0.8);
+  background: #FFFFFF;
+  backdrop-filter: none;
+  border-radius: 0;
+  padding: 60rpx 40rpx;
+  box-shadow: none;
+  border: 1px solid #E5E7EB;
   z-index: 1;
-  animation: slideUp 0.6s ease-out;
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(40rpx); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 /* 头部 */
 .login-header {
   text-align: center;
-  margin-bottom: 30rpx;
+  margin-bottom: 40rpx;
 }
 
 .logo-area {
-  margin-bottom: 10rpx;
+  margin-bottom: 20rpx;
 }
 
 .app-logo {
-  width: 100rpx;
-  height: 100rpx;
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 0;
 }
 
 .login-title {
   display: block;
-  font-size: 40rpx;
-  font-weight: 800;
-  color: #2d3436;
-  margin-bottom: 6rpx;
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8rpx;
+  letter-spacing: -0.5px;
 }
 
 .login-subtitle {
   font-size: 26rpx;
-  color: #636e72;
+  color: #6B7280;
+  font-weight: 400;
 }
 
 /* 表单 */
@@ -95,72 +66,92 @@
   display: block;
 }
 
+/* 输入组 - 直角设计 */
 .input-group {
   position: relative;
   margin-bottom: 24rpx;
   display: flex;
   align-items: center;
-  background: #fff;
-  border-radius: 20rpx;
+  background: #FFFFFF;
+  border-radius: 0;
   padding: 0 30rpx;
-  height: 88rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.03);
-  border: 2rpx solid transparent;
-  transition: all 0.3s;
+  height: 96rpx;
+  box-shadow: none;
+  border: 1px solid #E5E7EB;
+  transition: border-color 0.2s;
 }
 
 .input-group:focus-within {
-  border-color: #667eea;
-  box-shadow: 0 4rpx 20rpx rgba(102, 126, 234, 0.2);
-  transform: translateY(-2rpx);
+  border-color: #111827;
+  box-shadow: none;
+  transform: none;
 }
 
 .input-icon {
   font-size: 36rpx;
   margin-right: 20rpx;
-  opacity: 0.7;
+  color: #6B7280;
 }
 
 .input-field {
   flex: 1;
   height: 100%;
   font-size: 30rpx;
-  color: #2d3436;
+  color: #111827;
+  background: transparent;
+  border: none;
 }
 
 .input-placeholder {
-  color: #b2bec3;
+  color: #9CA3AF;
 }
 
-/* 按钮 */
+/* 按钮 - 黑色直角 */
 .submit-btn {
   margin-top: 40rpx;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
-  border-radius: 50rpx;
-  height: 88rpx;
+  background: #111827;
+  color: #FFFFFF;
+  border-radius: 0;
+  height: 96rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 32rpx;
   font-weight: 600;
-  box-shadow: 0 10rpx 30rpx rgba(102, 126, 234, 0.4);
-  transition: all 0.3s;
+  box-shadow: none;
+  transition: background-color 0.2s;
   border: none;
 }
 
 .submit-btn:active {
-  transform: scale(0.98);
-  box-shadow: 0 6rpx 20rpx rgba(102, 126, 234, 0.3);
+  transform: none;
+  background-color: #374151;
+  box-shadow: none;
 }
 
 .submit-btn.loading {
   opacity: 0.8;
+  background-color: #6B7280;
+}
+
+.loading-spinner {
+  width: 40rpx;
+  height: 40rpx;
+  margin-left: 16rpx;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #FFFFFF;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* 切换区域 */
 .toggle-area {
-  margin-top: 30rpx;
+  margin-top: 32rpx;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -168,21 +159,24 @@
 }
 
 .toggle-text {
-  color: #636e72;
+  color: #6B7280;
 }
 
 .toggle-btn {
-  color: #667eea;
+  color: #111827;
   font-weight: 600;
   margin-left: 10rpx;
-  padding: 10rpx 20rpx;
-  background: rgba(102, 126, 234, 0.1);
-  border-radius: 30rpx;
-  transition: all 0.3s;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  border: none;
+  border-bottom: 2px solid #111827;
+  transition: color 0.2s;
 }
 
 .toggle-btn:active {
-  background: rgba(102, 126, 234, 0.2);
+  background: transparent;
+  color: #374151;
 }
 
 /* 错误消息 */
@@ -190,11 +184,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ffecec;
+  background: #FEE2E2;
   padding: 20rpx;
-  border-radius: 16rpx;
+  border-radius: 0;
   margin-bottom: 30rpx;
-  animation: shake 0.4s ease-in-out;
+  border: 1px solid #EF4444;
 }
 
 .error-message icon {
@@ -202,27 +196,22 @@
 }
 
 .error-message text {
-  color: #ff6b6b;
+  color: #EF4444;
   font-size: 26rpx;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-10rpx); }
-  75% { transform: translateX(10rpx); }
 }
 
 /* 底部协议 */
 .footer-agreement {
-  margin-top: 40rpx;
+  margin-top: 48rpx;
   font-size: 22rpx;
-  color: #636e72;
+  color: #6B7280;
   text-align: center;
   z-index: 1;
 }
 
 .footer-agreement .link {
-  color: #667eea;
+  color: #111827;
   display: inline-block;
   margin: 0 4rpx;
+  border-bottom: 1px solid #111827;
 }

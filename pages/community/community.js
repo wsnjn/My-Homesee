@@ -27,9 +27,12 @@ Page({
 
     showGroupModal: false,
     showFriendModal: false,
+    showPostModal: false,
     newGroupName: '',
     newGroupAnnouncement: '',
     friendPhone: '',
+    newPostContent: '',
+    postVisibility: 0, // 0: public, 1: friends
 
     userInfoCache: {}
   },
@@ -443,10 +446,60 @@ Page({
   },
 
   hideModal() {
-    this.setData({ showGroupModal: false, showFriendModal: false });
+    this.setData({
+      showGroupModal: false,
+      showFriendModal: false,
+      showPostModal: false
+    });
+  },
+
+  preventBubble() {
+    // 阻止事件冒泡
   },
 
   // ========== 帖子功能 ==========
+
+  onPostContentInput(e) {
+    this.setData({ newPostContent: e.detail.value });
+  },
+
+  setPostVisibility(e) {
+    const visibility = e.currentTarget.dataset.value;
+    this.setData({ postVisibility: parseInt(visibility) });
+  },
+
+  async publishPost() {
+    if (!this.data.newPostContent.trim()) {
+      wx.showToast({ title: '请输入内容', icon: 'none' });
+      return;
+    }
+
+    try {
+      const res = await request({
+        url: '/api/community/posts/create',
+        method: 'POST',
+        data: {
+          userId: this.data.userId,
+          content: this.data.newPostContent,
+          visibility: this.data.postVisibility,
+          mediaUrls: JSON.stringify([]) // TODO: Support image upload
+        }
+      });
+
+      if (res.success) {
+        this.setData({
+          showPostModal: false,
+          newPostContent: '',
+          postVisibility: 0
+        });
+        wx.showToast({ title: '发布成功', icon: 'success' });
+        this.loadPosts(true);
+      }
+    } catch (e) {
+      console.error('发布帖子失败', e);
+      wx.showToast({ title: '发布失败', icon: 'none' });
+    }
+  },
 
   async loadPosts(reset = false) {
     if (this.data.loading || (!reset && !this.data.hasMore)) return;
@@ -602,7 +655,7 @@ Page({
       wx.navigateTo({ url: '/pages/login/login' });
       return;
     }
-    wx.navigateTo({ url: '/pages/post-create/post-create' });
+    this.setData({ showPostModal: true });
   },
 
   previewImage(e) {
