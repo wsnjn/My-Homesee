@@ -8,7 +8,7 @@ Page({
     userInput: '',
     loading: false,
     scrollTop: 0,
-    avatarUrl: '/models/image/default-avatar.png'
+    avatarUrl: 'https://files.homesee.xyz/api/files/download/default-avatar.png'
   },
 
   onLoad() {
@@ -43,7 +43,7 @@ Page({
 
   getAvatarUrl(user) {
     if (!user || !user.avatar) {
-      return '/models/image/default-avatar.png';
+      return 'https://files.homesee.xyz/api/files/download/default-avatar.png';
     }
     if (user.avatar.startsWith('http')) {
       return user.avatar;
@@ -319,7 +319,7 @@ Page({
     const { type, id } = e.currentTarget.dataset;
     if (type === 'house-tour' && id) {
       wx.navigateTo({
-        url: `/pages/house-tour/house-tour?id=${id}`
+        url: `/packageA/pages/house-tour/house-tour?id=${id}`
       });
     } else if (type === 'appointment' && id) {
       wx.navigateTo({

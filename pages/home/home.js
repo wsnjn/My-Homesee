@@ -9,7 +9,7 @@ Page({
         isLongPressing: false, // For tooltip
         appointments: [],
         loadingAppointments: false,
-        avatarUrl: '/models/image/default-avatar.png',
+        avatarUrl: 'https://files.homesee.xyz/api/files/download/default-avatar.png',
         displayName: '',
         // 功能卡片数据 - 与Vue3前端对齐
         features: [
@@ -95,7 +95,7 @@ Page({
                 user: null,
                 isLoggedIn: false,
                 displayName: '',
-                avatarUrl: '/models/image/default-avatar.png',
+                avatarUrl: 'https://files.homesee.xyz/api/files/download/default-avatar.png',
                 appointments: []
             });
         }
@@ -103,7 +103,7 @@ Page({
 
     getAvatarUrl(user) {
         if (!user || !user.avatar) {
-            return '/models/image/default-avatar.png';
+            return 'https://files.homesee.xyz/api/files/download/default-avatar.png';
         }
         if (user.avatar.startsWith('http')) {
             return user.avatar;
@@ -137,12 +137,12 @@ Page({
     },
 
     navigateToLogin() {
-        wx.navigateTo({ url: '/pages/login/login' }); // Assuming login page exists or will exist
+        wx.navigateTo({ url: '/pages/login/login' });
     },
 
     navigateToUserProfile() {
         this.closeUserMenu();
-        wx.navigateTo({ url: '/pages/user-profile/user-profile' });
+        wx.navigateTo({ url: '/packageB/pages/user-profile/user-profile' });
     },
 
     logout() {
@@ -170,11 +170,11 @@ Page({
     },
 
     navigateToMyAppointments() {
-        wx.navigateTo({ url: '/pages/my-appointments/my-appointments' });
+        wx.navigateTo({ url: '/packageB/pages/my-appointments/my-appointments' });
     },
 
     navigateToMaintenance() {
-        wx.navigateTo({ url: '/pages/maintenance/maintenance' });
+        wx.navigateTo({ url: '/packageB/pages/maintenance/maintenance' });
     },
 
     navigateToCommunity() {
@@ -182,19 +182,41 @@ Page({
     },
 
     navigateToVirtualWorld() {
-        wx.navigateTo({ url: '/pages/interactive-cube/interactive-cube' });
+        wx.navigateTo({ url: '/packageA/pages/interactive-cube/interactive-cube' });
     },
 
     // 功能卡片导航
     navigateToFeature(e) {
         const { page } = e.currentTarget.dataset;
-        if (page) {
-            const tabPages = ['home', 'house-selection', 'smart-matching', 'map-search'];
-            if (tabPages.includes(page)) {
-                wx.switchTab({ url: `/pages/${page}/${page}` });
+        if (!page) return;
+
+        // Special handling for pages that might be tabs or in subpackages
+        const pageMap = {
+            'house-selection': { url: '/pages/house-selection/house-selection', type: 'switchTab' },
+            'smart-matching': { url: '/pages/smart-matching/smart-matching', type: 'switchTab' },
+            'map-search': { url: '/pages/map-search/map-search', type: 'switchTab' },
+            'community': { url: '/pages/community/community', type: 'navigate' },
+            'maintenance': { url: '/packageB/pages/maintenance/maintenance', type: 'navigate' },
+            'my-appointments': { url: '/packageB/pages/my-appointments/my-appointments', type: 'navigate' }, // Using my-appointments for Safe Security temporarily if no specific page
+            'user-profile': { url: '/packageB/pages/user-profile/user-profile', type: 'navigate' }
+        };
+
+        const target = pageMap[page];
+        if (target) {
+            if (target.type === 'switchTab') {
+                wx.switchTab({ url: target.url });
             } else {
-                wx.navigateTo({ url: `/pages/${page}/${page}` });
+                wx.navigateTo({ url: target.url });
             }
+        } else {
+            // Fallback for direct path usage or unknown keys
+            wx.navigateTo({
+                url: `/pages/${page}/${page}`, fail: () => {
+                    // Try packageA/B as fallback if simple path fails?
+                    // For now, allow failing if not in map to encourage mapped safety
+                    console.warn(`Page ${page} not found in map and direct navigation failed.`);
+                }
+            });
         }
     },
 

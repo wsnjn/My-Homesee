@@ -32,7 +32,7 @@
   <view class="chat-content" wx:if="{{currentTab === 'chat'}}">
     <!-- 用户信息 -->
     <view class="user-profile" wx:if="{{userInfo}}">
-      <image class="profile-avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <image class="profile-avatar" src="{{userInfo.avatarUrl || 'https://files.homesee.xyz/api/files/download/default-avatar.png'}}" mode="aspectFill"></image>
       <view class="profile-info">
         <text class="profile-name">{{userInfo.username || userInfo.realName || '用户'}}</text>
         <view class="profile-status">
@@ -74,7 +74,7 @@
         <image 
           wx:if="{{item.groupType === 3}}"
           class="item-avatar friend-type" 
-          src="{{item.displayAvatar || '/images/default-avatar.png'}}" 
+          src="{{item.displayAvatar || 'https://files.homesee.xyz/api/files/download/default-avatar.png'}}" 
           mode="aspectFill"
         ></image>
         <!-- 群组显示群组图标 -->
@@ -115,7 +115,7 @@
 
       <view class="empty-hint" wx:if="{{friends.length === 0}}">暂无好友</view>
       <view class="chat-item" wx:for="{{friends}}" wx:key="id">
-        <image class="item-avatar friend-type" src="{{item.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+        <image class="item-avatar friend-type" src="{{item.avatarUrl || 'https://files.homesee.xyz/api/files/download/default-avatar.png'}}" mode="aspectFill"></image>
         <view class="item-info">
           <text class="item-name">{{item.username}}</text>
           <text class="item-desc">在线</text>
@@ -151,7 +151,7 @@
         <image 
           class="message-avatar" 
           wx:if="{{item.senderId !== userId}}"
-          src="{{item.senderAvatar || '/images/default-avatar.png'}}" 
+          src="{{item.senderAvatar || 'https://files.homesee.xyz/api/files/download/default-avatar.png'}}" 
           mode="aspectFill"
         ></image>
         <view class="message-content">
@@ -196,7 +196,7 @@
 
     <view class="post-card" wx:for="{{posts}}" wx:key="id">
       <view class="post-header">
-        <image class="post-avatar" src="{{item.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+        <image class="post-avatar" src="{{item.avatarUrl || 'https://files.homesee.xyz/api/files/download/default-avatar.png'}}" mode="aspectFill"></image>
         <view class="user-info">
           <text class="username">{{item.username || '用户' + item.userId}}</text>
           <text class="time">{{item.formattedTime || item.createdTime}}</text>

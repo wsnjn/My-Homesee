@@ -10,6 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "threejs-miniprogram": "^0.0.8"
+    "@babel/runtime": "^7.28.4"
   }
 }

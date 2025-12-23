@@ -222,7 +222,7 @@ Page({
           const userInfo = this.data.userInfoCache[msg.senderId];
           return {
             ...msg,
-            senderAvatar: userInfo ? this.getAvatarUrl(userInfo.avatar) : '/images/models/default-avatar.png',
+            senderAvatar: userInfo ? this.getAvatarUrl(userInfo.avatar) : 'https://files.homesee.xyz/api/files/download/default-avatar.png',
             senderName: userInfo ? (userInfo.username || userInfo.realName || '用户') : '用户',
             formattedTime: this.formatTime(msg.createdTime)
           };
@@ -667,7 +667,7 @@ Page({
 
   getAvatarUrl(avatarName) {
     console.log('getAvatarUrl input:', avatarName);
-    if (!avatarName) return '/images/models/default-avatar.png';
+    if (!avatarName) return 'https://files.homesee.xyz/api/files/download/default-avatar.png';
     if (avatarName.startsWith('http')) return avatarName;
     const url = `https://files.homesee.xyz/api/files/download/${avatarName}`;
     console.log('getAvatarUrl output:', url);

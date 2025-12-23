@@ -24,7 +24,7 @@
           />
           <image 
             wx:else
-            src="/images/models/IMG_20251208_160325.png"
+            src="https://files.homesee.xyz/api/files/download/IMG_20251208_160325.png"
             mode="aspectFill"
             class="avatar-img"
           />
@@ -69,7 +69,7 @@
       <view wx:if="{{loading}}" class="message ai-message">
         <view class="message-avatar">
           <image 
-            src="/images/models/IMG_20251208_160325.png"
+            src="https://files.homesee.xyz/api/files/download/IMG_20251208_160325.png"
             mode="aspectFill"
             class="avatar-img"
           />

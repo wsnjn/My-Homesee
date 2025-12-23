@@ -5,21 +5,59 @@
     "pages/house-selection/house-selection",
     "pages/smart-matching/smart-matching",
     "pages/community/community",
-    "pages/house-tour/house-tour",
-    "pages/maintenance/maintenance",
-    "pages/my-appointments/my-appointments",
-    "pages/user-profile/user-profile",
-    "pages/friend-circle/friend-circle",
-    "pages/chat-area/chat-area",
-    "pages/admin/admin",
-    "pages/landlord/landlord",
-    "pages/appointment/appointment",
-    "pages/maintenance-list/maintenance-list",
-    "pages/index/index",
-    "pages/logs/logs",
-    "pages/interactive-cube/interactive-cube",
     "pages/map-search/map-search"
   ],
+  "subpackages": [
+    {
+      "root": "packageA",
+      "name": "vr-tour",
+      "pages": [
+        "pages/house-tour/house-tour",
+        "pages/interactive-cube/interactive-cube"
+      ]
+    },
+    {
+      "root": "packageB",
+      "name": "tenant-services",
+      "pages": [
+        "pages/maintenance/maintenance",
+        "pages/my-appointments/my-appointments",
+        "pages/user-profile/user-profile",
+        "pages/appointment/appointment"
+      ]
+    },
+    {
+      "root": "packageC",
+      "name": "admin-management",
+      "pages": [
+        "pages/admin/admin",
+        "pages/landlord/landlord",
+        "pages/maintenance-list/maintenance-list"
+      ]
+    },
+    {
+      "root": "packageD",
+      "name": "social",
+      "pages": [
+        "pages/friend-circle/friend-circle",
+        "pages/chat-area/chat-area"
+      ]
+    }
+  ],
+  "preloadRule": {
+    "pages/home/home": {
+      "network": "all",
+      "packages": [
+        "tenant-services"
+      ]
+    },
+    "pages/house-selection/house-selection": {
+      "network": "all",
+      "packages": [
+        "vr-tour"
+      ]
+    }
+  },
   "window": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "HOMESEE",
@@ -56,18 +94,11 @@
   "usingComponents": {
     "svg-icon": "/components/svg-icon/svg-icon"
   },
-  "componentFramework": "glass-easel",
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents",
   "permission": {
     "scope.userLocation": {
       "desc": "你的位置信息将用于推荐附近的房源"
-    },
-    "scope.camera": {
-      "desc": "需要访问相机进行AR看房和图片上传"
-    },
-    "scope.record": {
-      "desc": "需要访问麦克风进行语音交互"
     }
   },
   "requiredPrivateInfos": [

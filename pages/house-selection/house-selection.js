@@ -534,7 +534,7 @@ Page({
   viewHouseDetail(e) {
     const { id } = e.currentTarget.dataset;
     wx.navigateTo({
-      url: `/pages/house-tour/house-tour?id=${id}`
+      url: `/packageA/pages/house-tour/house-tour?id=${id}`
     });
   },
 
@@ -607,7 +607,7 @@ Page({
   goToHouseTour(e) {
     const { id } = e.currentTarget.dataset;
     wx.navigateTo({
-      url: `/pages/house-tour/house-tour?id=${id}`
+      url: `/packageA/pages/house-tour/house-tour?id=${id}`
     });
   },
 

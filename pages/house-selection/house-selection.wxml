@@ -134,7 +134,7 @@
       <view class="house-image-wrapper" hover-class="house-image-wrapper-hover" hover-stay-time="100">
         <image 
           class="house-image" 
-          src="{{item.coverImage || '/images/models/客厅.jpg'}}" 
+          src="{{item.coverImage || 'https://files.homesee.xyz/api/files/download/客厅.jpg'}}" 
           mode="aspectFill"
         />
         <!-- 标签组：左上角 -->

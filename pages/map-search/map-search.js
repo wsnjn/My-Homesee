@@ -379,7 +379,7 @@ Page({
     navigateToDetail() {
         if (this.data.selectedRoom) {
             wx.navigateTo({
-                url: `/pages/house-detail/house-detail?id=${this.data.selectedRoom.id}`
+                url: `/packageA/pages/house-tour/house-tour?id=${this.data.selectedRoom.id}`
             });
         }
     },
