@@ -109,6 +109,12 @@
   margin-bottom: 10rpx;
 }
 
+/* rich-text 内容样式 */
+.rich-content {
+  line-height: 1.6;
+  word-break: break-word;
+}
+
 .link-text {
   color: #2563EB;
   text-decoration: underline;
@@ -117,7 +123,6 @@
 
 .link-group {
   display: inline-block;
-  margin-top: 10rpx;
 }
 
 .separator {

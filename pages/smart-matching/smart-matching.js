@@ -34,7 +34,7 @@ Page({
         messages: [{
           role: 'assistant',
           content: '您好！我是您的智能租房助手。请先登录以获取更个性化的服务。',
-          parsedContent: this.parseMessage('您好！我是您的智能租房助手。请先登录以获取更个性化的服务。'),
+          htmlContent: '您好！我是您的智能租房助手。请先登录以获取更个性化的服务。',
           timestamp: Date.now()
         }]
       });
@@ -65,7 +65,7 @@ Page({
       const messages = history.map(h => ({
         role: h.role,
         content: h.content,
-        parsedContent: this.parseMessage(h.content),
+        htmlContent: this.processHtmlForRichText(h.content),
         timestamp: new Date(h.createdTime).getTime()
       }));
 
@@ -75,7 +75,7 @@ Page({
         messages.push({
           role: 'assistant',
           content: welcomeMsg,
-          parsedContent: this.parseMessage(welcomeMsg),
+          htmlContent: this.processHtmlForRichText(welcomeMsg),
           timestamp: Date.now()
         });
       }
@@ -120,7 +120,6 @@ Page({
     const newMessage = {
       role: 'user',
       content: content,
-      parsedContent: this.parseMessage(content),
       timestamp: Date.now()
     };
 
@@ -150,7 +149,7 @@ Page({
           messages: [...this.data.messages, {
             role: 'assistant',
             content: aiMsg.content,
-            parsedContent: this.parseMessage(aiMsg.content),
+            htmlContent: this.processHtmlForRichText(aiMsg.content),
             timestamp: Date.now()
           }]
         });
@@ -160,7 +159,7 @@ Page({
           messages: [...this.data.messages, {
             role: 'assistant',
             content: errorMsg,
-            parsedContent: this.parseMessage(errorMsg),
+            htmlContent: this.processHtmlForRichText(errorMsg),
             timestamp: Date.now()
           }]
         });
@@ -173,7 +172,7 @@ Page({
         messages: [...this.data.messages, {
           role: 'assistant',
           content: netErrorMsg,
-          parsedContent: this.parseMessage(netErrorMsg),
+          htmlContent: this.processHtmlForRichText(netErrorMsg),
           timestamp: Date.now()
         }]
       });
@@ -190,141 +189,45 @@ Page({
     });
   },
 
-  // Parse HTML content into structured nodes
-  parseMessage(content) {
-    if (!content) return [];
+  // 处理 HTML 使其兼容 rich-text 组件
+  processHtmlForRichText(content) {
+    if (!content) return '';
 
-    let processed = content;
+    let html = content;
 
-    // 1. Extract and remove ACTION comment
-    const actionRegex = /<!--\s*ACTION:\s*({.*?})\s*-->/;
-    const actionMatch = processed.match(actionRegex);
-    if (actionMatch) {
-      try {
-        const action = JSON.parse(actionMatch[1]);
-        console.log('Hidden Action:', action);
-      } catch (e) {
-        console.error('Failed to parse action:', e);
-      }
-      processed = processed.replace(actionRegex, '');
-    }
+    // 1. 移除 ACTION 注释
+    html = html.replace(/<!--\s*ACTION:\s*({.*?})\s*-->/g, '');
 
-    // 2. Pre-process tags
-    processed = processed
-      .replace(/<br\s*\/?>/gi, '\n')
-      .replace(/<\/p>/gi, '\n')
-      .replace(/<p>/gi, '')
-      .replace(/\n\s*\n/g, '\n'); // Collapse multiple newlines into one
+    // 2. 清理多余空白：移除标签之间的空白和换行
+    html = html.replace(/>\s+</g, '><');  // 标签之间的空白
+    html = html.replace(/\n\s*/g, '');    // 移除所有换行和缩进
 
-    const nodes = [];
-    // Regex to match tags or text
-    const tagRegex = /<strong>(.*?)<\/strong>|<a\s+href="([^"]+)"[^>]*>(.*?)<\/a>/gi;
+    // 3. 处理列表：转换为紧凑的段落格式
+    html = html.replace(/<ul>/gi, '');
+    html = html.replace(/<\/ul>/gi, '');
+    html = html.replace(/<ol>/gi, '');
+    html = html.replace(/<\/ol>/gi, '');
+    html = html.replace(/<li>/gi, '<p style="margin:8px 0;">• ');  // 用段落替代li，添加bullet
+    html = html.replace(/<\/li>/gi, '</p>');
 
-    let lastIndex = 0;
-    let match;
+    // 4. 处理段落和换行
+    html = html.replace(/<p>/gi, '<p style="margin:8px 0;">');  // 紧凑段落间距
+    html = html.replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '<br/>');  // 连续br合并为一个
+    html = html.replace(/<br\s*\/?>/gi, '<br/>');  // 标准化br
 
-    while ((match = tagRegex.exec(processed)) !== null) {
-      // Add text before the tag
-      if (match.index > lastIndex) {
-        const text = processed.substring(lastIndex, match.index);
-        if (text) nodes.push({ type: 'text', text });
-      }
+    // 5. 将链接转换为带样式的文字
+    html = html.replace(
+      /<a\s+href="[^"]*houseId=(\d+)"[^>]*>([^<]*)<\/a>/gi,
+      '<span style="color:#007AFF;text-decoration:underline;">$2</span>'
+    );
 
-      if (match[0].toLowerCase().startsWith('<strong>')) {
-        // Bold
-        const text = match[1];
-        // Check if it's a title (e.g., "1. xxx")
-        if (/^\d+\./.test(text)) {
-          nodes.push({ type: 'title', text });
-        } else {
-          nodes.push({ type: 'bold', text });
-        }
-      } else if (match[0].toLowerCase().startsWith('<a')) {
-        // Link
-        const url = match[2];
-        const text = match[3];
-        let linkType = 'unknown';
-        let id = '';
+    // 6. 移除 target 属性
+    html = html.replace(/\s*target="[^"]*"/gi, '');
 
-        if (url.includes('house-tour')) {
-          linkType = 'house-tour';
-          const idMatch = url.match(/houseId=(\d+)/);
-          if (idMatch) id = idMatch[1];
-        } else if (url.includes('appointment')) {
-          linkType = 'appointment';
-          const idMatch = url.match(/houseId=(\d+)/);
-          if (idMatch) id = idMatch[1];
-        }
+    // 7. 加粗样式
+    html = html.replace(/<strong>/gi, '<span style="font-weight:bold;">');
+    html = html.replace(/<\/strong>/gi, '</span>');
 
-        nodes.push({ type: 'link', text, linkType, id, url });
-      }
-
-      lastIndex = tagRegex.lastIndex;
-    }
-
-    // Add remaining text
-    if (lastIndex < processed.length) {
-      const text = processed.substring(lastIndex);
-      if (text) nodes.push({ type: 'text', text });
-    }
-
-    return this.groupLinks(nodes);
-  },
-
-  // Group VR and Appointment links into a single block
-  groupLinks(nodes) {
-    const newNodes = [];
-    for (let i = 0; i < nodes.length; i++) {
-      const current = nodes[i];
-      // Look ahead for appointment link if current is house-tour link
-      if (current.type === 'link' && current.linkType === 'house-tour') {
-        let j = i + 1;
-        let foundAppointment = false;
-        let middleNodes = [];
-
-        // Scan next few nodes (limit to 3 to avoid scanning too far)
-        while (j < nodes.length && j < i + 4) {
-          const next = nodes[j];
-          if (next.type === 'link' && next.linkType === 'appointment') {
-            foundAppointment = true;
-            // Found it! Group them.
-            newNodes.push({
-              type: 'link-group',
-              items: [current, ...middleNodes, next]
-            });
-            i = j; // Advance main loop to the appointment link
-            break;
-          } else if (next.type === 'text') {
-            // Allow text nodes in between (like " | ", "\n", etc.)
-            middleNodes.push(next);
-          } else {
-            // If we hit something else (like bold or title), stop looking
-            break;
-          }
-          j++;
-        }
-
-        if (!foundAppointment) {
-          newNodes.push(current);
-        }
-      } else {
-        newNodes.push(current);
-      }
-    }
-    return newNodes;
-  },
-
-  // Handle link clicks
-  handleLinkTap(e) {
-    const { type, id } = e.currentTarget.dataset;
-    if (type === 'house-tour' && id) {
-      wx.navigateTo({
-        url: `/packageA/pages/house-tour/house-tour?id=${id}`
-      });
-    } else if (type === 'appointment' && id) {
-      wx.navigateTo({
-        url: `/pages/appointment/appointment?houseId=${id}`
-      });
-    }
+    return html;
   }
 });
