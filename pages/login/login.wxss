@@ -205,8 +205,41 @@
   margin-top: 48rpx;
   font-size: 22rpx;
   color: #6B7280;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 1;
+  padding: 20rpx;
+}
+
+.agreement-checkbox {
+  width: 32rpx;
+  height: 32rpx;
+  border: 1px solid #D1D5DB;
+  margin-right: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  background: #FFFFFF;
+}
+
+.agreement-checkbox.checked {
+  background: #111827;
+  border-color: #111827;
+}
+
+.checkbox-inner {
+  width: 12rpx;
+  height: 6rpx;
+  border-left: 2px solid #FFFFFF;
+  border-bottom: 2px solid #FFFFFF;
+  transform: rotate(-45deg) translate(2rpx, -2rpx);
+}
+
+.agreement-text {
+  display: flex;
+  align-items: center;
 }
 
 .footer-agreement .link {

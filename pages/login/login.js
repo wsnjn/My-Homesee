@@ -11,7 +11,8 @@ Page({
       phone: '',
       password: '',
       confirmPassword: '',
-      realName: ''
+      realName: '',
+      isAgreed: false // 默认不勾选
     }
   },
 
@@ -38,11 +39,29 @@ Page({
     });
   },
 
+  // 切换协议勾选状态
+  toggleAgreement() {
+    this.setData({
+      isAgreed: !this.data.isAgreed,
+      errorMessage: ''
+    });
+  },
+
+  // 打开用户协议
+  openAgreement() {
+    wx.showToast({ title: '用户协议', icon: 'none' });
+  },
+
+  // 打开隐私政策
+  openPrivacy() {
+    wx.showToast({ title: '隐私政策', icon: 'none' });
+  },
+
   // 表单输入处理
   onInputChange(e) {
     const { field } = e.currentTarget.dataset;
     const value = e.detail.value;
-    
+
     this.setData({
       [`formData.${field}`]: value
     });
@@ -81,7 +100,7 @@ Page({
   // 表单提交
   async handleSubmit() {
     const { isLogin, formData } = this.data;
-    
+
     // 表单验证
     if (!this.validateForm()) {
       return;
@@ -109,7 +128,7 @@ Page({
   // 登录处理
   async handleLogin() {
     const { phone, password } = this.data.formData;
-    
+
     const res = await post('/api/user/login', {
       phone: phone,
       password: password
@@ -118,7 +137,7 @@ Page({
     if (res.success) {
       // 保存用户信息
       wx.setStorageSync('user', res.user);
-      
+
       // 显示成功提示
       wx.showToast({
         title: '登录成功',
@@ -140,7 +159,7 @@ Page({
   // 注册处理
   async handleRegister() {
     const { username, phone, password, confirmPassword, realName } = this.data.formData;
-    
+
     // 验证密码确认
     if (password !== confirmPassword) {
       this.setData({
@@ -171,7 +190,7 @@ Page({
           realName: ''
         }
       });
-      
+
       wx.showToast({
         title: '注册成功',
         icon: 'success'
@@ -186,15 +205,21 @@ Page({
 
   // 表单验证
   validateForm() {
-    const { isLogin, formData } = this.data;
-    
+    const { isLogin, formData, isAgreed } = this.data;
+
+    // 检查是否同意协议
+    if (!isAgreed) {
+      this.setData({ errorMessage: '请阅读并勾选用户协议和隐私政策' });
+      return false;
+    }
+
     if (isLogin) {
       // 登录表单验证
       if (!formData.phone || !formData.password) {
         this.setData({ errorMessage: '请填写手机号和密码' });
         return false;
       }
-      
+
       if (!/^1[3-9]\d{9}$/.test(formData.phone)) {
         this.setData({ errorMessage: '请输入正确的手机号' });
         return false;
@@ -202,37 +227,43 @@ Page({
     } else {
       // 注册表单验证
       const { username, phone, password, confirmPassword, realName } = formData;
-      
+
       if (!username || !phone || !password || !confirmPassword || !realName) {
         this.setData({ errorMessage: '请填写所有必填字段' });
         return false;
       }
-      
+
       if (!/^1[3-9]\d{9}$/.test(phone)) {
         this.setData({ errorMessage: '请输入正确的手机号' });
         return false;
       }
-      
+
       if (password.length < 6) {
         this.setData({ errorMessage: '密码长度不能少于6位' });
         return false;
       }
     }
-    
+
     return true;
   },
 
   // 根据用户类型跳转
   redirectByUserType(userType) {
-    switch(userType) {
+    switch (userType) {
       case 1: // 租客
         wx.switchTab({ url: '/pages/home/home' });
         break;
       case 2: // 房东
-        wx.switchTab({ url: '/pages/landlord/landlord' });
-        break;
       case 3: // 管理员
-        wx.switchTab({ url: '/pages/admin/admin' });
+        wx.showToast({
+          title: '已进入访客模式',
+          icon: 'none',
+          duration: 2000
+        });
+        // 延迟跳转以让用户看清提示
+        setTimeout(() => {
+          wx.switchTab({ url: '/pages/home/home' });
+        }, 1500);
         break;
       default:
         wx.switchTab({ url: '/pages/home/home' });
