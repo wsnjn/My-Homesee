@@ -77,7 +77,7 @@
           <input 
             name="realName"
             type="text" 
-            placeholder="真实姓名"
+            placeholder="昵称/称呼（选填，非实名）"
             placeholder-class="input-placeholder"
             value="{{formData.realName}}"
             bindinput="onInputChange"
@@ -155,15 +155,21 @@
   </view>
 
   <!-- 底部协议 -->
-  <view class="footer-agreement" bindtap="toggleAgreement">
-    <view class="agreement-checkbox {{isAgreed ? 'checked' : ''}}">
-      <view class="checkbox-inner" wx:if="{{isAgreed}}"></view>
+  <view class="footer-agreement">
+    <view class="agreement-row" bindtap="toggleAgreement">
+      <view class="agreement-checkbox {{isAgreed ? 'checked' : ''}}">
+        <view class="checkbox-inner" wx:if="{{isAgreed}}"></view>
+      </view>
+      <view class="agreement-text">
+        <text>我已阅读并同意</text>
+        <text class="link" catchtap="openAgreement">《用户服务协议》</text>
+        <text>与</text>
+        <text class="link" catchtap="openPrivacy">《隐私政策》</text>
+        <text>，并同意按其中说明使用账号信息完成登录及与本小程序相关的服务。</text>
+      </view>
     </view>
-    <view class="agreement-text">
-      <text>我已阅读并同意</text>
-      <text class="link" catchtap="openAgreement">《用户协议》</text>
-      <text>和</text>
-      <text class="link" catchtap="openPrivacy">《隐私政策》</text>
+    <view class="agreement-hint">
+      <text>提示：登录账号为「手机号」格式，仅用于区分用户；无短信验证、无实名要求，可不使用真实号码。</text>
     </view>
   </view>
 </view>

@@ -1,390 +1,408 @@
-const { request } = require('../../utils/request');
+const { request, put } = require('../../utils/request');
+const {
+  locateAndValidateCoordinate,
+  roomNeedsCoordinateRefresh,
+  fetchNearbyPoiItems,
+  DEFAULT_CENTER_LNG,
+  DEFAULT_CENTER_LAT
+} = require('../../utils/amapLocation');
+
+const MARKER_ICON_BLUE =
+  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMyNTYzRUIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjEgMTBjMCA3LTkgMTMtOSAxM3MtOS02LTktMTNhOSA5IDAgMCAxIDE4IDB6Ij48L3BhdGg+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMCIgcj0iMyI+PC9jaXJjbGU+PC9zdmc+';
+
+function hashStringToMarkerId(str, fallbackIndex) {
+  const s = String(str);
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  }
+  const id = Math.abs(h) % 2000000000;
+  return id > 0 ? id : fallbackIndex + 1;
+}
+
+function getStableMarkerId(room, index) {
+  const id = room.id;
+  if (typeof id === 'number' && !isNaN(id) && id > 0 && id < 2000000000) {
+    return id;
+  }
+  const n = Number(id);
+  if (!isNaN(n) && String(n) === String(id) && n > 0) {
+    return n;
+  }
+  return hashStringToMarkerId(String(id), index);
+}
 
 Page({
-    data: {
-        rooms: [], // All rooms
-        filteredRooms: [], // Displayed rooms
-        markers: [],
+  data: {
+    rooms: [],
+    filteredRooms: [],
+    markers: [],
 
-        // Search & Filter
-        searchText: '',
-        activeFilters: [],
+    searchText: '',
+    activeFilters: [],
 
-        // Map State
-        latitude: 22.543099,
-        longitude: 114.057868,
-        scale: 12,
+    latitude: DEFAULT_CENTER_LAT,
+    longitude: DEFAULT_CENTER_LNG,
+    scale: 12,
 
-        // UI State
-        selectedRoom: null,
-        showDetail: false,
-        aiLoading: false,
-        aiItems: [],
-        sidebarOpen: false
-    },
+    selectedRoom: null,
+    showDetail: false,
+    aiLoading: false,
+    aiItems: [],
+    sidebarOpen: false,
 
-    onLoad() {
-        this.fetchRooms();
-    },
+    specificRoomId: '',
+    isProcessing: false
+  },
 
-    async fetchRooms() {
-        wx.showLoading({ title: '加载房源...' });
-        try {
-            const res = await request({ url: '/api/rooms/available' });
-            if (res && res.success && res.rooms) {
-                this.setData({
-                    rooms: res.rooms
-                });
-                this.applyFilters();
-            }
-        } catch (error) {
-            console.error('Fetch rooms failed', error);
-            wx.showToast({ title: '加载失败', icon: 'none' });
-        } finally {
-            wx.hideLoading();
-        }
-    },
+  _markerIdToRoomId: {},
 
-    // Input Handler
-    onSearchInput(e) {
-        this.setData({ searchText: e.detail.value });
-    },
+  onLoad() {
+    this._markerIdToRoomId = {};
+    this.fetchRooms();
+  },
 
-    onSearchConfirm() {
+  async fetchRooms() {
+    wx.showLoading({ title: '加载房源...' });
+    try {
+      const res = await request({ url: '/api/rooms/available' });
+      if (res && res.success && res.rooms) {
+        this.setData({ rooms: res.rooms });
         this.applyFilters();
-    },
-
-    // Filter Handler
-    toggleFilter(e) {
-        const type = e.currentTarget.dataset.type;
-        let filters = [...this.data.activeFilters];
-
-        if (filters.includes(type)) {
-            filters = filters.filter(t => t !== type);
-        } else {
-            // Exclusive rental types
-            if (['whole', 'shared', 'single'].includes(type)) {
-                filters = filters.filter(t => !['whole', 'shared', 'single'].includes(t));
-            }
-            filters.push(type);
-        }
-
-        this.setData({ activeFilters: filters });
-        this.applyFilters();
-    },
-
-    // Apply filters to rooms and update markers
-    applyFilters() {
-        let result = this.data.rooms;
-        const { searchText, activeFilters } = this.data;
-
-        // 1. Search Text
-        if (searchText) {
-            const key = searchText.toLowerCase();
-            result = result.filter(r =>
-                (r.communityName && r.communityName.toLowerCase().includes(key)) ||
-                (r.district && r.district.toLowerCase().includes(key)) ||
-                (r.street && r.street.toLowerCase().includes(key))
-            );
-        }
-
-        // 2. Rental Type (0: Whole, 1: Shared, 2: Single)
-        if (activeFilters.includes('whole')) {
-            result = result.filter(r => r.rentalType === 0);
-        }
-        if (activeFilters.includes('shared')) {
-            result = result.filter(r => r.rentalType === 1);
-        }
-        if (activeFilters.includes('single')) {
-            result = result.filter(r => r.rentalType === 2);
-        }
-
-        // 3. Subway Tag
-        if (activeFilters.includes('subway')) {
-            result = result.filter(r => r.description && r.description.includes('地铁'));
-        }
-
-        // 4. Sort Price
-        if (activeFilters.includes('price_desc')) {
-            result = [...result].sort((a, b) => b.rentPrice - a.rentPrice);
-        }
-
-        this.setData({ filteredRooms: result });
-        this.updateMarkers(result);
-    },
-
-    updateMarkers(rooms) {
-        const markers = rooms.map(room => {
-            // Handle invalid coords with simple random fallback near center (Mocking the Vue logic)
-            let lat = parseFloat(room.latitude);
-            let lng = parseFloat(room.longitude);
-
-            if (isNaN(lat) || isNaN(lng)) {
-                lat = 22.543099 + (Math.random() - 0.5) * 0.05;
-                lng = 114.057868 + (Math.random() - 0.5) * 0.05;
-            }
-
-            return {
-                id: room.id, // IMPORTANT: Ensure this is set correctly
-                latitude: lat,
-                longitude: lng,
-                width: 32,
-                height: 32,
-                // Simple Blue Pin Marker (Base64 SVG)
-                iconPath: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMyNTYzRUIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjEgMTBjMCA3LTkgMTMtOSAxM3MtOS02LTktMTNhOSA5IDAgMCAxIDE4IDB6Ij48L3BhdGg+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMCIgcj0iMyI+PC9jaXJjbGU+PC9zdmc+',
-                // Using custom callout for price bubble
-                callout: {
-                    content: `¥${room.rentPrice}`,
-                    color: '#ffffff',
-                    fontSize: 12,
-                    borderRadius: 16,
-                    bgColor: '#2563EB', // Changed to blue
-                    padding: 6,
-                    display: 'ALWAYS',
-                    textAlign: 'center'
-                }
-            };
-        });
-
-        console.log('Setting markers:', markers.length);
-        this.setData({ markers });
-    },
-
-    onMarkerTap(e) {
-        console.log('Marker tapped! Event:', e);
-        const markerId = e.detail.markerId || e.markerId;
-        console.log('Marker ID:', markerId);
-
-        const room = this.data.rooms.find(r => r.id === markerId);
-        console.log('Found room:', room);
-
-        if (room) {
-            // Force refresh by briefly hiding then showing
-            this.setData({ showDetail: false });
-
-            setTimeout(() => {
-                this.setData({
-                    selectedRoom: room,
-                    showDetail: true,
-                    aiLoading: true,
-                    aiItems: []
-                });
-
-                // Simulate AI Analysis Delay
-                setTimeout(() => {
-                    this.simulateAIAnalysis();
-                }, 600);
-            }, 50);
-        } else {
-            console.error('Room not found for marker ID:', markerId);
-            wx.showToast({
-                title: '房源数据未找到',
-                icon: 'none'
-            });
-        }
-    },
-
-    simulateAIAnalysis() {
-        // Mock data generation with color property for icons
-        const pois = [
-            { type: 'subway', name: '科学馆地铁站', distance: Math.floor(Math.random() * 500) + 100, color: '#2563EB' },
-            { type: 'bus', name: '兴华宾馆西公交站', distance: Math.floor(Math.random() * 300) + 50, color: '#10B981' },
-            { type: 'supermarket', name: '沃尔玛购物广场', distance: Math.floor(Math.random() * 800) + 200, color: '#F59E0B' },
-            { type: 'hospital', name: '深圳市第二人民医院', distance: Math.floor(Math.random() * 1000) + 500, color: '#EF4444' }
-        ];
-
-        // Sort by distance
-        pois.sort((a, b) => a.distance - b.distance);
-
-        this.setData({
-            aiLoading: false,
-            aiItems: pois
-        });
-    },
-
-    onMapTap() {
-        this.setData({ showDetail: false });
-    },
-
-    closeDetail() {
-        this.setData({ showDetail: false });
-    },
-
-    preventBubble() {
-        // Prevent click from bubbling to overlay
-    },
-
-    // Sidebar Toggle
-    toggleSidebar() {
-        this.setData({
-            sidebarOpen: !this.data.sidebarOpen
-        });
-    },
-
-    // Region Change Handler (prevents map reset)
-    onRegionChange(e) {
-        if (e.type === 'end' && e.causedBy === 'drag') {
-            this.setData({
-                latitude: e.detail.centerLocation.latitude,
-                longitude: e.detail.centerLocation.longitude
-            });
-        }
-    },
-
-    // AI Data Completion - Geocode rooms with missing coordinates
-    async startAICompletion() {
-        const AMAP_KEY = 'f912b11737cbc1bd7c50a495e2112315';
-
-        // Filter rooms needing completion
-        const incompleteRooms = this.data.rooms.filter(r =>
-            !r.latitude || !r.longitude || isNaN(parseFloat(r.latitude))
-        );
-
-        if (incompleteRooms.length === 0) {
-            wx.showToast({
-                title: '所有房源数据已完善！',
-                icon: 'success',
-                duration: 2000
-            });
-            return;
-        }
-
-        // Show progress modal
-        wx.showLoading({
-            title: `准备处理 ${incompleteRooms.length} 个房源...`,
-            mask: true
-        });
-
-        let successCount = 0;
-        let failCount = 0;
-
-        // Process each room sequentially
-        for (let i = 0; i < incompleteRooms.length; i++) {
-            const room = incompleteRooms[i];
-
-            wx.showLoading({
-                title: `处理中 ${i + 1}/${incompleteRooms.length}`,
-                mask: true
-            });
-
-            try {
-                // Build address from room data
-                const components = [
-                    room.city || '深圳市',
-                    room.district || '',
-                    room.street || '',
-                    room.communityName || ''
-                ].filter(Boolean);
-                const address = components.join('');
-
-                if (!address) {
-                    failCount++;
-                    continue;
-                }
-
-                // Call AMap Geocoding API
-                const geoResult = await this.geocodeAddress(address, AMAP_KEY);
-
-                if (geoResult) {
-                    // Update local room data
-                    const roomIndex = this.data.rooms.findIndex(r => r.id === room.id);
-                    if (roomIndex !== -1) {
-                        this.data.rooms[roomIndex].latitude = geoResult.lat;
-                        this.data.rooms[roomIndex].longitude = geoResult.lng;
-                    }
-
-                    // Update backend
-                    const updateSuccess = await this.updateRoomBackend(room.id, {
-                        latitude: geoResult.lat,
-                        longitude: geoResult.lng
-                    });
-
-                    if (updateSuccess) {
-                        successCount++;
-                    } else {
-                        failCount++;
-                    }
-                } else {
-                    failCount++;
-                }
-
-                // Small delay to avoid API rate limiting
-                await new Promise(resolve => setTimeout(resolve, 200));
-
-            } catch (error) {
-                console.error('Failed to process room:', room.id, error);
-                failCount++;
-            }
-        }
-
-        wx.hideLoading();
-
-        // Show result
-        wx.showModal({
-            title: 'AI 完善完成',
-            content: `成功: ${successCount} 个\n失败: ${failCount} 个`,
-            showCancel: false,
-            success: () => {
-                // Refresh map and data
-                this.setData({ rooms: this.data.rooms });
-                this.applyFilters();
-            }
-        });
-    },
-
-    // Geocode address using AMap API
-    geocodeAddress(address, key) {
-        return new Promise((resolve) => {
-            wx.request({
-                url: 'https://restapi.amap.com/v3/geocode/geo',
-                data: {
-                    address: address,
-                    key: key,
-                    city: '深圳'
-                },
-                success: (res) => {
-                    if (res.data.status === '1' && res.data.geocodes && res.data.geocodes.length > 0) {
-                        const location = res.data.geocodes[0].location.split(',');
-                        resolve({
-                            lng: parseFloat(location[0]),
-                            lat: parseFloat(location[1])
-                        });
-                    } else {
-                        resolve(null);
-                    }
-                },
-                fail: () => {
-                    resolve(null);
-                }
-            });
-        });
-    },
-
-    // Update room coordinates in backend
-    updateRoomBackend(roomId, data) {
-        return new Promise((resolve) => {
-            request({
-                url: `/api/rooms/update/${roomId}`,
-                method: 'PUT',
-                data: data
-            }).then(() => {
-                resolve(true);
-            }).catch((error) => {
-                console.error('Backend update failed:', error);
-                resolve(false);
-            });
-        });
-    },
-
-    navigateToDetail() {
-        if (this.data.selectedRoom) {
-            wx.navigateTo({
-                url: `/packageA/pages/house-tour/house-tour?id=${this.data.selectedRoom.id}`
-            });
-        }
-    },
-
-    goBack() {
-        wx.navigateBack();
+      }
+    } catch (error) {
+      console.error('加载房源失败', error);
+      wx.showToast({ title: '加载失败', icon: 'none' });
+    } finally {
+      wx.hideLoading();
     }
+  },
+
+  onSearchInput(e) {
+    this.setData({ searchText: e.detail.value });
+  },
+
+  onSpecificRoomInput(e) {
+    this.setData({ specificRoomId: e.detail.value });
+  },
+
+  onSearchConfirm() {
+    this.applyFilters();
+  },
+
+  toggleFilter(e) {
+    const type = e.currentTarget.dataset.type;
+    let filters = [...this.data.activeFilters];
+
+    if (filters.includes(type)) {
+      filters = filters.filter((t) => t !== type);
+    } else {
+      if (['whole', 'shared', 'single'].includes(type)) {
+        filters = filters.filter((t) => !['whole', 'shared', 'single'].includes(t));
+      }
+      filters.push(type);
+    }
+
+    this.setData({ activeFilters: filters });
+    this.applyFilters();
+  },
+
+  applyFilters() {
+    let result = this.data.rooms;
+    const { searchText, activeFilters } = this.data;
+
+    if (searchText) {
+      const key = searchText.toLowerCase();
+      result = result.filter(
+        (r) =>
+          (r.communityName && r.communityName.toLowerCase().includes(key)) ||
+          (r.district && r.district.toLowerCase().includes(key)) ||
+          (r.street && r.street.toLowerCase().includes(key))
+      );
+    }
+
+    if (activeFilters.includes('whole')) {
+      result = result.filter((r) => r.rentalType === 0);
+    }
+    if (activeFilters.includes('shared')) {
+      result = result.filter((r) => r.rentalType === 1);
+    }
+    if (activeFilters.includes('single')) {
+      result = result.filter((r) => r.rentalType === 2);
+    }
+
+    if (activeFilters.includes('subway')) {
+      result = result.filter((r) => r.description && r.description.includes('地铁'));
+    }
+
+    if (activeFilters.includes('price_desc')) {
+      result = [...result].sort((a, b) => b.rentPrice - a.rentPrice);
+    }
+
+    this.setData({ filteredRooms: result });
+    this.updateMarkers(result);
+  },
+
+  updateMarkers(rooms) {
+    this._markerIdToRoomId = {};
+    const markers = (rooms || []).map((room, index) => {
+      let lat = parseFloat(room.latitude);
+      let lng = parseFloat(room.longitude);
+
+      if (isNaN(lat) || isNaN(lng)) {
+        lat = DEFAULT_CENTER_LAT + (Math.random() - 0.5) * 0.05;
+        lng = DEFAULT_CENTER_LNG + (Math.random() - 0.5) * 0.05;
+      }
+
+      const markerId = getStableMarkerId(room, index);
+      this._markerIdToRoomId[markerId] = room.id;
+
+      return {
+        id: markerId,
+        latitude: lat,
+        longitude: lng,
+        width: 32,
+        height: 32,
+        iconPath: MARKER_ICON_BLUE,
+        callout: {
+          content: `¥${room.rentPrice}`,
+          color: '#ffffff',
+          fontSize: 12,
+          borderRadius: 16,
+          bgColor: '#2563EB',
+          padding: 6,
+          display: 'ALWAYS',
+          textAlign: 'center'
+        }
+      };
+    });
+
+    this.setData({ markers });
+  },
+
+  onMarkerTap(e) {
+    const markerId = e.detail.markerId;
+    const mappedId = this._markerIdToRoomId[markerId];
+    const room = this.data.rooms.find((r) => r.id == mappedId || r.id == markerId);
+
+    if (!room) {
+      wx.showToast({ title: '房源数据未找到', icon: 'none' });
+      return;
+    }
+
+    this.setData({ showDetail: false });
+
+    setTimeout(() => {
+      const tagsList = room.tags
+        ? String(room.tags)
+            .split(',')
+            .map((t) => t.trim())
+            .filter(Boolean)
+        : [];
+      this.setData({
+        selectedRoom: Object.assign({}, room, { tagsList }),
+        showDetail: true,
+        aiLoading: true,
+        aiItems: []
+      });
+      this.loadNearbyPoiForRoom(room);
+    }, 50);
+  },
+
+  async loadNearbyPoiForRoom(room) {
+    const lat = parseFloat(room.latitude);
+    const lng = parseFloat(room.longitude);
+
+    if (isNaN(lat) || isNaN(lng)) {
+      this.setData({
+        aiLoading: false,
+        aiItems: []
+      });
+      return;
+    }
+
+    try {
+      const items = await fetchNearbyPoiItems(lng, lat);
+      this.setData({
+        aiLoading: false,
+        aiItems: items.length ? items : []
+      });
+    } catch (err) {
+      console.error('周边配套查询失败', err);
+      this.setData({
+        aiLoading: false,
+        aiItems: []
+      });
+    }
+  },
+
+  onMapTap() {
+    this.setData({ showDetail: false });
+  },
+
+  closeDetail() {
+    this.setData({ showDetail: false });
+  },
+
+  preventBubble() {},
+
+  toggleSidebar() {
+    this.setData({
+      sidebarOpen: !this.data.sidebarOpen
+    });
+  },
+
+  onRegionChange(e) {
+    if (e.type === 'end' && e.causedBy === 'drag' && e.detail && e.detail.centerLocation) {
+      this.setData({
+        latitude: e.detail.centerLocation.latitude,
+        longitude: e.detail.centerLocation.longitude
+      });
+    }
+  },
+
+  async runConcurrent(tasks, concurrency) {
+    const queue = [...tasks];
+    const workers = [];
+    for (let w = 0; w < concurrency; w++) {
+      workers.push(
+        (async () => {
+          while (queue.length) {
+            const item = queue.shift();
+            if (item) await item();
+          }
+        })()
+      );
+    }
+    await Promise.all(workers);
+  },
+
+  async startAICompletion() {
+    if (this.data.isProcessing) return;
+
+    const toProcess = this.data.rooms.filter((r) => roomNeedsCoordinateRefresh(r));
+    if (toProcess.length === 0) {
+      wx.showToast({ title: '暂无需完善的房源', icon: 'none' });
+      return;
+    }
+
+    this.setData({ isProcessing: true });
+
+    let successCount = 0;
+    let failCount = 0;
+    let locateFailCount = 0;
+    let done = 0;
+
+    const tasks = toProcess.map((room) => async () => {
+      const { result, reason } = await locateAndValidateCoordinate(room);
+      done += 1;
+      wx.showLoading({ title: `处理中 ${done}/${toProcess.length}`, mask: true });
+
+      if (!result) {
+        locateFailCount += 1;
+        if (reason) {
+          console.warn(`[房源 ${room.id}] 定位失败`, reason);
+        }
+        return;
+      }
+
+      const idx = this.data.rooms.findIndex((r) => r.id == room.id);
+      if (idx === -1) {
+        locateFailCount += 1;
+        return;
+      }
+
+      const roomsCopy = [...this.data.rooms];
+      const updated = { ...roomsCopy[idx], latitude: result.lat, longitude: result.lng };
+      roomsCopy[idx] = updated;
+
+      try {
+        await put(`/api/rooms/update/${room.id}`, updated);
+        successCount += 1;
+        this.setData({ rooms: roomsCopy });
+      } catch (err) {
+        console.error('后端更新失败', room.id, err);
+        failCount += 1;
+      }
+
+      await new Promise((r) => setTimeout(r, 200));
+    });
+
+    wx.showLoading({ title: `准备处理 ${toProcess.length} 个房源`, mask: true });
+
+    await this.runConcurrent(tasks, 3);
+
+    wx.hideLoading();
+    this.setData({ isProcessing: false });
+    this.applyFilters();
+
+    wx.showModal({
+      title: '处理完成',
+      content: `成功 ${successCount}\n更新失败 ${failCount}\n定位失败 ${locateFailCount}`,
+      showCancel: false
+    });
+  },
+
+  async processSpecificRoom() {
+    if (this.data.isProcessing) return;
+
+    const roomId = String(this.data.specificRoomId || '').trim();
+    if (!roomId) {
+      wx.showToast({ title: '请输入房源ID', icon: 'none' });
+      return;
+    }
+
+    const room = this.data.rooms.find((r) => String(r.id) === roomId || r.id == roomId);
+    if (!room) {
+      wx.showToast({ title: '未找到该房源', icon: 'none' });
+      return;
+    }
+
+    this.setData({ isProcessing: true });
+    wx.showLoading({ title: '重新检测中...', mask: true });
+
+    try {
+      const { result, reason } = await locateAndValidateCoordinate(room);
+
+      if (!result) {
+        wx.showToast({
+          title: reason ? `未通过校验` : '无法定位',
+          icon: 'none'
+        });
+        if (reason) console.warn('[指定房源]', reason);
+        return;
+      }
+
+      const idx = this.data.rooms.findIndex((r) => r.id == room.id);
+      if (idx === -1) return;
+
+      const roomsCopy = [...this.data.rooms];
+      const updated = { ...roomsCopy[idx], latitude: result.lat, longitude: result.lng };
+      roomsCopy[idx] = updated;
+
+      await put(`/api/rooms/update/${room.id}`, updated);
+      this.setData({ rooms: roomsCopy });
+      this.applyFilters();
+
+      wx.showToast({ title: '更新成功', icon: 'success' });
+    } catch (err) {
+      console.error('指定房源更新失败', err);
+      wx.showToast({ title: '更新失败', icon: 'none' });
+    } finally {
+      wx.hideLoading();
+      this.setData({ isProcessing: false });
+    }
+  },
+
+  navigateToDetail() {
+    if (this.data.selectedRoom) {
+      wx.navigateTo({
+        url: `/packageA/pages/house-tour/house-tour?id=${this.data.selectedRoom.id}`
+      });
+    }
+  },
+
+  goBack() {
+    wx.navigateBack();
+  }
 });

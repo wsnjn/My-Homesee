@@ -97,6 +97,20 @@ Page({
     this.loadHouses();
   },
 
+  onShow() {
+    const pendingId = wx.getStorageSync('smartMatchingPendingRoomId');
+    if (pendingId) {
+      try {
+        wx.removeStorageSync('smartMatchingPendingRoomId');
+      } catch (e) {}
+      wx.showToast({
+        title: `可搜索房源编号 ${pendingId}`,
+        icon: 'none',
+        duration: 2500
+      });
+    }
+  },
+
   // 加载筛选选项 - 与 Vue3 前端一致
   async loadFilterOptions() {
     try {

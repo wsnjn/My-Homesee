@@ -156,15 +156,79 @@
         ></image>
         <view class="message-content">
           <text class="sender-name" wx:if="{{item.senderId !== userId}}">{{item.senderName}}</text>
-          <view class="message-bubble">
-            <text class="msg-text">{{item.content}}</text>
+          <view class="message-bubble {{item.msgType == 1 ? 'is-sticker' : ''}}">
+            <block wx:if="{{item.msgType == 1}}">
+              <image class="msg-sticker-img" src="{{item.content}}" mode="widthFix" show-menu-by-longpress="{{false}}" />
+            </block>
+            <block wx:else>
+              <text class="msg-text msg-emoji-text" user-select>{{item.content}}</text>
+            </block>
             <text class="msg-time">{{item.formattedTime}}</text>
           </view>
         </view>
       </view>
     </scroll-view>
 
+    <view class="emoji-panel" wx:if="{{showEmojiPanel}}">
+      <view class="emoji-picker-main-tabs">
+        <view
+          class="emoji-main-tab {{emojiPickerSubTab === 'unicode' ? 'active' : ''}}"
+          bindtap="selectEmojiPickerSubTab"
+          data-tab="unicode"
+        >字符表情</view>
+        <view
+          class="emoji-main-tab {{emojiPickerSubTab === 'image' ? 'active' : ''}}"
+          bindtap="selectEmojiPickerSubTab"
+          data-tab="image"
+        >图片贴图</view>
+      </view>
+      <block wx:if="{{emojiPickerSubTab === 'unicode'}}">
+        <scroll-view scroll-x class="emoji-cat-scroll" enable-flex>
+          <view class="emoji-cat-inner">
+            <view
+              wx:for="{{emojiCategories}}"
+              wx:key="name"
+              wx:for-index="catIdx"
+              class="emoji-cat-item {{activeEmojiCategoryIndex === catIdx ? 'active' : ''}}"
+              bindtap="selectEmojiCategory"
+              data-index="{{catIdx}}"
+            >{{item.name}}</view>
+          </view>
+        </scroll-view>
+        <scroll-view scroll-y class="emoji-grid-scroll">
+          <view class="emoji-grid">
+            <view
+              class="emoji-cell"
+              wx:for="{{currentEmojiList}}"
+              wx:key="*this"
+              bindtap="onEmojiCellTap"
+              data-ch="{{item}}"
+            >{{item}}</view>
+          </view>
+        </scroll-view>
+      </block>
+      <block wx:else>
+        <scroll-view scroll-y class="sticker-grid-scroll">
+          <view class="sticker-grid">
+            <view
+              class="sticker-cell"
+              wx:for="{{twemojiStickers}}"
+              wx:key="url"
+              bindtap="onStickerTap"
+              data-url="{{item.url}}"
+            >
+              <image class="sticker-thumb" src="{{item.url}}" mode="aspectFit" />
+            </view>
+          </view>
+        </scroll-view>
+        <text class="sticker-license-hint">图片来自 Twemoji（CC-BY 4.0）。抖音等平台表情包需自有授权素材才可接入。</text>
+      </block>
+    </view>
+
     <view class="input-area">
+      <view class="emoji-toggle" bindtap="toggleEmojiPanel">
+        <text class="emoji-toggle-face">😊</text>
+      </view>
       <input 
         class="message-input"
         placeholder="输入消息..."

@@ -226,3 +226,37 @@ page {
   border-radius: 0;
   font-weight: 600;
 }
+
+/* 协议与隐私 */
+.legal-card {
+  margin-top: 24rpx;
+  padding: 24rpx 0 8rpx;
+  border-top: 1px solid #E5E7EB;
+}
+
+.legal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.legal-row:last-child {
+  border-bottom: none;
+}
+
+.legal-text {
+  font-size: 26rpx;
+  color: #2563EB;
+}
+
+.legal-arrow {
+  font-size: 32rpx;
+  color: #9CA3AF;
+  line-height: 1;
+}
+
+.legal-link-hover {
+  opacity: 0.75;
+}

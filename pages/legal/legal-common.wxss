@@ -1,0 +1,71 @@
+/* 法律文档页面通用样式 */
+page {
+  background: #f8f9fa;
+  height: 100%;
+}
+
+.legal-scroll {
+  height: 100vh;
+  box-sizing: border-box;
+  padding: 24rpx 32rpx 48rpx;
+}
+
+.legal-header {
+  margin-bottom: 32rpx;
+  padding-bottom: 24rpx;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.legal-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 12rpx;
+}
+
+.legal-sub {
+  display: block;
+  font-size: 24rpx;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.section {
+  margin-bottom: 28rpx;
+}
+
+.section-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 8rpx;
+}
+
+.section-p {
+  display: block;
+  font-size: 26rpx;
+  color: #111827;
+  line-height: 1.75;
+  margin-bottom: 8rpx;
+  text-align: justify;
+}
+
+.section-list {
+  display: block;
+  font-size: 26rpx;
+  color: #111827;
+  line-height: 1.75;
+  margin-bottom: 8rpx;
+  padding-left: 0;
+}
+
+.bullet {
+  margin-left: 8rpx;
+}
+
+.emphasis {
+  font-weight: 600;
+  color: #2563eb;
+}

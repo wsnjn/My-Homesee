@@ -1,5 +1,6 @@
-﻿// pages/community/community.js
+// pages/community/community.js
 const { request } = require('../../utils/request');
+const { EMOJI_CATEGORIES, TWEMOJI_STICKERS } = require('../../utils/emojiLibrary');
 const app = getApp();
 
 Page({
@@ -18,6 +19,13 @@ Page({
     messages: [],
     newMessage: '',
     scrollToMessage: '',
+
+    showEmojiPanel: false,
+    emojiPickerSubTab: 'unicode',
+    twemojiStickers: [],
+    emojiCategories: [],
+    activeEmojiCategoryIndex: 0,
+    currentEmojiList: [],
 
     posts: [],
     page: 0,
@@ -40,6 +48,11 @@ Page({
   pollTimer: null,
 
   onLoad(options) {
+    this.setData({
+      emojiCategories: EMOJI_CATEGORIES,
+      currentEmojiList: EMOJI_CATEGORIES[0] ? EMOJI_CATEGORIES[0].items : [],
+      twemojiStickers: TWEMOJI_STICKERS
+    });
     this.checkLogin();
   },
 
@@ -272,6 +285,75 @@ Page({
     this.setData({ newMessage: e.detail.value });
   },
 
+  toggleEmojiPanel() {
+    this.setData({ showEmojiPanel: !this.data.showEmojiPanel });
+  },
+
+  selectEmojiPickerSubTab(e) {
+    const tab = e.currentTarget.dataset.tab;
+    if (tab === 'unicode' || tab === 'image') {
+      this.setData({ emojiPickerSubTab: tab });
+    }
+  },
+
+  selectEmojiCategory(e) {
+    const idx = parseInt(e.currentTarget.dataset.index, 10);
+    const cats = this.data.emojiCategories;
+    if (!cats[idx]) return;
+    this.setData({
+      activeEmojiCategoryIndex: idx,
+      currentEmojiList: cats[idx].items
+    });
+  },
+
+  onEmojiCellTap(e) {
+    const ch = e.currentTarget.dataset.ch;
+    if (!ch) return;
+    const newMessage = this.data.newMessage + ch;
+    this.setData({ newMessage });
+  },
+
+  onStickerTap(e) {
+    const url = e.currentTarget.dataset.url;
+    if (!url) return;
+    this.sendStickerMessage(url);
+  },
+
+  async sendStickerMessage(imageUrl) {
+    if (!imageUrl || !this.data.activeGroup) return;
+
+    try {
+      const res = await request({
+        url: '/api/community/messages/send',
+        method: 'POST',
+        data: {
+          senderId: this.data.userId,
+          groupId: this.data.activeGroup.id,
+          content: imageUrl,
+          msgType: 1
+        }
+      });
+
+      if (res.success) {
+        const newMsg = {
+          ...res.data,
+          senderAvatar: this.data.userInfo.avatarUrl,
+          senderName: this.data.userInfo.realName || this.data.userInfo.username || '我',
+          formattedTime: this.formatTime(res.data.createdTime)
+        };
+        const messages = [...this.data.messages, newMsg];
+        this.setData({
+          messages,
+          showEmojiPanel: false,
+          scrollToMessage: `msg-${res.data.id}`
+        });
+      }
+    } catch (e) {
+      console.error('发送贴图失败', e);
+      wx.showToast({ title: '发送失败', icon: 'none' });
+    }
+  },
+
   async sendMessage() {
     if (!this.data.newMessage.trim() || !this.data.activeGroup) return;
 
@@ -298,6 +380,7 @@ Page({
         this.setData({
           messages,
           newMessage: '',
+          showEmojiPanel: false,
           scrollToMessage: `msg-${res.data.id}`
         });
       }

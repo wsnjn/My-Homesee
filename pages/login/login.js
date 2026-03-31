@@ -6,13 +6,13 @@ Page({
     isLogin: true,
     loading: false,
     errorMessage: '',
+    isAgreed: false,
     formData: {
       username: '',
       phone: '',
       password: '',
       confirmPassword: '',
-      realName: '',
-      isAgreed: false // 默认不勾选
+      realName: ''
     }
   },
 
@@ -47,14 +47,16 @@ Page({
     });
   },
 
-  // 打开用户协议
   openAgreement() {
-    wx.showToast({ title: '用户协议', icon: 'none' });
+    wx.navigateTo({
+      url: '/pages/legal/user-agreement'
+    });
   },
 
-  // 打开隐私政策
   openPrivacy() {
-    wx.showToast({ title: '隐私政策', icon: 'none' });
+    wx.navigateTo({
+      url: '/pages/legal/privacy-policy'
+    });
   },
 
   // 表单输入处理
@@ -159,6 +161,7 @@ Page({
   // 注册处理
   async handleRegister() {
     const { username, phone, password, confirmPassword, realName } = this.data.formData;
+    const displayName = (realName && String(realName).trim()) || username;
 
     // 验证密码确认
     if (password !== confirmPassword) {
@@ -173,7 +176,7 @@ Page({
       username: username,
       phone: phone,
       password: password,
-      realName: realName
+      realName: displayName
     });
 
     if (res.success) {
@@ -209,7 +212,9 @@ Page({
 
     // 检查是否同意协议
     if (!isAgreed) {
-      this.setData({ errorMessage: '请阅读并勾选用户协议和隐私政策' });
+      this.setData({
+        errorMessage: '请先阅读《用户服务协议》与《隐私政策》并勾选同意'
+      });
       return false;
     }
 
@@ -226,10 +231,10 @@ Page({
       }
     } else {
       // 注册表单验证
-      const { username, phone, password, confirmPassword, realName } = formData;
+      const { username, phone, password, confirmPassword } = formData;
 
-      if (!username || !phone || !password || !confirmPassword || !realName) {
-        this.setData({ errorMessage: '请填写所有必填字段' });
+      if (!username || !phone || !password || !confirmPassword) {
+        this.setData({ errorMessage: '请填写用户名、登录账号、密码及确认密码' });
         return false;
       }
 

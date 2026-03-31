@@ -21,7 +21,7 @@
       <view class="sidebar-search">
         <input 
           class="sidebar-search-input"
-          placeholder="输入区域、地铁、小区名房..." 
+          placeholder="输入区域、地铁、小区名找房..." 
           placeholder-class="placeholder"
           bindinput="onSearchInput"
           bindconfirm="onSearchConfirm"
@@ -31,10 +31,31 @@
         </view>
       </view>
 
-      <!-- AI Completion Button -->
-      <button class="sidebar-ai-btn" bindtap="startAICompletion">
+      <!-- AI 完善数据（与 Web 端一致：仅处理缺坐标或默认中心点房源） -->
+      <button class="sidebar-ai-btn" disabled="{{isProcessing}}" bindtap="startAICompletion">
         AI 完善数据
       </button>
+
+      <!-- 指定房源重新检测 -->
+      <view class="sidebar-specific">
+        <view class="sidebar-specific-row">
+          <input
+            class="sidebar-specific-input"
+            type="text"
+            value="{{specificRoomId}}"
+            placeholder="输入房源ID重新检测"
+            placeholder-class="placeholder"
+            disabled="{{isProcessing}}"
+            bindinput="onSpecificRoomInput"
+            bindconfirm="processSpecificRoom"
+          />
+          <view class="sidebar-recheck-btn {{isProcessing ? 'disabled' : ''}}" bindtap="processSpecificRoom">
+            <svg-icon name="refresh-cw" size="16" color="#ffffff" />
+            <text class="sidebar-recheck-text">重新检测</text>
+          </view>
+        </view>
+        <text class="sidebar-specific-hint">输入房源编号，按地址重新解析经纬度并写回服务端</text>
+      </view>
 
       <!-- Divider -->
       <view class="sidebar-divider"></view>
@@ -67,7 +88,8 @@
 
   <!-- Sidebar Toggle Button -->
   <view class="sidebar-toggle" bindtap="toggleSidebar">
-    <text>{{sidebarOpen ? '◀' : '▶'}}</text>
+    <svg-icon wx:if="{{sidebarOpen}}" name="arrow-left" size="20" color="#111827" />
+    <svg-icon wx:else name="arrow-right" size="20" color="#111827" />
   </view>
 
 
@@ -76,7 +98,7 @@
     <view class="modal-content" catchtap="preventBubble">
       <!-- Close Button -->
       <view class="modal-close" bindtap="closeDetail">
-        <text>✕</text>
+        <svg-icon name="close" size="22" color="#6B7280" />
       </view>
 
       <!-- Header -->
@@ -92,7 +114,10 @@
 
       <!-- Tags -->
       <view class="modal-tags">
-        <text class="modal-tag">随时看房</text>
+        <block wx:if="{{selectedRoom.tagsList && selectedRoom.tagsList.length}}">
+          <text class="modal-tag" wx:for="{{selectedRoom.tagsList}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+        </block>
+        <text class="modal-tag" wx:else>随时看房</text>
         <text class="modal-tag" wx:if="{{selectedRoom.rentalType === 0}}">整租</text>
         <text class="modal-tag" wx:elif="{{selectedRoom.rentalType === 1}}">合租</text>
         <text class="modal-tag" wx:elif="{{selectedRoom.rentalType === 2}}">单间</text>

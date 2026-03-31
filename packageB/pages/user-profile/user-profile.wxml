@@ -182,6 +182,18 @@
         </view>
       </view>
 
+      <view class="legal-card">
+        <view class="card-title">协议与隐私</view>
+        <navigator url="/pages/legal/user-agreement" hover-class="legal-link-hover" class="legal-row">
+          <text class="legal-text">《用户服务协议》</text>
+          <text class="legal-arrow">›</text>
+        </navigator>
+        <navigator url="/pages/legal/privacy-policy" hover-class="legal-link-hover" class="legal-row">
+          <text class="legal-text">《隐私政策》</text>
+          <text class="legal-arrow">›</text>
+        </navigator>
+      </view>
+
     </view>
   </scroll-view>
 </view>

@@ -11,7 +11,8 @@
     <view class="message-list">
       <view 
         wx:for="{{messages}}" 
-        wx:key="timestamp" 
+        wx:for-index="msgIdx"
+        wx:key="msgIdx" 
         class="message {{item.role === 'user' ? 'user-message' : 'ai-message'}}"
       >
         <!-- 头像 -->
@@ -33,13 +34,28 @@
         <!-- 内容 -->
         <view class="message-content">
           <view class="message-bubble">
-            <!-- AI消息：使用rich-text直接渲染HTML -->
-            <rich-text 
-              wx:if="{{item.role === 'assistant'}}" 
-              nodes="{{item.htmlContent}}"
-              class="rich-content"
-            ></rich-text>
-            <!-- 用户消息：纯文本 -->
+            <block wx:if="{{item.role === 'assistant'}}">
+              <block wx:for="{{item.segments}}" wx:for-item="seg" wx:for-index="segIdx" wx:key="segIdx">
+                <rich-text
+                  wx:if="{{seg.type === 'html'}}"
+                  nodes="{{seg.html}}"
+                  class="rich-content"
+                ></rich-text>
+                <view
+                  wx:elif="{{seg.type === 'link'}}"
+                  class="ai-link {{seg.valid ? '' : 'ai-link-disabled'}}"
+                  catchtap="onAssistantLinkTap"
+                  data-valid="{{seg.valid}}"
+                  data-path="{{seg.miniPath}}"
+                  data-switchtab="{{seg.useSwitchTab}}"
+                  data-external="{{seg.externalUrl}}"
+                  data-reason="{{seg.reason}}"
+                >
+                  <text class="ai-link-label">{{seg.label}}</text>
+                  <text wx:if="{{!seg.valid && seg.reason}}" class="ai-link-reason">（{{seg.reason}}）</text>
+                </view>
+              </block>
+            </block>
             <text wx:else user-select>{{item.content}}</text>
           </view>
         </view>

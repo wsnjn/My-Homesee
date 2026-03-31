@@ -206,10 +206,23 @@
   font-size: 22rpx;
   color: #6B7280;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  gap: 16rpx;
   z-index: 1;
   padding: 20rpx;
+}
+
+.agreement-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.agreement-hint {
+  font-size: 20rpx;
+  color: #9CA3AF;
+  line-height: 1.5;
+  padding-left: 44rpx;
 }
 
 .agreement-checkbox {
@@ -239,7 +252,10 @@
 
 .agreement-text {
   display: flex;
-  align-items: center;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  line-height: 1.55;
 }
 
 .footer-agreement .link {

@@ -102,6 +102,67 @@ page {
   opacity: 0.8;
 }
 
+.sidebar-ai-btn[disabled] {
+  background: #9CA3AF;
+  opacity: 1;
+}
+
+/* 指定房源重新检测 */
+.sidebar-specific {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.sidebar-specific-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.sidebar-specific-input {
+  flex: 1;
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 8rpx;
+  padding: 12rpx 16rpx;
+  font-size: 24rpx;
+  color: #111827;
+}
+
+.sidebar-recheck-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 12rpx 20rpx;
+  background: #10B981;
+  color: #ffffff;
+  border-radius: 8rpx;
+  flex-shrink: 0;
+}
+
+.sidebar-recheck-btn:active {
+  opacity: 0.88;
+}
+
+.sidebar-recheck-btn.disabled {
+  background: #9CA3AF;
+  pointer-events: none;
+}
+
+.sidebar-recheck-text {
+  font-size: 24rpx;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.sidebar-specific-hint {
+  font-size: 20rpx;
+  color: #6B7280;
+  line-height: 1.4;
+}
+
 /* Sidebar Divider */
 .sidebar-divider {
   height: 1px;

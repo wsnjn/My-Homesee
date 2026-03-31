@@ -115,6 +115,48 @@
   word-break: break-word;
 }
 
+/* AI 可点击链接（由 <a href> 解析，与 Web 端同源） */
+.ai-link {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin: 8rpx 8rpx 8rpx 0;
+  padding: 8rpx 16rpx;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.ai-link:active {
+  opacity: 0.85;
+  background: #DBEAFE;
+}
+
+.ai-link-disabled {
+  background: #F3F4F6;
+  border-color: #E5E7EB;
+  opacity: 0.9;
+}
+
+.ai-link-label {
+  color: #2563EB;
+  font-size: 26rpx;
+  text-decoration: underline;
+}
+
+.ai-link-disabled .ai-link-label {
+  color: #6B7280;
+  text-decoration: none;
+}
+
+.ai-link-reason {
+  font-size: 22rpx;
+  color: #9CA3AF;
+  margin-left: 6rpx;
+}
+
 .link-text {
   color: #2563EB;
   text-decoration: underline;
