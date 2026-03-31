@@ -67,32 +67,68 @@
       <!-- Divider -->
       <view class="sidebar-divider"></view>
 
-      <!-- Filter Tags -->
-      <view class="sidebar-filters">
-        <view 
-          class="sidebar-tag {{activeFilters.includes('whole') ? 'active' : ''}}" 
-          bindtap="toggleFilter" data-type="whole"
-        >整租</view>
-        <view 
-          class="sidebar-tag {{activeFilters.includes('shared') ? 'active' : ''}}" 
-          bindtap="toggleFilter" data-type="shared"
-        >合租</view>
-        <view 
-          class="sidebar-tag {{activeFilters.includes('single') ? 'active' : ''}}" 
-          bindtap="toggleFilter" data-type="single"
-        >单间</view>
-        <view 
-          class="sidebar-tag {{activeFilters.includes('subway') ? 'active' : ''}}" 
-          bindtap="toggleFilter" data-type="subway"
-        >近地铁</view>
-        <view 
-          class="sidebar-tag {{activeFilters.includes('price_desc') ? 'active' : ''}}" 
-          bindtap="toggleFilter" data-type="price_desc"
-        >价格↓</view>
-        <view 
-          class="sidebar-tag {{activeFilters.includes('nearby') ? 'active' : ''}}" 
-          bindtap="toggleFilter" data-type="nearby"
-        >3km内</view>
+      <view class="section-toggle" bindtap="toggleBasicFilters">
+        <text class="section-title">基础筛选</text>
+        <text class="section-arrow">{{showBasicFilters ? '收起' : '展开'}}</text>
+      </view>
+      <view wx:if="{{showBasicFilters}}">
+        <view class="sidebar-filters">
+          <view 
+            class="sidebar-tag {{activeFilters.includes('whole') ? 'active' : ''}}" 
+            bindtap="toggleFilter" data-type="whole"
+          >整租</view>
+          <view 
+            class="sidebar-tag {{activeFilters.includes('shared') ? 'active' : ''}}" 
+            bindtap="toggleFilter" data-type="shared"
+          >合租</view>
+          <view 
+            class="sidebar-tag {{activeFilters.includes('single') ? 'active' : ''}}" 
+            bindtap="toggleFilter" data-type="single"
+          >单间</view>
+          <view 
+            class="sidebar-tag {{activeFilters.includes('subway') ? 'active' : ''}}" 
+            bindtap="toggleFilter" data-type="subway"
+          >近地铁</view>
+          <view 
+            class="sidebar-tag {{activeFilters.includes('nearby') ? 'active' : ''}}" 
+            bindtap="toggleFilter" data-type="nearby"
+          >3km内</view>
+          <view 
+            class="sidebar-tag {{activeFilters.includes('viewport') ? 'active' : ''}}" 
+            bindtap="toggleFilter" data-type="viewport"
+          >视野内</view>
+        </view>
+
+        <view class="layer-switches">
+          <view class="layer-btn {{activeRentalType === 'all' ? 'active' : ''}}" data-value="all" bindtap="onRentalTypeTap">全部</view>
+          <view class="layer-btn {{activeRentalType === 'whole' ? 'active' : ''}}" data-value="whole" bindtap="onRentalTypeTap">整租</view>
+          <view class="layer-btn {{activeRentalType === 'shared' ? 'active' : ''}}" data-value="shared" bindtap="onRentalTypeTap">合租</view>
+          <view class="layer-btn {{activeRentalType === 'single' ? 'active' : ''}}" data-value="single" bindtap="onRentalTypeTap">单间</view>
+        </view>
+
+        <view class="layer-switches">
+          <view class="layer-btn {{activePriceRange === 'all' ? 'active' : ''}}" data-value="all" bindtap="onPriceRangeTap">不限价格</view>
+          <view class="layer-btn {{activePriceRange === 'lt2000' ? 'active' : ''}}" data-value="lt2000" bindtap="onPriceRangeTap">2000以下</view>
+          <view class="layer-btn {{activePriceRange === '2000to4000' ? 'active' : ''}}" data-value="2000to4000" bindtap="onPriceRangeTap">2k-4k</view>
+          <view class="layer-btn {{activePriceRange === 'gt4000' ? 'active' : ''}}" data-value="gt4000" bindtap="onPriceRangeTap">4000以上</view>
+        </view>
+      </view>
+
+      <view class="section-toggle" bindtap="toggleAdvancedFilters">
+        <text class="section-title">高级筛选</text>
+        <text class="section-arrow">{{showAdvancedFilters ? '收起' : '展开'}}</text>
+      </view>
+      <view wx:if="{{showAdvancedFilters}}">
+        <view class="layer-switches">
+          <view class="layer-btn {{showMetroLayer ? 'active' : ''}}" bindtap="toggleMetroLayer">地铁图层</view>
+          <view class="layer-btn {{showBusinessLayer ? 'active' : ''}}" bindtap="toggleBusinessLayer">商圈图层</view>
+        </view>
+
+        <view class="layer-switches">
+          <view class="layer-btn {{sortType === 'default' ? 'active' : ''}}" data-value="default" bindtap="onSortTap">默认排序</view>
+          <view class="layer-btn {{sortType === 'price_asc' ? 'active' : ''}}" data-value="price_asc" bindtap="onSortTap">价格升序</view>
+          <view class="layer-btn {{sortType === 'distance_asc' ? 'active' : ''}}" data-value="distance_asc" bindtap="onSortTap">离我最近</view>
+        </view>
       </view>
 
       <view class="sidebar-reset" bindtap="resetFilters">重置筛选</view>
@@ -103,6 +139,55 @@
   <view class="sidebar-toggle" bindtap="toggleSidebar">
     <svg-icon wx:if="{{sidebarOpen}}" name="arrow-left" size="20" color="#111827" />
     <svg-icon wx:else name="arrow-right" size="20" color="#111827" />
+  </view>
+
+  <view class="room-strip" wx:if="{{filteredRooms.length}}">
+    <scroll-view class="room-strip-scroll" scroll-x="true" show-scrollbar="false" enhanced="true" scroll-into-view="{{cardScrollIntoView}}">
+      <view
+        wx:for="{{filteredRooms}}"
+        wx:key="id"
+        wx:for-item="room"
+        id="room-card-{{room.id}}"
+        class="room-card {{activeRoomId == room.id ? 'active' : ''}}"
+        data-id="{{room.id}}"
+        bindtap="onRoomCardTap"
+      >
+        <view class="room-card-price">¥{{room.rentPrice}}/月</view>
+        <view class="room-card-title">{{room.communityName || '房源'}}</view>
+        <view class="room-card-meta">{{room.bedroomCount || 1}}室{{room.parlorCount || 1}}厅 · {{room.roomArea || '-'}}㎡</view>
+        <view class="room-card-actions">
+          <view class="room-card-btn ghost" data-id="{{room.id}}" catchtap="toggleCardFavorite">
+            {{room.isFavorite ? '已收藏' : '收藏'}}
+          </view>
+          <view class="room-card-btn" data-id="{{room.id}}" catchtap="quickAppointment">预约</view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="empty-result" wx:if="{{!filteredRooms.length}}">
+    <view class="empty-card">
+      <view class="empty-title">当前条件下暂无房源</view>
+      <view class="empty-sub">试试放宽筛选条件，或拖动地图到其他区域</view>
+      <view class="empty-actions">
+        <view class="empty-btn ghost" bindtap="quickRelaxViewport">关闭视野内</view>
+        <view class="empty-btn ghost" bindtap="quickRelaxPrice">放宽价格</view>
+        <view class="empty-btn" bindtap="quickClearAll">清空筛选</view>
+      </view>
+
+      <view class="smart-title">智能建议</view>
+      <view class="smart-actions">
+        <view
+          wx:for="{{smartSuggestions}}"
+          wx:key="key"
+          class="smart-btn"
+          data-key="{{item.key}}"
+          bindtap="applySuggestion"
+        >
+          {{item.text}}
+        </view>
+      </view>
+    </view>
   </view>
 
 

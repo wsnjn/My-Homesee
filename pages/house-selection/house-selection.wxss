@@ -3,7 +3,165 @@
 
 .house-selection-container {
   min-height: 100vh;
-  background: #FFFFFF;
+  background: #f6f8fc;
+}
+
+.top-map-card {
+  position: relative;
+  margin: 16rpx 20rpx 0;
+  border-radius: 22rpx;
+  overflow: hidden;
+  height: 300rpx;
+  box-shadow: 0 10rpx 24rpx rgba(15, 23, 42, 0.12);
+}
+
+.top-map-bg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.search-bar.modern {
+  margin: 0;
+  border-radius: 14rpx;
+  border: 1px solid #e5e7eb;
+}
+
+.floating-filter-form {
+  position: relative;
+  z-index: 20;
+  margin: -38rpx 20rpx 6rpx;
+  padding: 18rpx 16rpx 16rpx;
+  background: linear-gradient(145deg, #ffffff 0%, #f8fbff 55%, #f3f7ff 100%);
+  border: 1px solid #dbe7ff;
+  border-radius: 28rpx;
+  box-shadow: 0 14rpx 30rpx rgba(37, 99, 235, 0.18), 0 6rpx 16rpx rgba(15, 23, 42, 0.08);
+}
+
+.room-tabs.moved-down {
+  margin: 0 0 10rpx;
+  display: flex;
+  background: #ffffff;
+  border-radius: 20rpx;
+  overflow: hidden;
+  border: 1px solid #d6e4ff;
+}
+
+.bedroom-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 6rpx;
+  padding: 10rpx 0 0;
+}
+
+.bedroom-option {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 8rpx 12rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+  border: 1px solid #dbe7ff;
+}
+
+.bedroom-radio {
+  width: 28rpx;
+  height: 28rpx;
+  border-radius: 50%;
+  border: 2rpx solid #c7d2fe;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.bedroom-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: transparent;
+  transform: scale(0.8);
+  transition: all 0.2s ease;
+}
+
+.bedroom-text {
+  font-size: 24rpx;
+  color: #475569;
+}
+
+.bedroom-option.active .bedroom-radio {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 6rpx rgba(79, 70, 229, 0.12);
+}
+
+.bedroom-option.active .bedroom-dot {
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+  transform: scale(1);
+}
+
+.bedroom-option.active .bedroom-text {
+  color: #1e1b4b;
+  font-weight: 700;
+}
+
+.bedroom-option.active {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+}
+
+
+.quick-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10rpx;
+  padding: 10rpx 20rpx 4rpx;
+}
+
+.shortcut-card {
+  background: transparent;
+  border-radius: 0;
+  border: none;
+  min-height: 110rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
+}
+
+.shortcut-emoji {
+  width: 96rpx;
+  font-size: 64rpx;
+  line-height: 1;
+  text-align: center;
+}
+
+.shortcut-label {
+  width: 96rpx;
+  font-size: 21rpx;
+  color: #374151;
+  text-align: center;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.detail-filter-row {
+  display: flex;
+  gap: 8rpx;
+  padding: 12rpx 20rpx 8rpx;
+}
+
+.detail-filter-item {
+  flex: 1;
+  height: 56rpx;
+  line-height: 56rpx;
+  text-align: center;
+  font-size: 24rpx;
+  background: #ffffff;
+  border: 1px solid #dbe7ff;
+  border-radius: 16rpx;
+  color: #334155;
 }
 
 /* 顶部地图位 */
@@ -96,16 +254,19 @@
 .room-tab {
   flex: 1;
   text-align: center;
-  height: 66rpx;
-  line-height: 66rpx;
+  height: 58rpx;
+  line-height: 58rpx;
   font-size: 28rpx;
   color: #6b7280;
+  margin: 4rpx;
+  border-radius: 999rpx;
 }
 
 .room-tab.active {
-  color: #111;
+  color: #ffffff;
   font-weight: 700;
-  text-decoration: underline;
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+  text-decoration: none;
 }
 
 .quick-tags {

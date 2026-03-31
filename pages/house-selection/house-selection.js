@@ -6,12 +6,23 @@ Page({
     pageTitle: 'Homesee',
     roomTabs: ['全部', '整租', '合租'],
     activeRoomTab: '全部',
-    quickTags: [
-      { key: 'noDeposit', text: '7天无理由退租', active: false },
-      { key: 'freeDeposit', text: '免押租房', active: false },
-      { key: 'lowPrice', text: '低价好房', active: false },
-      { key: 'nearMetro', text: '靠近地铁', active: false }
+    bedroomOptions: [
+      { label: '不限', value: '' },
+      { label: '1居', value: '1' },
+      { label: '2居', value: '2' },
+      { label: '3居+', value: '3+' }
     ],
+    activeBedroom: '',
+    topShortcuts: [
+      { key: 'direct', text: '房东直租', emoji: '🐰' },
+      { key: 'lowPrice', text: '低价好房', emoji: '🍓' },
+      { key: 'nearMetro', text: '靠近地铁', emoji: '🐾' },
+      { key: 'share', text: '随时入住', emoji: '🧸' }
+    ],
+    topMapLatitude: 30.5928,
+    topMapLongitude: 114.3055,
+    topMapScale: 11,
+    topMapMarkers: [],
     // 筛选条件
     filters: {
       priceRange: [0, 10000],
@@ -283,6 +294,14 @@ Page({
         }
       }
 
+      if (this.data.activeBedroom) {
+        if (this.data.activeBedroom === '3+') {
+          params.minBedroomCount = 3;
+        } else {
+          params.bedroomCount = Number(this.data.activeBedroom);
+        }
+      }
+
       // 装修
       if (this.data.selectedDecoration && this.data.selectedDecoration !== '不限') {
         const decoMap = { '毛坯': 1, '简装': 2, '精装': 3, '豪装': 4 };
@@ -326,19 +345,6 @@ Page({
         houses = houses.filter(h => h.hasElevator === 1);
       }
 
-      // 快捷标签过滤（弱依赖后端字段，基于文本和价格做本地筛选）
-      const lowPriceTag = this.data.quickTags.find(i => i.key === 'lowPrice');
-      const nearMetroTag = this.data.quickTags.find(i => i.key === 'nearMetro');
-      if (lowPriceTag && lowPriceTag.active) {
-        houses = houses.filter(h => Number(h.rentPrice || 0) <= 1500);
-      }
-      if (nearMetroTag && nearMetroTag.active) {
-        houses = houses.filter(h => {
-          const text = `${h.street || ''}${h.communityName || ''}${h.description || ''}`;
-          return text.includes('地铁');
-        });
-      }
-
       // 客户端排序
       switch (this.data.currentSort) {
         case 2: // 价格低到高
@@ -364,8 +370,13 @@ Page({
         formattedPhone: this.formatPhoneNumber(h.landlordPhone)
       }));
 
+      const topMapData = this.buildTopMapData(houses);
+
       this.setData({
         houses: houses,
+        topMapLatitude: topMapData.latitude,
+        topMapLongitude: topMapData.longitude,
+        topMapMarkers: topMapData.markers,
         hasMore: false, // Since /filter returns all results
         loading: false
       });
@@ -397,13 +408,98 @@ Page({
     this.loadHouses(true);
   },
 
-  onQuickTagTap(e) {
-    const index = e.currentTarget.dataset.index;
-    const quickTags = [...this.data.quickTags];
-    if (!quickTags[index]) return;
-    quickTags[index].active = !quickTags[index].active;
-    this.setData({ quickTags });
+  onBedroomTap(e) {
+    const value = e.currentTarget.dataset.value;
+    const tips = {
+      '': '不限户型，更多选择！',
+      '1': '一居轻生活，安排！',
+      '2': '两居舒适住，冲！',
+      '3+': '三居以上，大空间更自在！'
+    };
+    this.setData({ activeBedroom: value });
+    wx.showToast({
+      title: tips[String(value)] || '已切换户型',
+      icon: 'none',
+      duration: 900
+    });
     this.loadHouses(true);
+  },
+
+  onTopShortcutTap(e) {
+    const { key } = e.currentTarget.dataset;
+    if (key === 'direct') {
+      wx.showToast({ title: '已为你优先展示直租房源', icon: 'none' });
+      return;
+    }
+    if (key === 'lowPrice') {
+      this.setData({ currentSort: 2 });
+      this.loadHouses(true);
+      return;
+    }
+    if (key === 'nearMetro') {
+      this.setData({ searchKeyword: '地铁' });
+      this.loadHouses(true);
+      return;
+    }
+    if (key === 'share') {
+      wx.showToast({ title: '已优先展示可随时入住', icon: 'none' });
+    }
+  },
+
+  onDetailFilterTap(e) {
+    const { key } = e.currentTarget.dataset;
+    if (key === 'sort') {
+      const nextSort = this.data.currentSort >= 5 ? 1 : this.data.currentSort + 1;
+      this.setData({ currentSort: nextSort });
+      this.loadHouses(true);
+      return;
+    }
+    this.toggleFilterPanel();
+  },
+
+  buildTopMapData(houses) {
+    const valid = (houses || []).filter((h) => {
+      const lat = parseFloat(h.latitude);
+      const lng = parseFloat(h.longitude);
+      return !isNaN(lat) && !isNaN(lng);
+    });
+    if (!valid.length) {
+      return {
+        latitude: this.data.topMapLatitude,
+        longitude: this.data.topMapLongitude,
+        markers: []
+      };
+    }
+    const markers = valid.slice(0, 30).map((h, idx) => ({
+      id: Number(h.id) || idx + 1,
+      latitude: parseFloat(h.latitude),
+      longitude: parseFloat(h.longitude),
+      width: 28,
+      height: 28,
+      callout: {
+        content: `¥${h.rentPrice || '--'}`,
+        color: '#ffffff',
+        fontSize: 10,
+        borderRadius: 12,
+        bgColor: '#2563EB',
+        padding: 4,
+        display: 'ALWAYS',
+        textAlign: 'center'
+      }
+    }));
+    return {
+      latitude: parseFloat(valid[0].latitude),
+      longitude: parseFloat(valid[0].longitude),
+      markers
+    };
+  },
+
+  onTopMapMarkerTap(e) {
+    const markerId = e.detail.markerId;
+    if (!markerId) return;
+    wx.navigateTo({
+      url: `/pages/house-detail/house-detail?houseId=${markerId}`
+    });
   },
 
   goMapSearch() {

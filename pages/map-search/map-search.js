@@ -9,6 +9,7 @@ const {
 
 const MARKER_ICON_BLUE =
   'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMyNTYzRUIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjEgMTBjMCA3LTkgMTMtOSAxM3MtOS02LTktMTNhOSA5IDAgMCAxIDE4IDB6Ij48L3BhdGg+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMCIgcj0iMyI+PC9jaXJjbGU+PC9zdmc+';
+const MAP_SEARCH_STATE_KEY = 'map_search_state_v1';
 
 function toRad(deg) {
   return (deg * Math.PI) / 180;
@@ -66,6 +67,19 @@ Page({
     aiItems: [],
     sidebarOpen: false,
     resultCount: 0,
+    activeRoomId: null,
+    cardScrollIntoView: '',
+    viewportBounds: null,
+    showMetroLayer: false,
+    showBusinessLayer: false,
+    poiMarkers: [],
+    showBasicFilters: true,
+    showAdvancedFilters: false,
+    activePriceRange: 'all',
+    activeRentalType: 'all',
+    sortType: 'default',
+    favoriteIds: [],
+    smartSuggestions: [],
 
     specificRoomId: '',
     isProcessing: false
@@ -73,16 +87,34 @@ Page({
 
   _markerIdToRoomId: {},
   _searchDebounceTimer: null,
+  _poiDebounceTimer: null,
+  _regionDebounceTimer: null,
+  _mapCtx: null,
 
   onLoad() {
     this._markerIdToRoomId = {};
+    this._mapCtx = wx.createMapContext('map', this);
+    this.restoreState();
     this.fetchRooms();
   },
 
+  onHide() {
+    this.persistState();
+  },
+
   onUnload() {
+    this.persistState();
     if (this._searchDebounceTimer) {
       clearTimeout(this._searchDebounceTimer);
       this._searchDebounceTimer = null;
+    }
+    if (this._poiDebounceTimer) {
+      clearTimeout(this._poiDebounceTimer);
+      this._poiDebounceTimer = null;
+    }
+    if (this._regionDebounceTimer) {
+      clearTimeout(this._regionDebounceTimer);
+      this._regionDebounceTimer = null;
     }
   },
 
@@ -137,6 +169,8 @@ Page({
   toggleFilter(e) {
     const type = e.currentTarget.dataset.type;
     let filters = [...this.data.activeFilters];
+    const disabledLegacyFilterTypes = ['price_desc'];
+    if (disabledLegacyFilterTypes.includes(type)) return;
 
     if (filters.includes(type)) {
       filters = filters.filter((t) => t !== type);
@@ -151,9 +185,35 @@ Page({
     this.applyFilters();
   },
 
+  onPriceRangeTap(e) {
+    const value = e.currentTarget.dataset.value || 'all';
+    this.setData({ activePriceRange: value });
+    this.applyFilters();
+  },
+
+  onRentalTypeTap(e) {
+    const value = e.currentTarget.dataset.value || 'all';
+    this.setData({ activeRentalType: value });
+    this.applyFilters();
+  },
+
+  onSortTap(e) {
+    const value = e.currentTarget.dataset.value || 'default';
+    this.setData({ sortType: value });
+    this.applyFilters();
+  },
+
+  toggleBasicFilters() {
+    this.setData({ showBasicFilters: !this.data.showBasicFilters });
+  },
+
+  toggleAdvancedFilters() {
+    this.setData({ showAdvancedFilters: !this.data.showAdvancedFilters });
+  },
+
   applyFilters() {
     let result = this.data.rooms;
-    const { searchText, activeFilters, latitude, longitude } = this.data;
+    const { searchText, activeFilters, latitude, longitude, viewportBounds, activePriceRange, activeRentalType, sortType } = this.data;
 
     if (searchText) {
       const key = searchText.toLowerCase();
@@ -179,10 +239,6 @@ Page({
       result = result.filter((r) => r.description && r.description.includes('地铁'));
     }
 
-    if (activeFilters.includes('price_desc')) {
-      result = [...result].sort((a, b) => b.rentPrice - a.rentPrice);
-    }
-
     if (activeFilters.includes('nearby')) {
       result = result.filter((r) => {
         const lat = parseFloat(r.latitude);
@@ -192,16 +248,73 @@ Page({
       });
     }
 
+    if (activeFilters.includes('viewport') && viewportBounds) {
+      const { southwest, northeast } = viewportBounds;
+      result = result.filter((r) => {
+        const lat = parseFloat(r.latitude);
+        const lng = parseFloat(r.longitude);
+        if (isNaN(lat) || isNaN(lng)) return false;
+        return (
+          lat >= southwest.latitude &&
+          lat <= northeast.latitude &&
+          lng >= southwest.longitude &&
+          lng <= northeast.longitude
+        );
+      });
+    }
+
+    if (activeRentalType !== 'all') {
+      const rentalTypeMap = { whole: 0, shared: 1, single: 2 };
+      const targetType = rentalTypeMap[activeRentalType];
+      result = result.filter((r) => r.rentalType === targetType);
+    }
+
+    if (activePriceRange !== 'all') {
+      result = result.filter((r) => {
+        const price = Number(r.rentPrice);
+        if (isNaN(price)) return false;
+        if (activePriceRange === 'lt2000') return price < 2000;
+        if (activePriceRange === '2000to4000') return price >= 2000 && price <= 4000;
+        if (activePriceRange === 'gt4000') return price > 4000;
+        return true;
+      });
+    }
+
+    if (sortType === 'price_asc') {
+      result = [...result].sort((a, b) => Number(a.rentPrice || 0) - Number(b.rentPrice || 0));
+    } else if (sortType === 'distance_asc') {
+      result = [...result].sort((a, b) => {
+        const aLat = parseFloat(a.latitude);
+        const aLng = parseFloat(a.longitude);
+        const bLat = parseFloat(b.latitude);
+        const bLng = parseFloat(b.longitude);
+        const da = isNaN(aLat) || isNaN(aLng) ? Number.MAX_SAFE_INTEGER : calculateDistanceKm(latitude, longitude, aLat, aLng);
+        const db = isNaN(bLat) || isNaN(bLng) ? Number.MAX_SAFE_INTEGER : calculateDistanceKm(latitude, longitude, bLat, bLng);
+        return da - db;
+      });
+    }
+
+    const favoriteIds = this.data.favoriteIds || [];
+    result = result.map((item) => ({
+      ...item,
+      isFavorite: favoriteIds.includes(String(item.id))
+    }));
+
+    const activeRoomStillVisible = result.some((r) => String(r.id) === String(this.data.activeRoomId));
+    const nextActiveRoomId = activeRoomStillVisible ? this.data.activeRoomId : result[0]?.id || null;
+
     this.setData({
       filteredRooms: result,
-      resultCount: result.length
+      resultCount: result.length,
+      activeRoomId: nextActiveRoomId
     });
     this.updateMarkers(result);
+    this.updateSmartSuggestions(result.length);
   },
 
   updateMarkers(rooms) {
     this._markerIdToRoomId = {};
-    const markers = (rooms || []).map((room, index) => {
+    const roomMarkers = (rooms || []).map((room, index) => {
       let lat = parseFloat(room.latitude);
       let lng = parseFloat(room.longitude);
 
@@ -233,12 +346,16 @@ Page({
       };
     });
 
+    const markers = roomMarkers.concat(this.data.poiMarkers || []);
     this.setData({ markers });
   },
 
   onMarkerTap(e) {
     const markerId = e.detail.markerId;
     const mappedId = this._markerIdToRoomId[markerId];
+    if (!mappedId) {
+      return;
+    }
     const room = this.data.rooms.find((r) => r.id == mappedId || r.id == markerId);
 
     if (!room) {
@@ -259,10 +376,70 @@ Page({
         selectedRoom: Object.assign({}, room, { tagsList }),
         showDetail: true,
         aiLoading: true,
-        aiItems: []
+        aiItems: [],
+        activeRoomId: room.id,
+        cardScrollIntoView: `room-card-${room.id}`,
+        latitude: parseFloat(room.latitude) || this.data.latitude,
+        longitude: parseFloat(room.longitude) || this.data.longitude
       });
       this.loadNearbyPoiForRoom(room);
     }, 50);
+  },
+
+  onRoomCardTap(e) {
+    const roomId = e.currentTarget.dataset.id;
+    const room = this.data.filteredRooms.find((r) => String(r.id) === String(roomId));
+    if (!room) return;
+
+    const tagsList = room.tags
+      ? String(room.tags)
+          .split(',')
+          .map((t) => t.trim())
+          .filter(Boolean)
+      : [];
+
+    this.setData({
+      selectedRoom: Object.assign({}, room, { tagsList }),
+      showDetail: true,
+      aiLoading: true,
+      aiItems: [],
+      activeRoomId: room.id,
+      cardScrollIntoView: `room-card-${room.id}`,
+      latitude: parseFloat(room.latitude) || this.data.latitude,
+      longitude: parseFloat(room.longitude) || this.data.longitude,
+      scale: 14
+    });
+    this.loadNearbyPoiForRoom(room);
+  },
+
+  toggleCardFavorite(e) {
+    const roomId = e.currentTarget.dataset.id;
+    if (roomId === undefined || roomId === null) return;
+    const room = this.data.rooms.find((r) => String(r.id) === String(roomId));
+    if (!room) return;
+
+    const key = 'favorite_houses';
+    const list = wx.getStorageSync(key) || [];
+    const exists = list.some((item) => String(item.id) === String(room.id));
+    let nextList;
+    if (exists) {
+      nextList = list.filter((item) => String(item.id) !== String(room.id));
+      wx.showToast({ title: '已取消收藏', icon: 'none' });
+    } else {
+      nextList = [room].concat(list).slice(0, 200);
+      wx.showToast({ title: '收藏成功', icon: 'success' });
+    }
+    wx.setStorageSync(key, nextList);
+    const favoriteIds = nextList.map((item) => String(item.id));
+    this.setData({ favoriteIds });
+    this.applyFilters();
+  },
+
+  quickAppointment(e) {
+    const roomId = e.currentTarget.dataset.id;
+    wx.navigateTo({
+      url: `/packageB/pages/appointment/appointment?houseId=${roomId}`
+    });
   },
 
   async loadNearbyPoiForRoom(room) {
@@ -309,23 +486,216 @@ Page({
   },
 
   onRegionChange(e) {
-    if (e.type === 'end' && e.causedBy === 'drag' && e.detail && e.detail.centerLocation) {
+    if (e.type === 'end' && (e.causedBy === 'drag' || e.causedBy === 'scale') && e.detail && e.detail.centerLocation) {
       this.setData({
         latitude: e.detail.centerLocation.latitude,
         longitude: e.detail.centerLocation.longitude
       });
-      if (this.data.activeFilters.includes('nearby')) {
-        this.applyFilters();
-      }
+      if (this._regionDebounceTimer) clearTimeout(this._regionDebounceTimer);
+      this._regionDebounceTimer = setTimeout(() => {
+        this.updateViewportBounds();
+        if (
+          this.data.activeFilters.includes('nearby') ||
+          this.data.activeFilters.includes('viewport') ||
+          this.data.sortType === 'distance_asc'
+        ) {
+          this.applyFilters();
+        }
+        if (this.data.showMetroLayer || this.data.showBusinessLayer) {
+          if (this._poiDebounceTimer) clearTimeout(this._poiDebounceTimer);
+          this._poiDebounceTimer = setTimeout(() => this.refreshPoiLayer(), 250);
+        }
+      }, 180);
     }
   },
 
   resetFilters() {
     this.setData({
       searchText: '',
-      activeFilters: []
+      activeFilters: [],
+      activePriceRange: 'all',
+      activeRentalType: 'all',
+      sortType: 'default'
     });
     this.applyFilters();
+  },
+
+  quickRelaxViewport() {
+    const nextFilters = (this.data.activeFilters || []).filter((f) => f !== 'viewport');
+    this.setData({ activeFilters: nextFilters });
+    this.applyFilters();
+  },
+
+  quickRelaxPrice() {
+    this.setData({ activePriceRange: 'all' });
+    this.applyFilters();
+  },
+
+  quickClearAll() {
+    this.resetFilters();
+  },
+
+  updateSmartSuggestions(resultCount) {
+    const suggestions = [];
+    const { activeFilters, activePriceRange, activeRentalType, searchText, sortType } = this.data;
+    const has = (k) => (activeFilters || []).includes(k);
+
+    if (resultCount === 0) {
+      if (has('viewport')) suggestions.push({ key: 'remove_viewport', text: '去掉视野内限制' });
+      if (has('nearby')) suggestions.push({ key: 'remove_nearby', text: '去掉3km附近限制' });
+      if (searchText) suggestions.push({ key: 'clear_search', text: '清空关键词' });
+      if (activePriceRange !== 'all') suggestions.push({ key: 'price_all', text: '放宽价格条件' });
+      if (activeRentalType !== 'all') suggestions.push({ key: 'rental_all', text: '切换到全部出租类型' });
+      if (sortType !== 'default') suggestions.push({ key: 'sort_default', text: '恢复默认排序' });
+      suggestions.push({ key: 'clear_all', text: '一键清空所有筛选' });
+    } else {
+      if (!has('viewport')) suggestions.push({ key: 'add_viewport', text: '仅看当前视野' });
+      if (activePriceRange === 'all') suggestions.push({ key: 'price_2k_4k', text: '筛选2k-4k' });
+      if (activeRentalType === 'all') suggestions.push({ key: 'rental_whole', text: '只看整租' });
+      if (sortType !== 'distance_asc') suggestions.push({ key: 'sort_distance', text: '按距离排序' });
+    }
+
+    this.setData({ smartSuggestions: suggestions.slice(0, 4) });
+  },
+
+  applySuggestion(e) {
+    const key = e.currentTarget.dataset.key;
+    const filters = [...(this.data.activeFilters || [])];
+    const addFilter = (f) => {
+      if (!filters.includes(f)) filters.push(f);
+    };
+    const removeFilter = (f) => filters.filter((x) => x !== f);
+
+    if (key === 'remove_viewport') {
+      this.setData({ activeFilters: removeFilter('viewport') });
+    } else if (key === 'remove_nearby') {
+      this.setData({ activeFilters: removeFilter('nearby') });
+    } else if (key === 'clear_search') {
+      this.setData({ searchText: '' });
+    } else if (key === 'price_all') {
+      this.setData({ activePriceRange: 'all' });
+    } else if (key === 'rental_all') {
+      this.setData({ activeRentalType: 'all' });
+    } else if (key === 'sort_default') {
+      this.setData({ sortType: 'default' });
+    } else if (key === 'clear_all') {
+      this.resetFilters();
+      return;
+    } else if (key === 'add_viewport') {
+      addFilter('viewport');
+      this.setData({ activeFilters: filters });
+    } else if (key === 'price_2k_4k') {
+      this.setData({ activePriceRange: '2000to4000' });
+    } else if (key === 'rental_whole') {
+      this.setData({ activeRentalType: 'whole' });
+    } else if (key === 'sort_distance') {
+      this.setData({ sortType: 'distance_asc' });
+    }
+
+    this.applyFilters();
+  },
+
+  persistState() {
+    const state = {
+      searchText: this.data.searchText,
+      activeFilters: this.data.activeFilters,
+      activePriceRange: this.data.activePriceRange,
+      activeRentalType: this.data.activeRentalType,
+      sortType: this.data.sortType,
+      showBasicFilters: this.data.showBasicFilters,
+      showAdvancedFilters: this.data.showAdvancedFilters,
+      showMetroLayer: this.data.showMetroLayer,
+      showBusinessLayer: this.data.showBusinessLayer
+    };
+    wx.setStorageSync(MAP_SEARCH_STATE_KEY, state);
+  },
+
+  restoreState() {
+    const state = wx.getStorageSync(MAP_SEARCH_STATE_KEY) || {};
+    const favoriteList = wx.getStorageSync('favorite_houses') || [];
+    this.setData({
+      searchText: state.searchText || '',
+      activeFilters: Array.isArray(state.activeFilters) ? state.activeFilters : [],
+      activePriceRange: state.activePriceRange || 'all',
+      activeRentalType: state.activeRentalType || 'all',
+      sortType: state.sortType || 'default',
+      showBasicFilters: state.showBasicFilters !== false,
+      showAdvancedFilters: !!state.showAdvancedFilters,
+      showMetroLayer: !!state.showMetroLayer,
+      showBusinessLayer: !!state.showBusinessLayer,
+      favoriteIds: favoriteList.map((item) => String(item.id))
+    });
+  },
+
+  updateViewportBounds() {
+    if (!this._mapCtx || !this._mapCtx.getRegion) return;
+    this._mapCtx.getRegion({
+      success: (res) => {
+        if (res && res.southwest && res.northeast) {
+          this.setData({ viewportBounds: res });
+        }
+      }
+    });
+  },
+
+  toggleMetroLayer() {
+    this.setData({ showMetroLayer: !this.data.showMetroLayer }, () => {
+      this.refreshPoiLayer();
+    });
+  },
+
+  toggleBusinessLayer() {
+    this.setData({ showBusinessLayer: !this.data.showBusinessLayer }, () => {
+      this.refreshPoiLayer();
+    });
+  },
+
+  async refreshPoiLayer() {
+    const { showMetroLayer, showBusinessLayer, latitude, longitude } = this.data;
+    if (!showMetroLayer && !showBusinessLayer) {
+      this.setData({ poiMarkers: [] });
+      this.updateMarkers(this.data.filteredRooms);
+      return;
+    }
+
+    try {
+      const items = await fetchNearbyPoiItems(longitude, latitude);
+      const metroKeywords = ['地铁', '站'];
+      const businessKeywords = ['商场', '广场', '中心', 'mall', 'MALL'];
+
+      const poiMarkers = (items || [])
+        .filter((item) => {
+          const name = String(item.name || '');
+          const isMetro = metroKeywords.some((k) => name.includes(k));
+          const isBusiness = businessKeywords.some((k) => name.includes(k));
+          return (showMetroLayer && isMetro) || (showBusinessLayer && isBusiness);
+        })
+        .slice(0, 20)
+        .map((item, idx) => ({
+          id: 1900000000 + idx,
+          latitude: parseFloat(item.latitude),
+          longitude: parseFloat(item.longitude),
+          width: 20,
+          height: 20,
+          alpha: 0.95,
+          callout: {
+            content: item.name || '周边点位',
+            color: '#1F2937',
+            fontSize: 10,
+            borderRadius: 10,
+            bgColor: '#F9FAFB',
+            padding: 4,
+            display: 'BYCLICK',
+            textAlign: 'center'
+          }
+        }))
+        .filter((m) => !isNaN(m.latitude) && !isNaN(m.longitude));
+
+      this.setData({ poiMarkers });
+      this.updateMarkers(this.data.filteredRooms);
+    } catch (err) {
+      console.error('POI 图层刷新失败', err);
+    }
   },
 
   async runConcurrent(tasks, concurrency) {

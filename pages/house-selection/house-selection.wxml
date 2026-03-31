@@ -1,16 +1,30 @@
 <!--pages/house-selection/house-selection.wxml-->
 <view class="house-selection-container">
-  <view class="top-map">
-    <view class="nav-line">
-      <view class="page-title">{{pageTitle}}</view>
-      <view class="icons">
-        <text bindtap="goMapSearch">⌖</text>
-        <text>☆</text>
-        <text>⋯</text>
-        <text>✕</text>
-      </view>
+  <view class="top-map-card">
+    <map
+      class="top-map-bg"
+      latitude="{{topMapLatitude}}"
+      longitude="{{topMapLongitude}}"
+      scale="{{topMapScale}}"
+      markers="{{topMapMarkers}}"
+      show-location
+      bindmarkertap="onTopMapMarkerTap"
+      bindtap="goMapSearch"
+    ></map>
+  </view>
+
+  <view class="floating-filter-form">
+    <view class="room-tabs moved-down">
+      <view
+        wx:for="{{roomTabs}}"
+        wx:key="*this"
+        class="room-tab {{activeRoomTab === item ? 'active' : ''}}"
+        data-tab="{{item}}"
+        bindtap="onRoomTabTap"
+      >{{item}}</view>
     </view>
-    <view class="search-bar">
+
+    <view class="search-bar modern">
       <view class="search-input-container">
         <input
           class="search-input"
@@ -24,37 +38,42 @@
       </view>
       <button class="filter-btn" bindtap="toggleFilterPanel">筛选</button>
     </view>
-    <view class="room-tabs">
+
+    <view class="bedroom-row">
       <view
-        wx:for="{{roomTabs}}"
-        wx:key="*this"
-        class="room-tab {{activeRoomTab === item ? 'active' : ''}}"
-        data-tab="{{item}}"
-        bindtap="onRoomTabTap"
-      >{{item}}</view>
+        wx:for="{{bedroomOptions}}"
+        wx:key="value"
+        class="bedroom-option {{activeBedroom === item.value ? 'active' : ''}}"
+        data-value="{{item.value}}"
+        bindtap="onBedroomTap"
+      >
+        <view class="bedroom-radio">
+          <view class="bedroom-dot"></view>
+        </view>
+        <text class="bedroom-text">{{item.label}}</text>
+      </view>
     </view>
   </view>
 
-  <view class="quick-tags">
+  <view class="quick-shortcuts">
     <view
-      wx:for="{{quickTags}}"
+      class="shortcut-card"
+      wx:for="{{topShortcuts}}"
       wx:key="key"
-      class="q-tag {{item.active ? 'active' : ''}}"
-      data-index="{{index}}"
-      bindtap="onQuickTagTap"
-    >{{item.text}}</view>
+      data-key="{{item.key}}"
+      bindtap="onTopShortcutTap"
+    >
+      <text class="shortcut-emoji">{{item.emoji}}</text>
+      <text class="shortcut-label">{{item.text}}</text>
+    </view>
   </view>
 
-  <view class="sort-options">
-    <view
-      wx:for="{{sortOptions}}"
-      wx:key="id"
-      class="sort-option {{currentSort === item.id ? 'active' : ''}}"
-      bindtap="selectSort"
-      data-index="{{item.id}}"
-    >
-      {{item.name}}
-    </view>
+  <view class="detail-filter-row">
+    <view class="detail-filter-item" data-key="location" bindtap="onDetailFilterTap">位置 ▼</view>
+    <view class="detail-filter-item" data-key="houseType" bindtap="onDetailFilterTap">房型 ▼</view>
+    <view class="detail-filter-item" data-key="rent" bindtap="onDetailFilterTap">租金 ▼</view>
+    <view class="detail-filter-item" data-key="filter" bindtap="onDetailFilterTap">筛选 ▼</view>
+    <view class="detail-filter-item" data-key="sort" bindtap="onDetailFilterTap">排序 ▼</view>
   </view>
 
   <!-- 筛选面板 -->
