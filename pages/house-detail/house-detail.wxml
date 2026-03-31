@@ -1,0 +1,54 @@
+<view class="detail-page" wx:if="{{!loading && house}}">
+  <view class="banner">
+    <swiper class="banner-swiper" indicator-dots="{{false}}" circular="{{true}}" current="{{current}}" bindchange="onSwiperChange">
+      <swiper-item wx:for="{{imageList}}" wx:key="index">
+        <image class="banner-img" src="{{item}}" mode="aspectFill" />
+      </swiper-item>
+    </swiper>
+    <view class="top-actions">
+      <view class="t-btn" bindtap="goBack">↩</view>
+      <view class="t-btn" bindtap="toggleFavorite">{{isFavorite ? '★' : '☆'}}</view>
+      <view class="t-btn" bindtap="shareHouse">⋯</view>
+      <view class="t-btn" bindtap="goHome">✕</view>
+    </view>
+    <view class="counter">{{current + 1}}/{{imageList.length}}</view>
+  </view>
+
+  <view class="info-wrap">
+    <view class="title-row">
+      <view class="title">{{formatLayout(house)}} · {{house.communityName}} {{house.doorNumber || ''}}</view>
+      <view class="fav">收藏</view>
+    </view>
+    <view class="price"><text class="symbol">¥</text>{{house.rentPrice}}<text class="unit">/月</text></view>
+
+    <view class="tags">
+      <text class="tag">品牌家电</text>
+      <text class="tag">拎包入住</text>
+    </view>
+
+    <view class="meta-grid">
+      <view class="meta-item"><text class="v">{{house.orientation || '东'}}</text><text class="k">朝向</text></view>
+      <view class="meta-item"><text class="v">{{house.roomArea}}㎡</text><text class="k">面积</text></view>
+      <view class="meta-item"><text class="v">{{house.floorInfo || '未知'}}</text><text class="k">楼层</text></view>
+      <view class="meta-item"><text class="v">随时入住</text><text class="k">入住</text></view>
+    </view>
+
+    <view class="desc">
+      <view class="desc-title">房源描述</view>
+      <view class="desc-text">{{house.description || '暂无描述'}}</view>
+    </view>
+  </view>
+
+  <view class="bottom-bar">
+    <image class="owner-avatar" src="https://files.homesee.xyz/api/files/download/default-avatar.png" mode="aspectFill" />
+    <view class="owner-box">
+      <text class="owner-name">{{house.landlordName || '房东'}}</text>
+      <text class="owner-status">在线</text>
+    </view>
+    <view class="bottom-btn" bindtap="makeAppointment">预约</view>
+    <view class="bottom-btn" bindtap="callLandlord">电话</view>
+    <view class="ask-btn" bindtap="callLandlord">在线问</view>
+  </view>
+</view>
+
+<view class="loading" wx:if="{{loading}}">加载中...</view>

@@ -5,6 +5,8 @@
     "pages/legal/privacy-policy",
     "pages/home/home",
     "pages/house-selection/house-selection",
+    "pages/house-detail/house-detail",
+    "pages/mine/mine",
     "pages/smart-matching/smart-matching",
     "pages/community/community",
     "pages/map-search/map-search"
@@ -70,7 +72,7 @@
   },
   "tabBar": {
     "color": "#999999",
-    "selectedColor": "#2c3e50",
+    "selectedColor": "#111111",
     "backgroundColor": "#ffffff",
     "borderStyle": "black",
     "list": [
@@ -80,15 +82,15 @@
       },
       {
         "pagePath": "pages/house-selection/house-selection",
-        "text": "房源精选"
+        "text": "看房"
       },
       {
-        "pagePath": "pages/smart-matching/smart-matching",
-        "text": "匹配"
+        "pagePath": "pages/community/community",
+        "text": "消息"
       },
       {
-        "pagePath": "pages/map-search/map-search",
-        "text": "地图找房"
+        "pagePath": "pages/mine/mine",
+        "text": "我的"
       }
     ]
   },

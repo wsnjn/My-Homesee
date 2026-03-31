@@ -3,6 +3,15 @@ const { request } = require('../../utils/request');
 
 Page({
   data: {
+    pageTitle: 'Homesee',
+    roomTabs: ['全部', '整租', '合租'],
+    activeRoomTab: '全部',
+    quickTags: [
+      { key: 'noDeposit', text: '7天无理由退租', active: false },
+      { key: 'freeDeposit', text: '免押租房', active: false },
+      { key: 'lowPrice', text: '低价好房', active: false },
+      { key: 'nearMetro', text: '靠近地铁', active: false }
+    ],
     // 筛选条件
     filters: {
       priceRange: [0, 10000],
@@ -89,7 +98,8 @@ Page({
     minPrice: '',
     maxPrice: '',
     minArea: '',
-    maxArea: ''
+    maxArea: '',
+    selectedRentalType: ''
   },
 
   onLoad(options) {
@@ -316,6 +326,19 @@ Page({
         houses = houses.filter(h => h.hasElevator === 1);
       }
 
+      // 快捷标签过滤（弱依赖后端字段，基于文本和价格做本地筛选）
+      const lowPriceTag = this.data.quickTags.find(i => i.key === 'lowPrice');
+      const nearMetroTag = this.data.quickTags.find(i => i.key === 'nearMetro');
+      if (lowPriceTag && lowPriceTag.active) {
+        houses = houses.filter(h => Number(h.rentPrice || 0) <= 1500);
+      }
+      if (nearMetroTag && nearMetroTag.active) {
+        houses = houses.filter(h => {
+          const text = `${h.street || ''}${h.communityName || ''}${h.description || ''}`;
+          return text.includes('地铁');
+        });
+      }
+
       // 客户端排序
       switch (this.data.currentSort) {
         case 2: // 价格低到高
@@ -362,6 +385,29 @@ Page({
     const keyword = e.detail.value || '';
     this.setData({ searchKeyword: keyword });
     this.loadHouses(true);
+  },
+
+  onRoomTabTap(e) {
+    const tab = e.currentTarget.dataset.tab;
+    const nextData = { activeRoomTab: tab };
+    if (tab === '整租') nextData.selectedRentalType = '整租';
+    if (tab === '合租') nextData.selectedRentalType = '合租';
+    if (tab === '全部') nextData.selectedRentalType = '';
+    this.setData(nextData);
+    this.loadHouses(true);
+  },
+
+  onQuickTagTap(e) {
+    const index = e.currentTarget.dataset.index;
+    const quickTags = [...this.data.quickTags];
+    if (!quickTags[index]) return;
+    quickTags[index].active = !quickTags[index].active;
+    this.setData({ quickTags });
+    this.loadHouses(true);
+  },
+
+  goMapSearch() {
+    wx.navigateTo({ url: '/pages/map-search/map-search' });
   },
 
   // 切换筛选面板
@@ -641,9 +687,18 @@ Page({
     const house = this.data.houses.find(h => h.id === id);
     if (house) {
       wx.navigateTo({
-        url: `/pages/appointment/appointment?houseId=${id}&houseTitle=${encodeURIComponent(house.communityName)}`
+        url: `/packageB/pages/appointment/appointment?houseId=${id}&houseTitle=${encodeURIComponent(house.communityName)}`
       });
     }
+  },
+
+  // 跳转房源详情
+  goHouseDetail(e) {
+    const { id } = e.currentTarget.dataset;
+    if (!id) return;
+    wx.navigateTo({
+      url: `/pages/house-detail/house-detail?houseId=${id}`
+    });
   },
 
   // 拨打房东电话

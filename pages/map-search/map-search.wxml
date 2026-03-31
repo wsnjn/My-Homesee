@@ -1,5 +1,11 @@
 <!--pages/map-search/map-search.wxml-->
 <view class="container">
+  <view class="top-nav">
+    <view class="top-left" bindtap="goBack">‹</view>
+    <view class="top-title">Homesee 地图找房（{{resultCount}}）</view>
+    <view class="top-right" bindtap="moveToUserLocation">定位</view>
+  </view>
+
   <!-- Map Component (Full Screen) -->
   <map 
     id="map" 
@@ -21,6 +27,7 @@
       <view class="sidebar-search">
         <input 
           class="sidebar-search-input"
+          value="{{searchText}}"
           placeholder="输入区域、地铁、小区名找房..." 
           placeholder-class="placeholder"
           bindinput="onSearchInput"
@@ -82,7 +89,13 @@
           class="sidebar-tag {{activeFilters.includes('price_desc') ? 'active' : ''}}" 
           bindtap="toggleFilter" data-type="price_desc"
         >价格↓</view>
+        <view 
+          class="sidebar-tag {{activeFilters.includes('nearby') ? 'active' : ''}}" 
+          bindtap="toggleFilter" data-type="nearby"
+        >3km内</view>
       </view>
+
+      <view class="sidebar-reset" bindtap="resetFilters">重置筛选</view>
     </view>
   </view>
 

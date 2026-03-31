@@ -1,29 +1,54 @@
 <!--pages/house-selection/house-selection.wxml-->
 <view class="house-selection-container">
-  <!-- 搜索栏 -->
-  <view class="search-bar">
-    <view class="search-input-container">
-      <input 
-        class="search-input" 
-        placeholder="搜索房源..."
-        value="{{searchKeyword}}"
-        bindinput="onSearch"
-      />
-      <view class="search-icon-wrapper">
-        <svg-icon name="search" size="20" color="#9CA3AF" />
+  <view class="top-map">
+    <view class="nav-line">
+      <view class="page-title">{{pageTitle}}</view>
+      <view class="icons">
+        <text bindtap="goMapSearch">⌖</text>
+        <text>☆</text>
+        <text>⋯</text>
+        <text>✕</text>
       </view>
     </view>
-    <button class="filter-btn" bindtap="toggleFilterPanel">
-      <svg-icon name="filter" size="20" color="#FFFFFF" />
-      筛选
-    </button>
+    <view class="search-bar">
+      <view class="search-input-container">
+        <input
+          class="search-input"
+          placeholder="搜商圈、小区、地铁站"
+          value="{{searchKeyword}}"
+          bindinput="onSearch"
+        />
+        <view class="search-icon-wrapper">
+          <svg-icon name="search" size="18" color="#9CA3AF" />
+        </view>
+      </view>
+      <button class="filter-btn" bindtap="toggleFilterPanel">筛选</button>
+    </view>
+    <view class="room-tabs">
+      <view
+        wx:for="{{roomTabs}}"
+        wx:key="*this"
+        class="room-tab {{activeRoomTab === item ? 'active' : ''}}"
+        data-tab="{{item}}"
+        bindtap="onRoomTabTap"
+      >{{item}}</view>
+    </view>
   </view>
 
-  <!-- 排序选项 -->
+  <view class="quick-tags">
+    <view
+      wx:for="{{quickTags}}"
+      wx:key="key"
+      class="q-tag {{item.active ? 'active' : ''}}"
+      data-index="{{index}}"
+      bindtap="onQuickTagTap"
+    >{{item.text}}</view>
+  </view>
+
   <view class="sort-options">
-    <view 
-      wx:for="{{sortOptions}}" 
-      wx:key="id" 
+    <view
+      wx:for="{{sortOptions}}"
+      wx:key="id"
       class="sort-option {{currentSort === item.id ? 'active' : ''}}"
       bindtap="selectSort"
       data-index="{{item.id}}"
@@ -129,7 +154,7 @@
       <text class="empty-hint">尝试调整筛选条件或搜索关键词</text>
     </view>
 
-    <view wx:for="{{houses}}" wx:key="id" class="house-card">
+    <view wx:for="{{houses}}" wx:key="id" class="house-card" bindtap="goHouseDetail" data-id="{{item.id}}">
       <!-- 房屋图片 -->
       <view class="house-image-wrapper" hover-class="house-image-wrapper-hover" hover-stay-time="100">
         <image 
@@ -170,10 +195,7 @@
         </view>
         
         <!-- 房东电话 -->
-        <view wx:if="{{item.landlordPhone}}" class="landlord-phone">
-          <svg-icon name="phone" size="28" color="#6B7280" />
-          <text>房东电话: {{item.formattedPhone || item.landlordPhone}}</text>
-        </view>
+      <view wx:if="{{item.landlordPhone}}" class="landlord-phone">房东：{{item.formattedPhone || item.landlordPhone}}</view>
         
         <!-- 房屋规格 -->
         <view class="house-meta">
@@ -190,6 +212,10 @@
             <text class="price-symbol">¥</text>
             <text class="price-value">{{item.rentPrice}}</text>
             <text class="price-unit">/月</text>
+          </view>
+          <view class="stats">
+            <text>{{item.viewCount || 0}}浏览</text>
+            <text>{{item.consultCount || 0}}咨询</text>
           </view>
           <button 
             class="action-btn appointment-btn {{item.status !== 0 ? 'disabled' : ''}}" 

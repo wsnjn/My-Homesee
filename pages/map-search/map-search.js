@@ -10,6 +10,21 @@ const {
 const MARKER_ICON_BLUE =
   'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMyNTYzRUIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjEgMTBjMCA3LTkgMTMtOSAxM3MtOS02LTktMTNhOSA5IDAgMCAxIDE4IDB6Ij48L3BhdGg+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMCIgcj0iMyI+PC9jaXJjbGU+PC9zdmc+';
 
+function toRad(deg) {
+  return (deg * Math.PI) / 180;
+}
+
+function calculateDistanceKm(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 function hashStringToMarkerId(str, fallbackIndex) {
   const s = String(str);
   let h = 0;
@@ -50,16 +65,41 @@ Page({
     aiLoading: false,
     aiItems: [],
     sidebarOpen: false,
+    resultCount: 0,
 
     specificRoomId: '',
     isProcessing: false
   },
 
   _markerIdToRoomId: {},
+  _searchDebounceTimer: null,
 
   onLoad() {
     this._markerIdToRoomId = {};
     this.fetchRooms();
+  },
+
+  onUnload() {
+    if (this._searchDebounceTimer) {
+      clearTimeout(this._searchDebounceTimer);
+      this._searchDebounceTimer = null;
+    }
+  },
+
+  moveToUserLocation() {
+    wx.getLocation({
+      type: 'gcj02',
+      success: (res) => {
+        this.setData({
+          latitude: res.latitude,
+          longitude: res.longitude,
+          scale: 14
+        });
+      },
+      fail: () => {
+        wx.showToast({ title: '定位失败', icon: 'none' });
+      }
+    });
   },
 
   async fetchRooms() {
@@ -80,6 +120,10 @@ Page({
 
   onSearchInput(e) {
     this.setData({ searchText: e.detail.value });
+    if (this._searchDebounceTimer) clearTimeout(this._searchDebounceTimer);
+    this._searchDebounceTimer = setTimeout(() => {
+      this.applyFilters();
+    }, 250);
   },
 
   onSpecificRoomInput(e) {
@@ -109,7 +153,7 @@ Page({
 
   applyFilters() {
     let result = this.data.rooms;
-    const { searchText, activeFilters } = this.data;
+    const { searchText, activeFilters, latitude, longitude } = this.data;
 
     if (searchText) {
       const key = searchText.toLowerCase();
@@ -139,7 +183,19 @@ Page({
       result = [...result].sort((a, b) => b.rentPrice - a.rentPrice);
     }
 
-    this.setData({ filteredRooms: result });
+    if (activeFilters.includes('nearby')) {
+      result = result.filter((r) => {
+        const lat = parseFloat(r.latitude);
+        const lng = parseFloat(r.longitude);
+        if (isNaN(lat) || isNaN(lng)) return false;
+        return calculateDistanceKm(latitude, longitude, lat, lng) <= 3;
+      });
+    }
+
+    this.setData({
+      filteredRooms: result,
+      resultCount: result.length
+    });
     this.updateMarkers(result);
   },
 
@@ -258,7 +314,18 @@ Page({
         latitude: e.detail.centerLocation.latitude,
         longitude: e.detail.centerLocation.longitude
       });
+      if (this.data.activeFilters.includes('nearby')) {
+        this.applyFilters();
+      }
     }
+  },
+
+  resetFilters() {
+    this.setData({
+      searchText: '',
+      activeFilters: []
+    });
+    this.applyFilters();
   },
 
   async runConcurrent(tasks, concurrency) {
@@ -397,7 +464,7 @@ Page({
   navigateToDetail() {
     if (this.data.selectedRoom) {
       wx.navigateTo({
-        url: `/packageA/pages/house-tour/house-tour?id=${this.data.selectedRoom.id}`
+        url: `/pages/house-detail/house-detail?houseId=${this.data.selectedRoom.id}`
       });
     }
   },

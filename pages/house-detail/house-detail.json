@@ -1,6 +1,6 @@
 {
-  "navigationBarTitleText": "消息",
+  "navigationBarTitleText": "房源详情",
   "navigationBarBackgroundColor": "#ffffff",
   "navigationBarTextStyle": "black",
-  "usingComponents": {}
+  "backgroundColor": "#ffffff"
 }

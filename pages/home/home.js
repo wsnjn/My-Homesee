@@ -178,11 +178,19 @@ Page({
     },
 
     navigateToCommunity() {
-        wx.navigateTo({ url: '/pages/community/community' });
+        wx.switchTab({ url: '/pages/community/community' });
     },
 
     navigateToVirtualWorld() {
         wx.navigateTo({ url: '/packageA/pages/interactive-cube/interactive-cube' });
+    },
+
+    navigateToMapSearch() {
+        wx.navigateTo({ url: '/pages/map-search/map-search' });
+    },
+
+    navigateToMine() {
+        wx.switchTab({ url: '/pages/mine/mine' });
     },
 
     // 功能卡片导航
@@ -206,7 +214,11 @@ Page({
             if (target.type === 'switchTab') {
                 wx.switchTab({ url: target.url });
             } else {
-                wx.navigateTo({ url: target.url });
+                if (target.url === '/pages/community/community' || target.url === '/pages/mine/mine') {
+                    wx.switchTab({ url: target.url });
+                } else {
+                    wx.navigateTo({ url: target.url });
+                }
             }
         } else {
             // Fallback for direct path usage or unknown keys

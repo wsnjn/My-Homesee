@@ -1,66 +1,106 @@
-// pages/chat-area/chat-area.js
+const { request } = require('../../../utils/request')
+
 Page({
-
-  /**
-   * 页面的初始数据
-   */
   data: {
-
+    groupId: '',
+    title: '聊天',
+    user: null,
+    messages: [],
+    inputText: '',
+    loading: false,
+    scrollTo: ''
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
   onLoad(options) {
-
+    const user = wx.getStorageSync('user') || null
+    const groupId = options.groupId || ''
+    const title = options.title ? decodeURIComponent(options.title) : '聊天'
+    this.setData({ user, groupId, title })
+    wx.setNavigationBarTitle({ title })
+    this.loadMessages()
   },
 
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
   onShow() {
-
+    this.loadMessages()
   },
 
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide() {
-
+  async loadMessages() {
+    const { groupId } = this.data
+    if (!groupId) return
+    this.setData({ loading: true })
+    try {
+      const res = await request({
+        url: `/api/community/messages/group/${groupId}`,
+        method: 'GET'
+      })
+      const list = (res && res.success && Array.isArray(res.data)) ? res.data : []
+      const messages = list.map(m => ({
+        ...m,
+        isSelf: this.data.user && m.senderId === this.data.user.id,
+        timeText: this.formatTime(m.createdTime)
+      }))
+      const last = messages[messages.length - 1]
+      this.setData({
+        messages,
+        scrollTo: last ? `msg-${last.id}` : ''
+      })
+    } catch (e) {
+      wx.showToast({ title: '消息加载失败', icon: 'none' })
+    } finally {
+      this.setData({ loading: false })
+    }
   },
 
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload() {
-
+  onInput(e) {
+    this.setData({ inputText: e.detail.value || '' })
   },
 
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh() {
+  async sendMessage() {
+    const { inputText, user, groupId } = this.data
+    const text = (inputText || '').trim()
+    if (!text) return
+    if (!user || !user.id) {
+      wx.showToast({ title: '请先登录', icon: 'none' })
+      return
+    }
 
+    try {
+      const res = await request({
+        url: '/api/community/messages/send',
+        method: 'POST',
+        data: {
+          senderId: user.id,
+          groupId: Number(groupId),
+          content: text,
+          msgType: 0
+        }
+      })
+      if (res && res.success && res.data) {
+        const item = {
+          ...res.data,
+          isSelf: true,
+          timeText: this.formatTime(res.data.createdTime)
+        }
+        const messages = [...this.data.messages, item]
+        this.setData({
+          messages,
+          inputText: '',
+          scrollTo: `msg-${item.id}`
+        })
+        return
+      }
+      wx.showToast({ title: '发送失败', icon: 'none' })
+    } catch (e) {
+      wx.showToast({ title: '发送失败', icon: 'none' })
+    }
   },
 
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom() {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage() {
-
+  formatTime(str) {
+    if (!str) return ''
+    const date = new Date(str)
+    if (Number.isNaN(date.getTime())) return ''
+    const h = String(date.getHours()).padStart(2, '0')
+    const m = String(date.getMinutes()).padStart(2, '0')
+    return `${h}:${m}`
   }
 })

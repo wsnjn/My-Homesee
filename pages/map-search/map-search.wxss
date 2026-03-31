@@ -15,6 +15,44 @@ page {
   margin: 0;
 }
 
+.top-nav {
+  position: fixed;
+  top: 16rpx;
+  left: 16rpx;
+  right: 16rpx;
+  height: 72rpx;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 14rpx;
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+.top-left {
+  width: 72rpx;
+  text-align: center;
+  font-size: 42rpx;
+  color: #1f2937;
+  line-height: 1;
+}
+
+.top-title {
+  flex: 1;
+  text-align: center;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #111827;
+}
+
+.top-right {
+  min-width: 92rpx;
+  padding: 0 18rpx;
+  font-size: 24rpx;
+  color: #2563EB;
+  text-align: center;
+}
+
 /* Map Container */
 /* Map Container */
 .map {
@@ -197,6 +235,16 @@ page {
   background: #111827;
   color: white;
   border-color: #111827;
+}
+
+.sidebar-reset {
+  margin-top: 4rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: #2563EB;
+  padding: 10rpx 0;
+  border: 1px dashed #BFDBFE;
+  border-radius: 8rpx;
 }
 
 /* Sidebar Toggle Button - Right Side */
