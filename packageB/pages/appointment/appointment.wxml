@@ -1,3 +1,16 @@
+<view class="page">
+  <view class="card">
+    <view class="title">预约看房</view>
+    <view class="item">房源：{{houseTitle}}</view>
+    <view class="row">
+      <picker mode="date" value="{{date}}" bindchange="onDate" class="ipt"><view>{{date || '选择日期'}}</view></picker>
+      <picker mode="time" value="{{time}}" bindchange="onTime" class="ipt"><view>{{time}}</view></picker>
+    </view>
+    <picker range="{{['现场看房','视频看房']}}" bindchange="onType" class="ipt"><view>{{type==='1'?'现场看房':'视频看房'}}</view></picker>
+    <textarea class="ta" placeholder="备注（选填）" value="{{remark}}" bindinput="onRemark" />
+    <button class="btn hs-btn-primary" bindtap="submit" loading="{{submitting}}">提交预约</button>
+  </view>
+</view>
 <!--pages/appointment/appointment.wxml-->
 <view class="container">
   <!-- 房屋信息卡片 -->

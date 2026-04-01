@@ -2,11 +2,11 @@ Page({
   data: {
     user: null,
     menuList: [
-      { key: 'appointments', text: '我的申请' },
-      { key: 'favorites', text: '我的收藏' },
-      { key: 'history', text: '浏览记录' },
-      { key: 'service', text: '联系客服' },
-      { key: 'privacy', text: '隐私协议' }
+      { key: 'appointments', text: '我的申请', sub: '看房与合同进度', icon: 'empty', tint: 'linear-gradient(145deg,#ecfdf5,#d1fae5)' },
+      { key: 'favorites', text: '我的收藏', sub: '心动房源一键回顾', icon: 'heart', tint: 'linear-gradient(145deg,#fef2f2,#fecaca)' },
+      { key: 'history', text: '浏览记录', sub: '最近看过的房间', icon: 'clock', tint: 'linear-gradient(145deg,#eff6ff,#dbeafe)' },
+      { key: 'service', text: '联系客服', sub: '人工与电话支持', icon: 'message', tint: 'linear-gradient(145deg,#fff7ed,#ffedd5)' },
+      { key: 'privacy', text: '隐私协议', sub: '数据与授权说明', icon: 'lock', tint: 'linear-gradient(145deg,#f5f3ff,#ede9fe)' }
     ]
   },
 
@@ -32,7 +32,7 @@ Page({
     if (key === 'service') {
       wx.showModal({
         title: '联系客服',
-        content: '客服电话：400-123-4567',
+        content: '客服电话：13429858256',
         showCancel: false
       })
       return

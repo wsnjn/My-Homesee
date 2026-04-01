@@ -1,3 +1,29 @@
+.page { min-height: 100vh; background: #f0fdfa; padding: 24rpx; box-sizing: border-box; }
+.card { background: #fff; border-radius: 24rpx; padding: 22rpx; }
+.title { font-size: 34rpx; font-weight: 800; color: #0f172a; margin-bottom: 14rpx; }
+.item { font-size: 25rpx; color: #475569; margin-bottom: 12rpx; }
+.row { display: flex; gap: 12rpx; }
+.ipt {
+  flex: 1;
+  margin-bottom: 12rpx;
+  background: #f8fafc;
+  border: 1rpx solid #e2e8f0;
+  border-radius: 14rpx;
+  padding: 18rpx 16rpx;
+  font-size: 26rpx;
+  color: #0f172a;
+}
+.ta {
+  width: 100%;
+  min-height: 150rpx;
+  margin-top: 8rpx;
+  background: #f8fafc;
+  border: 1rpx solid #e2e8f0;
+  border-radius: 14rpx;
+  padding: 16rpx;
+  box-sizing: border-box;
+}
+.btn { margin-top: 16rpx; height: 84rpx; line-height: 84rpx; font-size: 30rpx; }
 /* pages/appointment/appointment.wxss */
 /* 工业极简风格 - 预约页 */
 

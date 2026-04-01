@@ -1,8 +1,8 @@
 {
-  "navigationBarTitleText": "Homesee",
-  "navigationBarBackgroundColor": "#ffffff",
-  "navigationBarTextStyle": "black",
-  "backgroundColor": "#f8f9fa",
+  "navigationBarTitleText": "看房",
+  "navigationBarBackgroundColor": "#0f766e",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#f0fdfa",
   "backgroundTextStyle": "dark",
   "enablePullDownRefresh": true,
   "onReachBottomDistance": 50

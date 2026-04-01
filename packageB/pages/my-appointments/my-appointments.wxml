@@ -1,3 +1,22 @@
+<view class="page">
+  <view class="tabs">
+    <view class="tab {{tab==='all'?'active':''}}" data-tab="all" bindtap="switchTab">全部</view>
+    <view class="tab {{tab==='pending'?'active':''}}" data-tab="pending" bindtap="switchTab">进行中</view>
+    <view class="tab {{tab==='done'?'active':''}}" data-tab="done" bindtap="switchTab">已结束</view>
+  </view>
+
+  <view class="list">
+    <view wx:if="{{!filtered.length && !loading}}" class="empty">暂无预约记录</view>
+    <view wx:for="{{filtered}}" wx:key="id" class="card" data-id="{{item.roomId || item.houseId}}" bindtap="goHouse">
+      <view class="row">
+        <text class="title">{{item.communityName || item.roomTitle || '房源预约'}}</text>
+        <text class="status">{{item.statusText}}</text>
+      </view>
+      <text class="meta">{{item.dateText}}</text>
+      <text class="meta">类型：{{item.type === 1 ? '现场看房' : '视频看房'}}</text>
+    </view>
+  </view>
+</view>
 <!--pages/my-appointments/my-appointments.wxml-->
 <view class="container">
   <!-- 未登录状态 -->

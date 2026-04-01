@@ -1,34 +1,49 @@
 <view class="message-page">
-  <view class="top-bar">
-    <text class="title">消息</text>
-    <view class="badge" wx:if="{{unreadTotal > 0}}">{{unreadTotal}}</view>
+  <view class="msg-header">
+    <view class="header-row">
+      <view class="header-titles">
+        <text class="title">消息</text>
+        <text class="subtitle">房东与平台会话</text>
+      </view>
+      <view wx:if="{{unreadTotal > 0}}" class="badge-pill">{{unreadTotal}} 条未读</view>
+      <view wx:else class="status-pill">已全部已读</view>
+    </view>
   </view>
 
-  <scroll-view class="msg-list" scroll-y>
-    <view wx:if="{{conversations.length === 0}}" class="empty">
-      <text class="empty-main">暂无消息</text>
-      <text class="empty-sub">去看房后可与房东发起沟通</text>
-      <button class="go-btn" bindtap="goHouseSelection">去看房</button>
+  <scroll-view class="msg-list" scroll-y enhanced show-scrollbar="{{false}}">
+    <view wx:if="{{conversations.length === 0}}" class="empty-wrap">
+      <view class="empty-card">
+        <view class="empty-ico">
+          <svg-icon name="message" size="56" color="#cbd5e1" />
+        </view>
+        <text class="empty-main">还没有消息</text>
+        <text class="empty-sub">去看房后可与房东发起沟通，预约也会提醒到这里</text>
+        <button class="empty-btn hs-btn-primary" bindtap="goHouseSelection">去看房</button>
+      </view>
     </view>
 
     <view
       wx:for="{{conversations}}"
       wx:key="id"
-      class="msg-item"
+      class="msg-card"
+      hover-class="msg-card-hover"
       data-item="{{item}}"
       bindtap="openChat"
     >
-      <image class="avatar" src="{{item.avatar}}" mode="aspectFill" />
+      <view class="avatar-frame">
+        <image class="avatar" src="{{item.avatar}}" mode="aspectFill" />
+      </view>
       <view class="main">
-        <view class="row">
+        <view class="row top">
           <text class="name">{{item.title}}</text>
           <text class="time">{{item.lastTime}}</text>
         </view>
-        <view class="row">
+        <view class="row bottom">
           <text class="preview">{{item.lastText}}</text>
-          <view class="dot" wx:if="{{item.unread > 0}}">{{item.unread}}</view>
+          <view class="unread-dot" wx:if="{{item.unread > 0}}">{{item.unread}}</view>
         </view>
       </view>
     </view>
+    <view class="list-pad"></view>
   </scroll-view>
 </view>

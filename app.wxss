@@ -1,6 +1,6 @@
 /**app.wxss**/
-/* 导入工业极简设计系统 */
-@import "styles/industrial-minimal.wxss";
+@import "styles/homesee-theme.wxss";
+
 .container {
   height: 100%;
   display: flex;
@@ -9,4 +9,4 @@
   justify-content: space-between;
   padding: 200rpx 0;
   box-sizing: border-box;
-} 
+}

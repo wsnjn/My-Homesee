@@ -1,37 +1,181 @@
 <view class="home-page">
-  <view class="top-red">
-    <view class="search-row">
-      <view class="search-input" bindtap="navigateToHouseSelection">
-        <text class="placeholder">找房 - Homesee</text>
+  <view class="hero">
+    <view class="hero-blob hero-blob-a"></view>
+    <view class="hero-blob hero-blob-b"></view>
+    <view class="hero-inner">
+      <view class="hero-top">
+        <view class="brand-block">
+          <view class="brand-mark">H</view>
+          <view class="brand-texts">
+            <text class="brand-name">Homesee</text>
+            <text class="brand-tag">懂你的租房助手</text>
+          </view>
+        </view>
+        <view class="hero-weather-pill">
+          <view class="weather-ico">
+            <svg-icon name="home" size="22" color="#0f766e" />
+          </view>
+          <text class="weather-txt">{{greetingTag}}</text>
+        </view>
       </view>
-      <view class="round-btn" bindtap="navigateToMine">☆</view>
-      <view class="round-btn" bindtap="navigateToMapSearch">⌖</view>
-      <view class="round-btn" bindtap="navigateToSmartMatching">✕</view>
-    </view>
 
-    <view class="quick4">
-      <view class="q-item" bindtap="navigateToMaintenance"><text>水电门锁</text></view>
-      <view class="q-item" bindtap="navigateToMyAppointments"><text>合同</text></view>
-      <view class="q-item" bindtap="navigateToMyAppointments"><text>账单</text></view>
-      <view class="q-item" bindtap="navigateToCommunity"><text>找平台</text></view>
+      <view class="greeting-block">
+        <text class="greeting-hi">{{greetingLine}}</text>
+        <text class="greeting-sub" wx:if="{{isLoggedIn}}">为你整理了预约与常用入口</text>
+        <text class="greeting-sub" wx:else>登录后可同步预约与收藏</text>
+      </view>
+
+      <view class="search-pill" hover-class="search-pill-hover" bindtap="navigateToHouseSelection">
+        <view class="search-ico">
+          <svg-icon name="search" size="20" color="#94a3b8" />
+        </view>
+        <text class="search-placeholder">搜小区、商圈、地铁…</text>
+        <view class="search-go">去找房</view>
+      </view>
+
+      <view class="orbit-row">
+        <view
+          class="orbit-item"
+          hover-class="orbit-item-hover"
+          bindtap="navigateToMine"
+        >
+          <view class="orbit-ring orbit-coral">
+            <svg-icon name="user" size="36" color="#0f766e" />
+          </view>
+          <text class="orbit-label">我的</text>
+        </view>
+        <view
+          class="orbit-item"
+          hover-class="orbit-item-hover"
+          bindtap="navigateToMapSearch"
+        >
+          <view class="orbit-ring orbit-teal">
+            <svg-icon name="map" size="36" color="#0f766e" />
+          </view>
+          <text class="orbit-label">地图</text>
+        </view>
+        <view
+          class="orbit-item"
+          hover-class="orbit-item-hover"
+          bindtap="navigateToSmartMatching"
+        >
+          <view class="orbit-ring orbit-violet">
+            <svg-icon name="match" size="36" color="#5b21b6" />
+          </view>
+          <text class="orbit-label">智能匹配</text>
+        </view>
+        <view
+          class="orbit-item"
+          hover-class="orbit-item-hover"
+          bindtap="navigateToCommunity"
+        >
+          <view class="orbit-ring orbit-sky">
+            <svg-icon name="message" size="36" color="#0369a1" />
+          </view>
+          <text class="orbit-label">消息</text>
+        </view>
+      </view>
     </view>
-    <view class="banner" bindtap="navigateToHouseSelection">推荐活动</view>
   </view>
 
-  <view class="service-grid">
-    <view class="s-item" bindtap="navigateToHouseSelection">找房</view>
-    <view class="s-item" bindtap="navigateToMapSearch">地图找房</view>
-    <view class="s-item" bindtap="navigateToMyAppointments">预定</view>
-    <view class="s-item" bindtap="navigateToMyAppointments">预约看房</view>
-    <view class="s-item" bindtap="navigateToMaintenance">投诉建议</view>
-    <view class="s-item" bindtap="navigateToMaintenance">优选搬家</view>
-    <view class="s-item" bindtap="navigateToUserProfile">我的管家</view>
-    <view class="s-item" bindtap="navigateToMaintenance">wifi密码</view>
-    <view class="s-item" bindtap="navigateToCommunity">社区活动</view>
-  </view>
+  <view class="sheet">
+    <view class="quick-strip">
+      <view
+        wx:for="{{quickChips}}"
+        wx:key="key"
+        class="chip {{chipPulse === item.key ? 'chip-pulse' : ''}}"
+        data-key="{{item.key}}"
+        bindtap="onQuickChipTap"
+      >
+        <view class="chip-ico">
+          <svg-icon name="{{item.icon}}" size="22" color="#0d9488" />
+        </view>
+        <text class="chip-txt">{{item.text}}</text>
+      </view>
+    </view>
 
-  <view class="todo-empty">
-    <image src="/models/logo (1).png" class="empty-logo" mode="aspectFit"></image>
-    <text>您暂时还没有待办事项哦 ~</text>
+    <view
+      class="promo-card"
+      hover-class="promo-card-hover"
+      bindtap="navigateToHouseSelection"
+    >
+      <view class="promo-glow"></view>
+      <view class="promo-body">
+        <view class="promo-kicker">本周精选</view>
+        <view class="promo-title">发现下一间理想住所</view>
+        <view class="promo-desc">全景看房 · 地图选点 · 在线预约一站完成</view>
+      </view>
+      <view class="promo-cta">立即浏览</view>
+    </view>
+
+    <view class="section-head">
+      <text class="section-title">服务矩阵</text>
+      <text class="section-more" bindtap="navigateToHouseSelection">全部服务 ›</text>
+    </view>
+    <view class="service-matrix">
+      <view
+        wx:for="{{serviceMatrix}}"
+        wx:key="key"
+        class="matrix-cell {{animReady ? 'matrix-in' : ''}}"
+        style="transition-delay: {{index * 45}}ms;"
+        data-key="{{item.key}}"
+        bindtap="onServiceMatrixTap"
+      >
+        <view class="matrix-icon-wrap" style="background: {{item.tint}};">
+          <svg-icon name="{{item.icon}}" size="40" color="#0f766e" />
+        </view>
+        <text class="matrix-label">{{item.label}}</text>
+      </view>
+    </view>
+
+    <view class="section-head">
+      <text class="section-title">精选能力</text>
+    </view>
+    <view class="feature-list">
+      <view
+        wx:for="{{features}}"
+        wx:key="id"
+        class="feature-card {{animReady ? 'feature-in' : ''}}"
+        style="transition-delay: {{(index + 6) * 50}}ms;"
+        data-page="{{item.page}}"
+        bindtap="navigateToFeature"
+      >
+        <view class="feature-icon">
+          <svg-icon name="{{item.icon}}" size="40" color="#0d9488" />
+        </view>
+        <view class="feature-body">
+          <text class="feature-name">{{item.name}}</text>
+          <text class="feature-desc">{{item.description}}</text>
+        </view>
+        <view class="feature-link">{{item.linkText}} ›</view>
+      </view>
+    </view>
+
+    <view wx:if="{{isLoggedIn && appointments.length}}" class="apt-block">
+      <view class="section-head apt-head">
+        <text class="section-title">看房预约</text>
+        <text class="section-more" bindtap="navigateToMyAppointments">管理 ›</text>
+      </view>
+      <block wx:for="{{appointments}}" wx:key="id" wx:for-item="apt">
+        <view wx:if="{{index < 3}}" class="apt-row">
+          <view class="apt-dot {{apt.statusClass}}"></view>
+          <view class="apt-main">
+            <text class="apt-title">{{apt.typeText}} · {{apt.formattedTime}}</text>
+            <text class="apt-sub">{{apt.statusText}}</text>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <view class="todo-card" wx:if="{{!isLoggedIn || appointments.length === 0}}">
+      <view class="todo-icon-wrap">
+        <svg-icon name="inbox" size="48" color="#0d9488" />
+      </view>
+      <text class="todo-title">待办空空如也</text>
+      <text class="todo-hint">预约看房、报修账单会出现在这里</text>
+      <button wx:if="{{!isLoggedIn}}" class="todo-login hs-btn-primary" bindtap="navigateToLogin">登录体验完整功能</button>
+    </view>
+
+    <view class="home-safe-bottom"></view>
   </view>
 </view>

@@ -1,3 +1,5 @@
 {
-  "usingComponents": {}
+  "navigationBarTitleText": "在线报修",
+  "navigationBarBackgroundColor": "#0f766e",
+  "navigationBarTextStyle": "white"
 }

@@ -1,3 +1,54 @@
+<view class="match-page">
+  <view class="hero-card">
+    <text class="hero-title">智能匹配</text>
+    <text class="hero-sub">根据你的预算、户型与偏好生成推荐</text>
+  </view>
+
+  <view class="form-card">
+    <view class="row">
+      <input class="ipt" type="number" placeholder="最低租金" value="{{form.minPrice}}" data-field="minPrice" bindinput="onInput" />
+      <input class="ipt" type="number" placeholder="最高租金" value="{{form.maxPrice}}" data-field="maxPrice" bindinput="onInput" />
+    </view>
+    <view class="row">
+      <picker class="ipt" range="{{rentalTypeOptions}}" bindchange="onPicker" data-field="rentalType" data-options="rental">
+        <view>{{form.rentalType || '租赁方式'}}</view>
+      </picker>
+      <picker class="ipt" range="{{bedroomOptions}}" bindchange="onPicker" data-field="bedroom" data-options="bedroom">
+        <view>{{form.bedroom || '户型偏好'}}</view>
+      </picker>
+    </view>
+    <view class="row">
+      <picker class="ipt" range="{{orientationOptions}}" bindchange="onPicker" data-field="orientation" data-options="orientation">
+        <view>{{form.orientation || '朝向偏好'}}</view>
+      </picker>
+      <input class="ipt" placeholder="区域关键词（如 光谷）" value="{{form.districtKeyword}}" data-field="districtKeyword" bindinput="onInput" />
+    </view>
+    <view class="switch-row">
+      <view class="switch-item"><text>需要电梯</text><switch color="#0d9488" checked="{{form.hasElevator}}" data-field="hasElevator" bindchange="onSwitch" /></view>
+      <view class="switch-item"><text>偏好近地铁</text><switch color="#0d9488" checked="{{form.nearMetro}}" data-field="nearMetro" bindchange="onSwitch" /></view>
+    </view>
+    <button class="run-btn hs-btn-primary" bindtap="runMatching" loading="{{loading}}">开始匹配</button>
+  </view>
+
+  <view class="result-head" wx:if="{{matchedList.length}}">
+    <text>推荐结果 {{matchedList.length}} 套</text>
+    <text class="to-list" bindtap="applyToHouseSelection">应用到看房列表</text>
+  </view>
+
+  <view class="result-list">
+    <view class="room-card" wx:for="{{matchedList}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail">
+      <view class="title-row">
+        <text class="room-title">{{item.communityName || item.district || '房源'}}</text>
+        <text class="score">匹配 {{item.score}}%</text>
+      </view>
+      <view class="meta">{{item.bedroomCount || 1}}室 · {{item.roomArea || '-'}}㎡ · {{item.orientation || '朝向待补充'}}</view>
+      <view class="foot">
+        <text class="price">¥{{item.rentPrice || '--'}}/月</text>
+        <text class="view-link">查看详情</text>
+      </view>
+    </view>
+  </view>
+</view>
 <!--pages/smart-matching/smart-matching.wxml-->
 <view class="chat-container">
   <!-- 消息列表 -->

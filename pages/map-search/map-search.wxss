@@ -20,20 +20,21 @@ page {
   top: 16rpx;
   left: 16rpx;
   right: 16rpx;
-  height: 72rpx;
-  background: rgba(255, 255, 255, 0.96);
-  border-radius: 14rpx;
+  height: 76rpx;
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.94), rgba(13, 148, 136, 0.9));
+  border-radius: 22rpx;
   z-index: 150;
   display: flex;
   align-items: center;
-  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.08);
+  box-shadow: 0 16rpx 40rpx rgba(13, 148, 136, 0.35);
+  border: 1rpx solid rgba(255, 255, 255, 0.2);
 }
 
 .top-left {
   width: 72rpx;
   text-align: center;
   font-size: 42rpx;
-  color: #1f2937;
+  color: #fff;
   line-height: 1;
 }
 
@@ -42,14 +43,15 @@ page {
   text-align: center;
   font-size: 24rpx;
   font-weight: 700;
-  color: #111827;
+  color: #fff;
 }
 
 .top-right {
   min-width: 92rpx;
   padding: 0 18rpx;
   font-size: 24rpx;
-  color: #2563EB;
+  color: #a7f3d0;
+  font-weight: 600;
   text-align: center;
 }
 
@@ -66,12 +68,13 @@ page {
   right: 0;
   top: 50%;
   transform: translateY(-50%);
-  width: 500rpx; /* Wider to accommodate longer search and filters */
-  background: white;
-  box-shadow: -4rpx 0 12rpx rgba(0,0,0,0.15);
+  width: 500rpx;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: -8rpx 0 40rpx rgba(15, 23, 42, 0.12);
   z-index: 100;
-  transition: transform 0.3s ease;
-  border-radius: 16rpx 0 0 16rpx; /* Rounded left corners */
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  border-radius: 28rpx 0 0 28rpx;
+  border: 1rpx solid rgba(226, 232, 240, 0.9);
 }
 
 .sidebar-closed {
@@ -109,8 +112,9 @@ page {
 .sidebar-search-btn {
   width: 70rpx;
   height: 70rpx;
-  background: #111827;
-  border-radius: 8rpx;
+  background: linear-gradient(135deg, #0d9488, #14b8a6);
+  border-radius: 16rpx;
+  box-shadow: 0 8rpx 20rpx rgba(13, 148, 136, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -705,14 +709,19 @@ page {
 
 /* Modal Action Button */
 .modal-action-btn {
-  background: #111827;
-  color: white;
-  border-radius: 8rpx;
+  background: linear-gradient(135deg, #0d9488, #14b8a6);
+  color: #fff;
+  border-radius: 999rpx;
   font-size: 28rpx;
-  font-weight: 600;
+  font-weight: 700;
   width: 100%;
   border: none;
   padding: 24rpx 0;
+  box-shadow: 0 12rpx 28rpx rgba(13, 148, 136, 0.35);
+}
+
+.modal-action-btn::after {
+  border: none;
 }
 
 .loading-spinner {

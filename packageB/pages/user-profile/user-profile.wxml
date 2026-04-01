@@ -1,3 +1,13 @@
+<view class="page">
+  <view class="card">
+    <view class="title">个人信息</view>
+    <input class="ipt" placeholder="姓名" value="{{form.realName}}" data-field="realName" bindinput="onInput" />
+    <input class="ipt" placeholder="手机号" value="{{form.phone}}" data-field="phone" bindinput="onInput" />
+    <input class="ipt" placeholder="邮箱" value="{{form.email}}" data-field="email" bindinput="onInput" />
+    <input class="ipt" placeholder="公司/学校" value="{{form.company}}" data-field="company" bindinput="onInput" />
+    <button class="btn hs-btn-primary" bindtap="onSave" loading="{{saving}}">保存信息</button>
+  </view>
+</view>
 <!--pages/user-profile/user-profile.wxml-->
 <view class="profile-container">
   <!-- Navigation Bar -->

@@ -1,23 +1,50 @@
 <view class="mine-page">
-  <view class="profile-card" bindtap="goProfile">
-    <image class="avatar" src="{{user && user.avatar ? (user.avatar.indexOf('http') === 0 ? user.avatar : 'https://files.homesee.xyz/api/files/download/' + user.avatar) : 'https://files.homesee.xyz/api/files/download/default-avatar.png'}}" mode="aspectFill" />
-    <view class="profile-main">
-      <view class="name">{{user ? (user.realName || user.username || '新用户') : '新用户'}}</view>
-      <view class="phone">{{user ? user.phone : '未登录'}}</view>
-    </view>
-    <view class="arrow">›</view>
-  </view>
-
-  <view class="menu-card">
-    <view class="menu-item" wx:for="{{menuList}}" wx:key="key" data-key="{{item.key}}" bindtap="onMenuTap">
-      <view class="menu-left">
-        <text class="menu-icon">◦</text>
-        <text>{{item.text}}</text>
+  <view class="mine-hero">
+    <view class="hero-glow"></view>
+    <view class="profile-row" bindtap="goProfile">
+      <view class="avatar-wrap">
+        <image
+          class="avatar"
+          src="{{user && user.avatar ? (user.avatar.indexOf('http') === 0 ? user.avatar : 'https://files.homesee.xyz/api/files/download/' + user.avatar) : 'https://files.homesee.xyz/api/files/download/default-avatar.png'}}"
+          mode="aspectFill"
+        />
+        <view class="avatar-ring"></view>
       </view>
-      <text class="arrow">›</text>
+      <view class="profile-info">
+        <text class="name">{{user ? (user.realName || user.username || '新用户') : '点击登录'}}</text>
+        <text class="phone">{{user ? user.phone : '同步预约 · 收藏 · 账单'}}</text>
+        <view class="profile-tags">
+          <text class="mini-tag">实名友好</text>
+          <text class="mini-tag">安心租住</text>
+        </view>
+      </view>
+      <text class="chev">›</text>
     </view>
   </view>
 
-  <button class="logout-btn" bindtap="logout">退出登录</button>
-  <view class="version">版本信息: 1.0.54</view>
+  <view class="mine-body">
+    <view class="section-label">账户与服务</view>
+    <view class="menu-list">
+      <view
+        wx:for="{{menuList}}"
+        wx:key="key"
+        class="menu-tile"
+        hover-class="menu-tile-hover"
+        data-key="{{item.key}}"
+        bindtap="onMenuTap"
+      >
+        <view class="tile-icon" style="background: {{item.tint}};">
+          <svg-icon name="{{item.icon}}" size="40" color="#0f766e" />
+        </view>
+        <view class="tile-main">
+          <text class="tile-title">{{item.text}}</text>
+          <text class="tile-sub">{{item.sub}}</text>
+        </view>
+        <text class="tile-arrow">›</text>
+      </view>
+    </view>
+
+    <button class="logout-btn" hover-class="logout-btn-hover" bindtap="logout">退出登录</button>
+    <view class="version">Homesee · v1.0.54</view>
+  </view>
 </view>

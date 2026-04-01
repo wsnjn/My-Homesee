@@ -1,3 +1,24 @@
+<view class="page">
+  <view class="hero">
+    <text class="hero-title">在线报修</text>
+    <text class="hero-sub">提交问题后，管家会尽快与你联系</text>
+  </view>
+  <view class="card">
+    <view class="label">报修类型</view>
+    <view class="chips">
+      <view wx:for="{{typeList}}" wx:key="*this" class="chip {{activeType===item?'active':''}}" data-type="{{item}}" bindtap="chooseType">{{item}}</view>
+    </view>
+    <view class="label">问题描述</view>
+    <textarea class="ta" placeholder="请描述故障现象、位置、紧急程度" value="{{content}}" bindinput="onContent" />
+    <view class="label">联系电话</view>
+    <input class="ipt" placeholder="请输入手机号" value="{{contactPhone}}" bindinput="onPhone" />
+    <button class="btn hs-btn-primary" bindtap="submitRepair" loading="{{submitting}}">提交报修</button>
+    <view class="service-row">
+      <text>紧急问题可直接联系客服电话</text>
+      <text class="service-phone" bindtap="callService">13429858256</text>
+    </view>
+  </view>
+</view>
 <!--pages/maintenance/maintenance.wxml-->
 <view class="container">
   <view class="header">

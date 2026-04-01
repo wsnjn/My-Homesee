@@ -1,3 +1,22 @@
+.page { min-height: 100vh; background: #f0fdfa; padding: 24rpx; box-sizing: border-box; }
+.hero {
+  background: linear-gradient(135deg, #0f766e, #14b8a6);
+  border-radius: 24rpx;
+  color: #fff;
+  padding: 22rpx;
+}
+.hero-title { font-size: 34rpx; font-weight: 800; display: block; }
+.hero-sub { margin-top: 8rpx; font-size: 23rpx; opacity: 0.9; display: block; }
+.card { margin-top: 14rpx; background: #fff; border-radius: 24rpx; padding: 20rpx; }
+.label { margin: 10rpx 0; font-size: 24rpx; color: #475569; font-weight: 700; }
+.chips { display: flex; gap: 10rpx; flex-wrap: wrap; margin-bottom: 8rpx; }
+.chip { padding: 10rpx 20rpx; border-radius: 999rpx; background: #f1f5f9; color: #334155; font-size: 23rpx; }
+.chip.active { background: #0d9488; color: #fff; }
+.ta { width: 100%; min-height: 160rpx; border: 1rpx solid #e2e8f0; background: #f8fafc; border-radius: 16rpx; padding: 16rpx; box-sizing: border-box; }
+.ipt { margin-top: 8rpx; padding: 16rpx; border-radius: 14rpx; border: 1rpx solid #e2e8f0; background: #f8fafc; font-size: 26rpx; }
+.btn { margin-top: 16rpx; height: 84rpx; line-height: 84rpx; font-size: 30rpx; }
+.service-row { margin-top: 16rpx; display: flex; justify-content: space-between; color: #64748b; font-size: 24rpx; }
+.service-phone { color: #0d9488; font-weight: 700; }
 /* pages/maintenance/maintenance.wxss */
 page {
   background-color: #FFFFFF;

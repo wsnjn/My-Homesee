@@ -1,3 +1,15 @@
+.page { min-height: 100vh; background: #f0fdfa; padding: 24rpx; box-sizing: border-box; }
+.card { background: #fff; border-radius: 24rpx; padding: 24rpx; }
+.title { font-size: 34rpx; font-weight: 800; margin-bottom: 16rpx; color: #0f172a; }
+.ipt {
+  margin-bottom: 12rpx;
+  padding: 18rpx;
+  border-radius: 14rpx;
+  border: 1rpx solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 26rpx;
+}
+.btn { margin-top: 12rpx; height: 84rpx; line-height: 84rpx; font-size: 30rpx; }
 /* pages/user-profile/user-profile.wxss */
 /* Industrial Minimal - User Profile */
 

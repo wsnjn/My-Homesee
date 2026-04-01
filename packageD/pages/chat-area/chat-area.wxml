@@ -1,26 +1,39 @@
 <view class="chat-page">
-  <scroll-view class="msg-list" scroll-y scroll-into-view="{{scrollTo}}">
-    <view wx:if="{{messages.length === 0 && !loading}}" class="empty">暂无消息，开始聊聊吧</view>
+  <view class="chat-bg"></view>
+  <scroll-view class="msg-list" scroll-y scroll-into-view="{{scrollTo}}" enhanced show-scrollbar="{{false}}">
+    <view wx:if="{{messages.length === 0 && !loading}}" class="empty-state">
+      <view class="empty-ico">
+        <svg-icon name="message" size="56" color="#cbd5e1" />
+      </view>
+      <text class="empty-title">开始一段新对话</text>
+      <text class="empty-hint">问问房源、约看房，消息会安全保存在此</text>
+    </view>
     <view
       wx:for="{{messages}}"
       wx:key="id"
       id="msg-{{item.id}}"
       class="msg-row {{item.isSelf ? 'self' : ''}}"
     >
-      <view class="bubble">{{item.content}}</view>
+      <view class="bubble-wrap">
+        <view class="bubble">{{item.content}}</view>
+      </view>
       <text class="time">{{item.timeText}}</text>
     </view>
+    <view class="list-bottom-pad"></view>
   </scroll-view>
 
   <view class="input-bar">
-    <input
-      class="input"
-      placeholder="输入消息..."
-      value="{{inputText}}"
-      bindinput="onInput"
-      bindconfirm="sendMessage"
-      confirm-type="send"
-    />
-    <button class="send" bindtap="sendMessage">发送</button>
+    <view class="input-shell">
+      <input
+        class="input"
+        placeholder="说点什么…"
+        placeholder-class="input-ph"
+        value="{{inputText}}"
+        bindinput="onInput"
+        bindconfirm="sendMessage"
+        confirm-type="send"
+      />
+    </view>
+    <button class="send hs-btn-primary" bindtap="sendMessage">发送</button>
   </view>
 </view>

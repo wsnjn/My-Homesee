@@ -14,10 +14,10 @@ Page({
     ],
     activeBedroom: '',
     topShortcuts: [
-      { key: 'direct', text: '房东直租', emoji: '🐰' },
-      { key: 'lowPrice', text: '低价好房', emoji: '🍓' },
-      { key: 'nearMetro', text: '靠近地铁', emoji: '🐾' },
-      { key: 'share', text: '随时入住', emoji: '🧸' }
+      { key: 'direct', text: '房东直租', icon: 'user' },
+      { key: 'lowPrice', text: '低价好房', icon: 'heart' },
+      { key: 'nearMetro', text: '靠近地铁', icon: 'subway' },
+      { key: 'share', text: '随时入住', icon: 'check-circle' }
     ],
     topMapLatitude: 30.5928,
     topMapLongitude: 114.3055,
@@ -110,7 +110,10 @@ Page({
     maxPrice: '',
     minArea: '',
     maxArea: '',
-    selectedRentalType: ''
+    selectedRentalType: '',
+    listCount: 0,
+    sortLabel: '默认排序',
+    animReady: false
   },
 
   onLoad(options) {
@@ -118,7 +121,46 @@ Page({
     this.loadHouses();
   },
 
+  onReady() {
+    setTimeout(() => {
+      this.setData({ animReady: true });
+    }, 50);
+  },
+
+  getSortLabel() {
+    const hit = this.data.sortOptions.find((o) => o.id === this.data.currentSort);
+    return hit ? hit.name : '排序';
+  },
+
+  onQuickResetList() {
+    this.resetFilters();
+    this.setData({
+      searchKeyword: '',
+      activeBedroom: '',
+      activeRoomTab: '全部',
+      selectedRentalType: '',
+      currentSort: 1
+    });
+    this.loadHouses(true);
+  },
+
   onShow() {
+    const smartFilters = wx.getStorageSync('smartMatchingFilters');
+    if (smartFilters) {
+      try {
+        wx.removeStorageSync('smartMatchingFilters');
+      } catch (e) {}
+      this.setData({
+        minPrice: smartFilters.minPrice || '',
+        maxPrice: smartFilters.maxPrice || '',
+        activeBedroom: smartFilters.bedroom || '',
+        selectedRentalType: smartFilters.rentalType || '',
+        selectedOrientation: smartFilters.orientation || ''
+      });
+      wx.showToast({ title: '已应用智能匹配条件', icon: 'none' });
+      this.loadHouses(true);
+    }
+
     const pendingId = wx.getStorageSync('smartMatchingPendingRoomId');
     if (pendingId) {
       try {
@@ -378,7 +420,9 @@ Page({
         topMapLongitude: topMapData.longitude,
         topMapMarkers: topMapData.markers,
         hasMore: false, // Since /filter returns all results
-        loading: false
+        loading: false,
+        listCount: houses.length,
+        sortLabel: this.getSortLabel()
       });
 
     } catch (error) {
@@ -387,7 +431,7 @@ Page({
         title: '加载失败',
         icon: 'error'
       });
-      this.setData({ loading: false });
+      this.setData({ loading: false, listCount: 0 });
     }
   },
 
@@ -432,7 +476,11 @@ Page({
       return;
     }
     if (key === 'lowPrice') {
-      this.setData({ currentSort: 2 });
+      const opt = this.data.sortOptions.find((o) => o.id === 2);
+      this.setData({
+        currentSort: 2,
+        sortLabel: opt ? opt.name : '价格低→高'
+      });
       this.loadHouses(true);
       return;
     }
@@ -481,7 +529,7 @@ Page({
         color: '#ffffff',
         fontSize: 10,
         borderRadius: 12,
-        bgColor: '#2563EB',
+        bgColor: '#0d9488',
         padding: 4,
         display: 'ALWAYS',
         textAlign: 'center'

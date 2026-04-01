@@ -1,6 +1,5 @@
 {
-    "usingComponents": {
-        "DinoOverlay": "/components/dino-overlay/dino-overlay"
-    },
-    "navigationBarTitleText": "HOMESEE"
+  "navigationBarTitleText": "首页",
+  "navigationBarBackgroundColor": "#0f766e",
+  "navigationBarTextStyle": "white"
 }

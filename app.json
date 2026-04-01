@@ -63,18 +63,18 @@
     }
   },
   "window": {
-    "navigationBarTextStyle": "black",
+    "navigationBarTextStyle": "white",
     "navigationBarTitleText": "HOMESEE",
-    "navigationBarBackgroundColor": "#ffffff",
-    "backgroundColor": "#f8f9fa",
-    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#0f766e",
+    "backgroundColor": "#f0fdfa",
+    "backgroundTextStyle": "dark",
     "enablePullDownRefresh": false
   },
   "tabBar": {
-    "color": "#999999",
-    "selectedColor": "#111111",
+    "color": "#94a3b8",
+    "selectedColor": "#0d9488",
     "backgroundColor": "#ffffff",
-    "borderStyle": "black",
+    "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/home/home",

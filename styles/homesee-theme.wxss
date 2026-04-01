@@ -1,0 +1,88 @@
+/**
+ * Homesee 全局设计变量与基础样式（极光栖居主题）
+ * 在 app.wxss 中 @import，各页可叠加使用
+ */
+page {
+  --hs-primary: #0d9488;
+  --hs-primary-dark: #0f766e;
+  --hs-primary-soft: #ccfbf1;
+  --hs-accent: #ea580c;
+  --hs-accent-soft: #ffedd5;
+  --hs-violet: #7c3aed;
+  --hs-violet-soft: #ede9fe;
+  --hs-text: #0f172a;
+  --hs-text-secondary: #475569;
+  --hs-text-muted: #94a3b8;
+  --hs-bg: #f0fdfa;
+  --hs-card: #ffffff;
+  --hs-radius-xl: 36rpx;
+  --hs-radius-lg: 28rpx;
+  --hs-radius-md: 20rpx;
+  --hs-shadow: 0 16rpx 48rpx rgba(15, 23, 42, 0.07);
+  --hs-shadow-hover: 0 24rpx 56rpx rgba(13, 148, 136, 0.18);
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica,
+    'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  color: var(--hs-text);
+  background-color: var(--hs-bg);
+  box-sizing: border-box;
+}
+
+view,
+text,
+input,
+button {
+  box-sizing: border-box;
+}
+
+/* 渐变主按钮 */
+.hs-btn-primary {
+  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 45%, #2dd4bf 100%);
+  color: #fff;
+  border: none;
+  border-radius: 999rpx;
+  font-weight: 600;
+  box-shadow: 0 12rpx 32rpx rgba(13, 148, 136, 0.35);
+}
+
+.hs-btn-primary::after {
+  border: none;
+}
+
+/* 幽灵按钮 */
+.hs-btn-ghost {
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--hs-primary-dark);
+  border: 2rpx solid rgba(13, 148, 136, 0.35);
+  border-radius: 999rpx;
+}
+
+.hs-btn-ghost::after {
+  border: none;
+}
+
+/* 玻璃卡片 */
+.hs-glass-card {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1rpx solid rgba(255, 255, 255, 0.9);
+  border-radius: var(--hs-radius-lg);
+  box-shadow: var(--hs-shadow);
+}
+
+/* 标题层级 */
+.hs-h1 {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: var(--hs-text);
+  letter-spacing: -0.5rpx;
+}
+
+.hs-h2 {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--hs-text);
+}
+
+.hs-caption {
+  font-size: 24rpx;
+  color: var(--hs-text-muted);
+}

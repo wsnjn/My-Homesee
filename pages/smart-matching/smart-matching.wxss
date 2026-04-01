@@ -1,3 +1,74 @@
+.match-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #ecfeff 0%, #f0fdfa 40%, #f8fafc 100%);
+  padding: 24rpx;
+  box-sizing: border-box;
+}
+.hero-card {
+  background: linear-gradient(135deg, #0f766e, #14b8a6);
+  border-radius: 28rpx;
+  padding: 28rpx;
+  color: #fff;
+  box-shadow: 0 14rpx 32rpx rgba(13, 148, 136, 0.3);
+}
+.hero-title { font-size: 38rpx; font-weight: 800; display: block; }
+.hero-sub { margin-top: 8rpx; font-size: 24rpx; opacity: 0.92; display: block; }
+.form-card {
+  margin-top: 20rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 20rpx;
+}
+.row { display: flex; gap: 12rpx; margin-bottom: 12rpx; }
+.ipt {
+  flex: 1;
+  background: #f8fafc;
+  border: 1rpx solid #e2e8f0;
+  border-radius: 16rpx;
+  padding: 18rpx 16rpx;
+  font-size: 26rpx;
+  color: #0f172a;
+}
+.switch-row { margin-top: 10rpx; }
+.switch-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10rpx 4rpx;
+  font-size: 25rpx;
+  color: #334155;
+}
+.run-btn { margin-top: 16rpx; height: 84rpx; line-height: 84rpx; font-size: 30rpx; }
+.result-head {
+  margin-top: 24rpx;
+  display: flex;
+  justify-content: space-between;
+  color: #0f172a;
+  font-size: 26rpx;
+  font-weight: 700;
+}
+.to-list { color: #0d9488; }
+.result-list { margin-top: 12rpx; }
+.room-card {
+  background: #fff;
+  border-radius: 22rpx;
+  padding: 18rpx;
+  margin-bottom: 14rpx;
+  box-shadow: 0 8rpx 22rpx rgba(15, 23, 42, 0.06);
+}
+.title-row { display: flex; justify-content: space-between; align-items: center; }
+.room-title { font-size: 30rpx; color: #0f172a; font-weight: 700; }
+.score {
+  font-size: 22rpx;
+  color: #fff;
+  background: #0d9488;
+  border-radius: 999rpx;
+  padding: 6rpx 14rpx;
+}
+.meta { margin-top: 8rpx; color: #64748b; font-size: 24rpx; }
+.foot { margin-top: 12rpx; display: flex; justify-content: space-between; align-items: center; }
+.price { color: #0d9488; font-size: 34rpx; font-weight: 800; }
+.view-link { color: #0d9488; font-size: 24rpx; }
 /* pages/smart-matching/smart-matching.wxss */
 /* 工业极简风格 - 智能匹配页 - 修正版 */
 
