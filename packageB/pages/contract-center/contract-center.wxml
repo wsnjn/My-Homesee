@@ -1,0 +1,15 @@
+<view class="page">
+  <view class="card">
+    <view class="title">当前租约</view>
+    <view wx:if="{{!contract && !loading}}" class="empty">暂无有效合同</view>
+    <view wx:if="{{contract}}" class="list">
+      <view class="row"><text class="k">合同编号</text><text class="v">{{contract.contractNumber}}</text></view>
+      <view class="row"><text class="k">房源信息</text><text class="v">{{contract.roomName}}</text></view>
+      <view class="row"><text class="k">租期</text><text class="v">{{contract.startDate}} 至 {{contract.endDate}}</text></view>
+      <view class="row"><text class="k">月租</text><text class="v">¥{{contract.monthlyRent}}</text></view>
+      <view class="row"><text class="k">押金</text><text class="v">¥{{contract.depositAmount}}</text></view>
+      <view class="row"><text class="k">付款周期</text><text class="v">{{contract.paymentCycleText}}</text></view>
+      <view class="row"><text class="k">状态</text><text class="v">{{contract.contractStatusText}}</text></view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,15 @@
+<view class="page">
+  <view class="card">
+    <view class="title">我的账单</view>
+    <view wx:if="{{!list.length && !loading}}" class="empty">暂无账单记录</view>
+    <view wx:for="{{list}}" wx:key="month" class="item">
+      <view class="top">
+        <text class="month">{{item.month}}</text>
+        <text class="status {{item.status==='已支付'?'paid':'unpaid'}}">{{item.status}}</text>
+      </view>
+      <view class="meta">租金：¥{{item.rent}}</view>
+      <view class="meta">水费：¥{{item.waterFee}}，电费：¥{{item.electricFee}}</view>
+      <view class="total">合计：¥{{item.total}}</view>
+    </view>
+  </view>
+</view>

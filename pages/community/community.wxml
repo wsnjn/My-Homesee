@@ -3,10 +3,23 @@
     <view class="header-row">
       <view class="header-titles">
         <text class="title">消息</text>
-        <text class="subtitle">房东与平台会话</text>
+        <text class="subtitle">会话 · 邻里动态</text>
       </view>
       <view wx:if="{{unreadTotal > 0}}" class="badge-pill">{{unreadTotal}} 条未读</view>
       <view wx:else class="status-pill">已全部已读</view>
+    </view>
+  </view>
+
+  <view class="social-entries">
+    <view class="social-card" hover-class="social-card-hover" bindtap="goFriendCircle">
+      <view class="social-card-ico">
+        <svg-icon name="users" size="40" color="#0d9488" />
+      </view>
+      <view class="social-card-text">
+        <text class="social-card-title">朋友圈</text>
+        <text class="social-card-desc">发动态、点赞与评论</text>
+      </view>
+      <text class="social-card-arrow">›</text>
     </view>
   </view>
 

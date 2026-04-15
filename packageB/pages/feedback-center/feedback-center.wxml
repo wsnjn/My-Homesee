@@ -1,0 +1,13 @@
+<view class="page">
+  <view class="card">
+    <view class="title">投诉建议</view>
+    <view class="chips">
+      <view class="chip {{type==='建议'?'active':''}}" data-type="建议" bindtap="onType">建议</view>
+      <view class="chip {{type==='投诉'?'active':''}}" data-type="投诉" bindtap="onType">投诉</view>
+      <view class="chip {{type==='表扬'?'active':''}}" data-type="表扬" bindtap="onType">表扬</view>
+    </view>
+    <textarea class="ta" placeholder="请输入你的反馈内容" value="{{content}}" bindinput="onContent" />
+    <input class="ipt" type="number" maxlength="11" placeholder="联系电话（选填）" value="{{contactPhone}}" bindinput="onPhone" />
+    <button class="btn hs-btn-primary" bindtap="submit" loading="{{submitting}}">提交反馈</button>
+  </view>
+</view>

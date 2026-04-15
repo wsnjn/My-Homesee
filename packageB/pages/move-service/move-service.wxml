@@ -1,0 +1,13 @@
+<view class="page">
+  <view class="card">
+    <view class="title">搬家预约</view>
+    <input class="ipt" placeholder="起始地址" data-field="fromAddress" value="{{fromAddress}}" bindinput="onInput" />
+    <input class="ipt" placeholder="目的地址" data-field="toAddress" value="{{toAddress}}" bindinput="onInput" />
+    <picker mode="date" value="{{moveDate}}" bindchange="onDate">
+      <view class="picker">{{moveDate || '选择搬家日期'}}</view>
+    </picker>
+    <input class="ipt" type="number" maxlength="11" placeholder="联系电话" data-field="contactPhone" value="{{contactPhone}}" bindinput="onInput" />
+    <textarea class="ta" placeholder="备注（楼层、电梯、物品量等）" data-field="remark" value="{{remark}}" bindinput="onInput" />
+    <button class="btn hs-btn-primary" bindtap="submit" loading="{{submitting}}">提交搬家预约</button>
+  </view>
+</view>

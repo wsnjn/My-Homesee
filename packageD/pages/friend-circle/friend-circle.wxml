@@ -1,2 +1,133 @@
-<!--pages/friend-circle/friend-circle.wxml-->
-<text>pages/friend-circle/friend-circle.wxml</text>
+<view class="fc-page">
+  <view class="fc-top">
+    <view class="fc-filter">
+      <text class="fc-filter-label">范围</text>
+      <picker mode="selector" range="{{feedFilters}}" value="{{feedFilterIndex}}" bindchange="onFeedFilterChange">
+        <view class="fc-picker">{{feedFilters[feedFilterIndex]}}</view>
+      </picker>
+    </view>
+
+    <view class="composer">
+      <view class="composer-head">
+        <image class="composer-avatar" src="{{composerAvatar}}" mode="aspectFill" />
+        <view class="composer-main">
+          <textarea
+            class="composer-input"
+            placeholder="{{hasActiveLease ? '分享你的生活…' : '签约入住后可发布动态'}}"
+            disabled="{{!hasActiveLease}}"
+            maxlength="2000"
+            value="{{newPostContent}}"
+            bindinput="onPostInput"
+          />
+        </view>
+      </view>
+
+      <view class="preview-box" wx:if="{{previewImage}}">
+        <image wx:if="{{previewType === 'image'}}" class="preview-img" src="{{previewImage}}" mode="aspectFill" />
+        <video wx:elif="{{previewType === 'video'}}" class="preview-video" src="{{previewImage}}" controls />
+        <view class="preview-x" bindtap="clearPreview">×</view>
+      </view>
+
+      <view class="composer-actions">
+        <view class="media-btns">
+          <button class="mini-btn" size="mini" disabled="{{!hasActiveLease}}" bindtap="chooseImage">图片</button>
+          <button class="mini-btn" size="mini" disabled="{{!hasActiveLease}}" bindtap="chooseVideo">视频</button>
+        </view>
+        <view class="post-opts">
+          <picker mode="selector" range="{{visibilityOptions}}" value="{{visibilityIndex}}" bindchange="onVisibilityChange">
+            <view class="vis-pill">{{visibilityOptions[visibilityIndex]}}</view>
+          </picker>
+          <button class="submit-pill" disabled="{{!hasActiveLease || submitting}}" bindtap="submitPost">
+            {{submitting ? '发送中' : '发布'}}
+          </button>
+        </view>
+      </view>
+      <view class="lease-hint" wx:if="{{!hasActiveLease}}">
+        <text>仅限住户发布动态（需有效租约）</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{filteredPosts.length === 0}}" class="empty-feed">
+    <svg-icon name="community" size="64" color="#cbd5e1" />
+    <text class="empty-t">暂无动态</text>
+    <text class="empty-s">试试发布第一条，或邀请好友一起玩</text>
+  </view>
+
+  <view wx:for="{{filteredPosts}}" wx:key="id" class="post-card">
+    <view class="post-hd">
+      <image class="post-av" src="{{item.avatarUrl}}" mode="aspectFill" />
+      <view class="post-meta">
+        <text class="post-name">{{item.displayName}}</text>
+        <text class="post-time">{{item.timeText}}</text>
+      </view>
+      <view class="vis-tag {{item.visibility === 1 ? 'friends' : 'pub'}}">
+        {{item.visibility === 1 ? '仅好友' : '公开'}}
+      </view>
+    </view>
+
+    <view class="post-body">
+      <text class="post-text" wx:if="{{item.content}}">{{item.content}}</text>
+      <view class="media-grid" wx:if="{{item.mediaList.length}}">
+        <block wx:for="{{item.mediaList}}" wx:key="raw" wx:for-item="m">
+          <image
+            wx:if="{{m.isImage}}"
+            class="media-img"
+            src="{{m.url}}"
+            mode="aspectFill"
+            bindtap="previewMedia"
+            data-url="{{m.url}}"
+          />
+          <video wx:elif="{{m.isVideo}}" class="media-video" src="{{m.url}}" controls show-center-play-btn />
+          <view wx:else class="media-audio">附件：{{m.raw}}</view>
+        </block>
+      </view>
+    </view>
+
+    <view class="post-ft">
+      <view
+        class="ft-btn {{item.liked ? 'on' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="onToggleLike"
+      >
+        <text>{{item.likeCount > 0 ? item.likeCount : '赞'}}</text>
+      </view>
+      <view
+        class="ft-btn"
+        data-id="{{item.id}}"
+        data-index="{{index}}"
+        bindtap="onToggleComments"
+      >
+        <text>{{item.commentCount > 0 ? item.commentCount : '评论'}}</text>
+      </view>
+    </view>
+
+    <view class="comment-panel" wx:if="{{item.showComments}}">
+      <view class="comment-line" wx:for="{{item.comments}}" wx:key="id" wx:for-item="c">
+        <text class="c-user">{{c.displayName || '用户'}}：</text>
+        <text class="c-txt">{{c.content}}</text>
+      </view>
+      <view class="comment-bar">
+        <input
+          class="comment-inp"
+          placeholder="写评论…"
+          value="{{item.newComment}}"
+          data-id="{{item.id}}"
+          data-index="{{index}}"
+          bindinput="onCommentInput"
+          confirm-type="send"
+          bindconfirm="submitComment"
+        />
+        <button
+          class="send-btn"
+          size="mini"
+          data-id="{{item.id}}"
+          data-index="{{index}}"
+          bindtap="submitComment"
+        >发送</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-pad"></view>
+</view>

@@ -11,90 +11,11 @@
     <view class="label">问题描述</view>
     <textarea class="ta" placeholder="请描述故障现象、位置、紧急程度" value="{{content}}" bindinput="onContent" />
     <view class="label">联系电话</view>
-    <input class="ipt" placeholder="请输入手机号" value="{{contactPhone}}" bindinput="onPhone" />
+    <input class="ipt" type="number" maxlength="11" placeholder="请输入手机号" value="{{contactPhone}}" bindinput="onPhone" />
     <button class="btn hs-btn-primary" bindtap="submitRepair" loading="{{submitting}}">提交报修</button>
     <view class="service-row">
       <text>紧急问题可直接联系客服电话</text>
       <text class="service-phone" bindtap="callService">13429858256</text>
-    </view>
-  </view>
-</view>
-<!--pages/maintenance/maintenance.wxml-->
-<view class="container">
-  <view class="header">
-    <view class="title-wrapper">
-      <svg-icon name="fix" size="24" color="#111827" />
-      <text class="title">维修服务 (MAINTENANCE)</text>
-    </view>
-    <button class="btn-primary" bindtap="handleCreate">
-      <svg-icon name="plus" size="16" color="#FFFFFF" />
-      <text>申请维修</text>
-    </button>
-  </view>
-
-  <scroll-view scroll-y class="request-list">
-    <view class="empty-card" wx:if="{{!activeLease}}">
-      <text>暂无有效租约，无法申请维修</text>
-    </view>
-
-    <view class="empty-card" wx:elif="{{requests.length === 0}}">
-      <text>暂无维修记录</text>
-    </view>
-
-    <view class="request-card" wx:for="{{requests}}" wx:key="id">
-      <view class="card-header">
-        <text class="req-title">{{item.requestTitle}}</text>
-        <view class="status-badge {{item.statusInfo.class}}">
-          {{item.statusInfo.text}}
-        </view>
-      </view>
-      
-      <view class="req-desc">{{item.requestDescription}}</view>
-      
-      <view class="req-meta">
-        <view class="meta-item">
-          <text class="label">申请日期:</text>
-          <text class="value">{{item.formattedTime}}</text>
-        </view>
-        <view class="meta-item" wx:if="{{item.expectedFixDate}}">
-          <text class="label">期望日期:</text>
-          <text class="value">{{item.formattedFixDate}}</text>
-        </view>
-      </view>
-    </view>
-  </scroll-view>
-
-  <!-- Create Modal -->
-  <view class="modal-overlay" wx:if="{{showCreateModal}}" catchtap="hideModal">
-    <view class="modal-content" catchtap="preventBubble">
-      <view class="modal-header">
-        <text class="modal-title">申请维修 / NEW REQUEST</text>
-        <view class="close-btn" bindtap="hideModal">
-          <svg-icon name="close" size="20" color="#6B7280" />
-        </view>
-      </view>
-      
-      <view class="form-group">
-        <text class="label">标题</text>
-        <input class="input" placeholder="请简要描述问题 (如: 水龙头漏水)" value="{{newTitle}}" bindinput="onTitleInput" />
-      </view>
-      
-      <view class="form-group">
-        <text class="label">详细描述</text>
-        <textarea class="textarea" placeholder="请详细描述故障情况和发生位置..." value="{{newDesc}}" bindinput="onDescInput"></textarea>
-      </view>
-      
-      <view class="form-group">
-        <text class="label">期望维修日期</text>
-        <picker mode="date" value="{{newDate}}" start="{{newDate}}" bindchange="onDateChange">
-          <view class="picker-value">{{newDate}}</view>
-        </picker>
-      </view>
-      
-      <view class="modal-actions">
-        <button class="btn-secondary" bindtap="hideModal">取消</button>
-        <button class="btn-primary" bindtap="submitRequest">提交申请</button>
-      </view>
     </view>
   </view>
 </view>

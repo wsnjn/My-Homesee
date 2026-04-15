@@ -1,5 +1,9 @@
 const BASE_URL = 'https://api.homesee.xyz'; // 服务器地址
 
+// 默认请求超时（毫秒）。弱网/冷启动时 10s 易触发 wx.request 的 fail: timeout
+const DEFAULT_REQUEST_TIMEOUT = 30000;
+const DEFAULT_UPLOAD_TIMEOUT = 120000;
+
 // 获取用户token
 const getToken = () => {
   try {
@@ -17,16 +21,16 @@ const checkTokenExpired = (res) => {
 };
 
 // 统一错误处理
-const handleError = (error, reject) => {
+const handleError = (error, reject, options = {}) => {
   console.error('请求错误:', error);
 
-  if (error.errMsg && error.errMsg.includes('timeout')) {
+  if (!options.silent && error.errMsg && error.errMsg.includes('timeout')) {
     wx.showToast({
       title: '请求超时',
       icon: 'error',
       duration: 2000
     });
-  } else if (error.errMsg && error.errMsg.includes('fail')) {
+  } else if (!options.silent && error.errMsg && error.errMsg.includes('fail')) {
     wx.showToast({
       title: '网络错误',
       icon: 'error',
@@ -69,7 +73,7 @@ const request = (options) => {
       method: options.method || 'GET',
       data: options.data || {},
       header: headers,
-      timeout: options.timeout || 10000, // 10秒超时
+      timeout: options.timeout != null ? options.timeout : DEFAULT_REQUEST_TIMEOUT,
       success: (res) => {
         // 检查token是否过期
         if (checkTokenExpired(res)) {
@@ -91,16 +95,18 @@ const request = (options) => {
         } else {
           // 业务错误处理
           const errorMsg = res.data?.message || `请求失败: ${res.statusCode}`;
-          wx.showToast({
-            title: errorMsg,
-            icon: 'error',
-            duration: 2000
-          });
+          if (!options.silent) {
+            wx.showToast({
+              title: errorMsg,
+              icon: 'error',
+              duration: 2000
+            });
+          }
           reject(res);
         }
       },
       fail: (err) => {
-        handleError(err, reject);
+        handleError(err, reject, options);
       }
     });
   });
@@ -116,6 +122,7 @@ const uploadFile = (options) => {
       filePath: options.filePath,
       name: options.name || 'file',
       formData: options.formData || {},
+      timeout: options.timeout != null ? options.timeout : DEFAULT_UPLOAD_TIMEOUT,
       header: {
         'Authorization': token ? `Bearer ${token}` : '',
         ...options.header

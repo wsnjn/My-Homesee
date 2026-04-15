@@ -3,5 +3,7 @@
   "navigationBarBackgroundColor": "#0f766e",
   "navigationBarTextStyle": "white",
   "backgroundColor": "#f0fdfa",
-  "usingComponents": {}
+  "usingComponents": {
+    "svg-icon": "/components/svg-icon/svg-icon"
+  }
 }

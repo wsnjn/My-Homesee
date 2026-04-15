@@ -27,7 +27,12 @@
         "pages/maintenance/maintenance",
         "pages/my-appointments/my-appointments",
         "pages/user-profile/user-profile",
-        "pages/appointment/appointment"
+        "pages/appointment/appointment",
+        "pages/contract-center/contract-center",
+        "pages/bill-center/bill-center",
+        "pages/feedback-center/feedback-center",
+        "pages/move-service/move-service",
+        "pages/wifi-service/wifi-service"
       ]
     },
     {
@@ -60,6 +65,12 @@
       "packages": [
         "vr-tour"
       ]
+    },
+    "pages/smart-matching/smart-matching": {
+      "network": "all",
+      "packages": [
+        "social"
+      ]
     }
   },
   "window": {
@@ -83,10 +94,6 @@
       {
         "pagePath": "pages/house-selection/house-selection",
         "text": "看房"
-      },
-      {
-        "pagePath": "pages/community/community",
-        "text": "消息"
       },
       {
         "pagePath": "pages/mine/mine",

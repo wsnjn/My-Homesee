@@ -1,0 +1,8 @@
+.page { min-height: 100vh; background: #f0fdfa; padding: 24rpx; box-sizing: border-box; }
+.card { background: #fff; border-radius: 24rpx; padding: 24rpx; }
+.title { font-size: 32rpx; font-weight: 800; color: #0f172a; margin-bottom: 14rpx; }
+.empty { color: #64748b; font-size: 26rpx; padding: 20rpx 0; }
+.row { display: flex; justify-content: space-between; gap: 16rpx; padding: 16rpx 0; border-bottom: 1rpx solid #eef2f7; }
+.row:last-child { border-bottom: 0; }
+.k { color: #64748b; font-size: 24rpx; }
+.v { color: #0f172a; font-size: 26rpx; text-align: right; }

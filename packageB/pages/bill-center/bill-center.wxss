@@ -1,0 +1,13 @@
+.page { min-height: 100vh; background: #f0fdfa; padding: 24rpx; box-sizing: border-box; }
+.card { background: #fff; border-radius: 24rpx; padding: 24rpx; }
+.title { font-size: 32rpx; font-weight: 800; color: #0f172a; margin-bottom: 14rpx; }
+.empty { color: #64748b; font-size: 26rpx; padding: 20rpx 0; }
+.item { padding: 16rpx 0; border-bottom: 1rpx solid #eef2f7; }
+.item:last-child { border-bottom: 0; }
+.top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8rpx; }
+.month { font-size: 28rpx; color: #0f172a; font-weight: 700; }
+.status { font-size: 22rpx; padding: 4rpx 12rpx; border-radius: 999rpx; }
+.status.paid { background: #dcfce7; color: #15803d; }
+.status.unpaid { background: #fee2e2; color: #b91c1c; }
+.meta { color: #64748b; font-size: 24rpx; margin-top: 4rpx; }
+.total { color: #0d9488; font-size: 26rpx; margin-top: 8rpx; font-weight: 700; }

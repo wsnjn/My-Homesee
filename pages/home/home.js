@@ -29,8 +29,7 @@ Page({
             { key: 'feedback', label: '投诉建议', icon: 'message', tint: 'linear-gradient(145deg,#fef2f2,#fecaca)' },
             { key: 'move', label: '优选搬家', icon: 'location', tint: 'linear-gradient(145deg,#f0fdf4,#bbf7d0)' },
             { key: 'butler', label: '我的管家', icon: 'user', tint: 'linear-gradient(145deg,#eff6ff,#dbeafe)' },
-            { key: 'wifi', label: 'WiFi密码', icon: 'wifi', tint: 'linear-gradient(145deg,#f8fafc,#e2e8f0)' },
-            { key: 'activity', label: '社区活动', icon: 'users', tint: 'linear-gradient(145deg,#fdf4ff,#fae8ff)' }
+            { key: 'wifi', label: 'WiFi密码', icon: 'wifi', tint: 'linear-gradient(145deg,#f8fafc,#e2e8f0)' }
         ],
         features: [
             {
@@ -64,14 +63,6 @@ Page({
                 description: '在线报修 · 进度追踪 · 快速响应',
                 page: 'maintenance',
                 linkText: '立即报修'
-            },
-            {
-                id: 5,
-                name: '社区互动',
-                icon: 'community',
-                description: '邻里互动 · 经验分享 · 活动组织',
-                page: 'community',
-                linkText: '加入社区'
             },
             {
                 id: 6,
@@ -226,9 +217,24 @@ Page({
     navigateToMaintenance() {
         wx.navigateTo({ url: '/packageB/pages/maintenance/maintenance' });
     },
+    navigateToContractCenter() {
+        wx.navigateTo({ url: '/packageB/pages/contract-center/contract-center' });
+    },
+    navigateToBillCenter() {
+        wx.navigateTo({ url: '/packageB/pages/bill-center/bill-center' });
+    },
+    navigateToFeedbackCenter() {
+        wx.navigateTo({ url: '/packageB/pages/feedback-center/feedback-center' });
+    },
+    navigateToMoveService() {
+        wx.navigateTo({ url: '/packageB/pages/move-service/move-service' });
+    },
+    navigateToWifiService() {
+        wx.navigateTo({ url: '/packageB/pages/wifi-service/wifi-service' });
+    },
 
     navigateToCommunity() {
-        wx.switchTab({ url: '/pages/community/community' });
+        wx.navigateTo({ url: '/pages/community/community' });
     },
 
     navigateToVirtualWorld() {
@@ -253,11 +259,11 @@ Page({
             return;
         }
         if (key === 'contract' || key === 'bill') {
-            this.navigateToMyAppointments();
+            key === 'contract' ? this.navigateToContractCenter() : this.navigateToBillCenter();
             return;
         }
         if (key === 'platform') {
-            this.navigateToCommunity();
+            this.navigateToSmartMatching();
         }
     },
 
@@ -266,13 +272,12 @@ Page({
         const route = {
             find: () => this.navigateToHouseSelection(),
             map: () => this.navigateToMapSearch(),
-            book: () => this.navigateToMyAppointments(),
+            book: () => this.navigateToHouseSelection(),
             visit: () => this.navigateToMyAppointments(),
-            feedback: () => this.navigateToMaintenance(),
-            move: () => this.navigateToMaintenance(),
+            feedback: () => this.navigateToFeedbackCenter(),
+            move: () => this.navigateToMoveService(),
             butler: () => this.navigateToUserProfile(),
-            wifi: () => this.navigateToMaintenance(),
-            activity: () => this.navigateToCommunity()
+            wifi: () => this.navigateToWifiService()
         };
         const fn = route[key];
         if (fn) fn();
@@ -288,7 +293,6 @@ Page({
             'house-selection': { url: '/pages/house-selection/house-selection', type: 'switchTab' },
             'smart-matching': { url: '/pages/smart-matching/smart-matching', type: 'navigate' },
             'map-search': { url: '/pages/map-search/map-search', type: 'navigate' },
-            'community': { url: '/pages/community/community', type: 'switchTab' },
             'maintenance': { url: '/packageB/pages/maintenance/maintenance', type: 'navigate' },
             'my-appointments': { url: '/packageB/pages/my-appointments/my-appointments', type: 'navigate' },
             'user-profile': { url: '/packageB/pages/user-profile/user-profile', type: 'navigate' }

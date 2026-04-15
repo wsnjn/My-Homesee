@@ -64,16 +64,6 @@
           </view>
           <text class="orbit-label">智能匹配</text>
         </view>
-        <view
-          class="orbit-item"
-          hover-class="orbit-item-hover"
-          bindtap="navigateToCommunity"
-        >
-          <view class="orbit-ring orbit-sky">
-            <svg-icon name="message" size="36" color="#0369a1" />
-          </view>
-          <text class="orbit-label">消息</text>
-        </view>
       </view>
     </view>
   </view>

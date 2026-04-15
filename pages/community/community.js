@@ -74,6 +74,10 @@ Page({
     wx.switchTab({ url: '/pages/house-selection/house-selection' })
   },
 
+  goFriendCircle() {
+    wx.navigateTo({ url: '/packageD/pages/friend-circle/friend-circle' })
+  },
+
   getAvatarUrl(fileName) {
     if (!fileName) return 'https://files.homesee.xyz/api/files/download/default-avatar.png'
     if (String(fileName).startsWith('http')) return fileName
